@@ -112,16 +112,17 @@ We use scripts to create teams and users. Details about the design choices how w
 Step by step instructions to create users and teams in DOMjudge:
 
    1. first add different 'Team Categories' which we can use for each course part
-    
 
-	    click on 'DOMjudge' in top right corner, to get 'DOMjudge Jury interface'
-	    click on 'Team Categories'
-	    click on 'Add new category' button
-	      in 'Name' box enter text "teams-config-1"
-	      and set 'Visible' radio button to "No"
-	      note: self-registration is by default 'No'
-	    click on 'Save' button at bottom of window 
-	       
+
+	      click on 'DOMjudge' in top right corner, to get 'DOMjudge Jury interface'
+              click on 'Team Categories'
+	      click on 'Add new category' button
+	        in 'Name' box enter text "teams-config-1"
+	        and set 'Visible' radio button to "No"
+	        note: self-registration is by default 'No'
+	      click on 'Save' button at bottom of window 
+
+	
    2. create a `teams.csv` file with two columns:
 
        1. the first column is  the name of the team. We use as team name a string containing a comma separated set of student names.
@@ -187,9 +188,8 @@ With the following script we  can send out the emails:
   
 #### Create contest
           
-Then create different contest for each course part
-   We take as coursename 'ads2324', but you can
-   use any coursename here.
+Then create different contest for each course part.
+We take as coursename 'ads2324', but you can use any coursename here.
         
     click on 'DOMjudge' in top right corner, to get 'DOMjudge Jury interface'
     click on 'Contests'       
@@ -204,12 +204,6 @@ Then create different contest for each course part
        select in "Team categories" the value 'teams-config-1'
        
     
-
-   
-
-
-   
-
 
 ### 2. Creating, adding, submitting, and downloading results of a problem 
 
@@ -267,8 +261,6 @@ Always keep the local BACPtools problem folder, because using that we can easily
 
 
 We need to import the problem twice:
- 
-
 
   1. One version **for grading** containing both the public and secret samples. The judging is set to be done **none-lazy**, meaning all samples are evaluated.  This folder is the leading problem folder. 
   2. One version **for practicing** which is a copy where we removed all secret samples in the 'data/secret/' folder.  The judging is set to be done **lazy**.
