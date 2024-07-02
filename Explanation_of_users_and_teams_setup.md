@@ -83,7 +83,7 @@ Example:
           
    You can offcourse also make teams with only one student with only a single name and email in the columns.           
    
-   Often you can export a list of students from some source, eg. brightspace,  and automatically generate the `teams.csv` file with a script. 
+   Often you can export a list of students from some source, eg. brightspace,  and automatically generate the `teams.csv` file with a script. If you then want to combine students in teams you can edit this file manually to group them then in teams.
 
 
 ###  Extended `teams_domjudge.csv`
@@ -108,7 +108,19 @@ When we run the script:
 
     create_domjudge_import_files.py  "teams_domjudge.csv" 
 
-we generate two files `teams.yaml` and `users.yaml` which we can import to DOMjudge to create the teams and users in DOMjudge.
+we generate two files `teams.yaml` and `users.yaml` which we can import to DOMjudge to create the teams and users in DOMjudge. We can do the import manually 
+via the "Import / export" page linked on the "DOMjudge Jury interface". But we can also do it using the [REST API](https://www.domjudge.org/docs/manual/main/develop.html#api) using the [httpie tool](https://httpie.io):
+
+    DOMJUDGE_SERVER="http://localhost:12345"    
+    PASSWORD="secret" 
+    # admin password can be read from ./data/passwords/admin.pw 
+    # see https://github.com/harcokuppens/DOMjudgeDockerCompose/
+    
+    # import teams (hack: using json@teams.yaml to allow still import yaml)
+    https -a "admin:$PASSWORD" --check-status -b -f POST "$DOMJUDGE_SERVER/api/v4/users/teams" json@teams.yaml
+
+    # import accounts
+    https -a "admin:$PASSWORD" --check-status -b -f POST "$DOMJUDGE_SERVER/api/v4/users/accounts" yaml@accounts.yaml
 
 
 ### mailing credentials to students
