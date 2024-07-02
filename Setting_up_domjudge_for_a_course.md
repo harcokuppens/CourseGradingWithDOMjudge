@@ -2,24 +2,23 @@
 
 ### Table of Contents
 
-
- * [A. Create a fresh and up to date DOMjudge installation](#a.-create-a-fresh-and-up-to-date-domjudge-installation)
-   * [A new installation](#a-new-installation)
-   * [Reset and update existing installation](#reset-and-update-existing-installation)
- * [B. Basic configuration](#b.-basic-configuration)
-   * [1. Make demo contest private, and delete demo user](#1.-make-demo-contest-private,-and-delete-demo-user)
-   * [2. Make DOMjudge use external id's for configuration data](#2.-make-domjudge-use-external-id's-for-configuration-data)
- * [C. Setup and usage DOMjudge for the course](#c.-setup-and-usage-domjudge-for-the-course)
- * [C.1. Setup part of a course for a specific teams configuration](#c.1.-setup-part-of-a-course-for-a-specific-teams-configuration)
-   * [Create teams](#create-teams)
-   * [Mailing credentials to students](#mailing-credentials-to-students)
-   * [Create contest](#create-contest)
- * [C.2. Creating, adding, submitting, and downloading results of a problem](#c.2.-creating,-adding,-submitting,-and-downloading-results-of-a-problem)
-   * [Create problem for the course](#create-problem-for-the-course)
-   * [Add problem to the course](#add-problem-to-the-course)
-   * [Students can submit code to the problem](#students-can-submit-code-to-the-problem)
-   * [When the problem's deadline is reached, the teacher downloads its final submissions](#when-the-problem's-deadline-is-reached,-the-teacher-downloads-its-final-submissions)
-
+ * [A. Create a fresh and up to date DOMjudge installation](#a-create-a-fresh-and-up-to-date-domjudge-installation)
+    * [A new installation](#a-new-installation)
+    * [Reset and update existing installation](#reset-and-update-existing-installation)
+ * [B. Basic configuration](#b-basic-configuration)
+    * [1. Make demo contest private, and delete demo user](#1-make-demo-contest-private-and-delete-demo-user)
+    * [2. Make DOMjudge use external id's for configuration data](#2-make-domjudge-use-external-ids-for-configuration-data)
+ * [C. Setup and usage DOMjudge for the course](#c-setup-and-usage-domjudge-for-the-course)
+ * [C.1. Setup part of a course for a specific teams configuration](#c1-setup-part-of-a-course-for-a-specific-teams-configuration)
+    * [Create teams](#create-teams)
+    * [Mailing credentials to students](#mailing-credentials-to-students)
+    * [Create contest](#create-contest)
+ * [C.2. Creating, adding, submitting, and downloading results of a problem](#c2-creating-adding-submitting-and-downloading-results-of-a-problem)
+    * [Create problem for the course](#create-problem-for-the-course)
+    * [Add problem to the course](#add-problem-to-the-course)
+    * [Students can submit code to the problem](#students-can-submit-code-to-the-problem)
+    * [When the problem's deadline is reached, the teacher downloads its final submissions](#when-the-problems-deadline-is-reached-the-teacher-downloads-its-final-submissions
+      
 ## A. Create a fresh and up to date DOMjudge installation
 
 You do not want to load of one course to effect another course. So we advice to use per course a separate DOMjudge installation. 
