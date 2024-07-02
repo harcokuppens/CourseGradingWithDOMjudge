@@ -129,46 +129,45 @@ Step by step instructions to create users and teams in DOMjudge:
        2. the second column we set with a string containing a comma separated set of emails, one per student.
 
    
-   Example:
+      Example:
    
-        $ cat teams.csv
-        "Piet Venema, Jan Jansen", "pietvenema@gmail.com,janjansen@gmail.com"
-        "Henk Hier, Piet Praat", "henkhier@gmail.com, pietpraat@gmail.com"
-        ....
+          $ cat teams.csv
+          "Piet Venema, Jan Jansen", "pietvenema@gmail.com,janjansen@gmail.com"
+          "Henk Hier, Piet Praat", "henkhier@gmail.com, pietpraat@gmail.com"
+          ....
           
           
-  You can offcourse also make teams with only one student with only a single name and email in the columns.           
+      You can offcourse also make teams with only one student with only a single name and email in the columns.           
    
-  Often you can export a list of students from some source, eg. brightspace,  and automatically generate the `teams.csv` file with a script. If you then want to combine students in teams you can edit this file manually to group them then in teams.
+      Often you can export a list of students from some source, eg. brightspace,  and automatically generate the `teams.csv` file with a script. If you then want to combine students in teams you can edit this file manually to group them then in teams.
              
     
    3. generate loginname/password and team category for DOMjudge in `teams_domjudge.csv`
  
-        TEAM_CONFIGURATION_NUMBER=1 
-        generate_domjudge_data.py teams.csv $TEAM_CONFIGURATION_NUMBER > "teams_domjudge.csv"
+          TEAM_CONFIGURATION_NUMBER=1 
+          generate_domjudge_data.py teams.csv $TEAM_CONFIGURATION_NUMBER > "teams_domjudge.csv"
    
-     The  `TEAM_CONFIGURATION_NUMBER` is used to generate a team category which is unique. For the first part of the course we would use 1, for the second part of the course 2 etc...
+      The  `TEAM_CONFIGURATION_NUMBER` is used to generate a team category which is unique. For the first part of the course we would use 1, for the second part of the course 2 etc...
 
    4. use `teams_domjudge.csv` to generate the `teams.yaml` and `users.yaml` import files by running the script:
 
-        create_domjudge_import_files.py  "teams_domjudge.csv" 
+          create_domjudge_import_files.py  "teams_domjudge.csv" 
 
    
    5. Import `teams.yaml` and `users.yaml` import files into DOMjudge.
 
-       We can do the import manually 
-via the "Import / export" page linked on the "DOMjudge Jury interface". But we can also do it using the [REST API](https://www.domjudge.org/docs/manual/main/develop.html#api) using the [httpie tool](https://httpie.io):
+      We can do the import manually via the "Import / export" page linked on the "DOMjudge Jury interface". But we can also do it using the [REST API](https://www.domjudge.org/docs/manual/main/develop.html#api) using the [httpie tool](https://httpie.io):
 
-        DOMJUDGE_SERVER="http://localhost:12345"    
-        PASSWORD="secret" 
-        # admin password can be read from ./data/passwords/admin.pw 
-        # see https://github.com/harcokuppens/DOMjudgeDockerCompose/
+          DOMJUDGE_SERVER="http://localhost:12345"    
+          PASSWORD="secret" 
+          # admin password can be read from ./data/passwords/admin.pw 
+          # see https://github.com/harcokuppens/DOMjudgeDockerCompose/
     
-        # import teams (hack: using json@teams.yaml to allow still import yaml)
-        https -a "admin:$PASSWORD" --check-status -b -f POST "$DOMJUDGE_SERVER/api/v4/users/teams" json@teams.yaml
+          # import teams (hack: using json@teams.yaml to allow still import yaml)
+          https -a "admin:$PASSWORD" --check-status -b -f POST "$DOMJUDGE_SERVER/api/v4/users/teams" json@teams.yaml
 
-        # import accounts
-        https -a "admin:$PASSWORD" --check-status -b -f POST "$DOMJUDGE_SERVER/api/v4/users/accounts" yaml@accounts.yaml
+          # import accounts
+          https -a "admin:$PASSWORD" --check-status -b -f POST "$DOMJUDGE_SERVER/api/v4/users/accounts" yaml@accounts.yaml
 
 
 
@@ -351,12 +350,12 @@ The problem's deadline is communicated to the students during the course and in 
    2. Use download script to **download results** from grading script. 
  
 
-        export CODEDIR="./scripts/"
-        # create a new directory to collect all data there
-        mkdir grading_data_processed_using_domjudge
-        cd grading_data_processed_using_domjudge  
-        user=userwithadminrights; password='mypassword'; 
-        python3  $CODEDIR/fetch  --auth "${user}:${password}" --url https://domjudge.science.ru.nl/ --contest grading --problem boxesgrading
+          export CODEDIR="./scripts/"
+          # create a new directory to collect all data there
+          mkdir grading_data_processed_using_domjudge
+          cd grading_data_processed_using_domjudge  
+          user=userwithadminrights; password='mypassword'; 
+          python3  $CODEDIR/fetch  --auth "${user}:${password}" --url https://domjudge.science.ru.nl/ --contest grading --problem boxesgrading
   
 
    3. **Process results** of problem and format to excel
@@ -367,11 +366,11 @@ The problem's deadline is communicated to the students during the course and in 
        the latest judgement of the latest submission and
        output this list as a csv file:
      
-         python3 $CODEDIR/reprocess.py
+           python3 $CODEDIR/reprocess.py
   
        We output two `csv` files one with more and with less details.
        
        Convert these `csv` files to nice excel files containing a table:
   
-         python3 $CODEDIR/csv2xslt.py gradings.csv
-         python3 $CODEDIR/csv2xslt.py gradings.details.csv  
+           python3 $CODEDIR/csv2xslt.py gradings.csv
+           python3 $CODEDIR/csv2xslt.py gradings.details.csv  
