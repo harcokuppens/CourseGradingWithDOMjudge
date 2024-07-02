@@ -17,7 +17,7 @@
     * [Create problem for the course](#create-problem-for-the-course)
     * [Add problem to the course](#add-problem-to-the-course)
     * [Students can submit code to the problem](#students-can-submit-code-to-the-problem)
-    * [When the problem's deadline is reached, the teacher downloads its final submissions](#when-the-problems-deadline-is-reached-the-teacher-downloads-its-final-submissions
+    * [When the problem's deadline is reached, the teacher downloads its final submissions](#when-the-problems-deadline-is-reached-the-teacher-downloads-its-final-submissions)
       
 ## A. Create a fresh and up to date DOMjudge installation
 
