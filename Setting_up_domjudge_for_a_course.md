@@ -9,15 +9,15 @@
     * [1. Make demo contest private, and delete demo user](#1-make-demo-contest-private-and-delete-demo-user)
     * [2. Make DOMjudge use external id's for configuration data](#2-make-domjudge-use-external-ids-for-configuration-data)
  * [C. Setup and usage DOMjudge for the course](#c-setup-and-usage-domjudge-for-the-course)
- * [C.1. Setup part of a course for a specific teams configuration](#c1-setup-part-of-a-course-for-a-specific-teams-configuration)
-    * [Create teams](#create-teams)
-    * [Mailing credentials to students](#mailing-credentials-to-students)
-    * [Create contest](#create-contest)
- * [C.2. Creating, adding, submitting, and downloading results of a problem](#c2-creating-adding-submitting-and-downloading-results-of-a-problem)
-    * [Create problem for the course](#create-problem-for-the-course)
-    * [Add problem to the course](#add-problem-to-the-course)
-    * [Students can submit code to the problem](#students-can-submit-code-to-the-problem)
-    * [When the problem's deadline is reached, the teacher downloads its final submissions](#when-the-problems-deadline-is-reached-the-teacher-downloads-its-final-submissions)
+    * [1. Setup part of a course for a specific teams configuration](#1-setup-part-of-a-course-for-a-specific-teams-configuration)
+       * [Create teams](#create-teams)
+       * [Mailing credentials to students](#mailing-credentials-to-students)
+       * [Create contest](#create-contest)
+    * [2. Creating, adding, submitting, and downloading results of a problem](#2-creating-adding-submitting-and-downloading-results-of-a-problem)
+       * [Create problem for the course](#create-problem-for-the-course)
+       * [Add problem to the course](#add-problem-to-the-course)
+       * [Students can submit code to the problem](#students-can-submit-code-to-the-problem)
+       * [When the problem's deadline is reached, the teacher downloads its final submissions](#when-the-problems-deadline-is-reached-the-teacher-downloads-its-final-submissions)
       
 ## A. Create a fresh and up to date DOMjudge installation
 
@@ -97,12 +97,12 @@ In the following document I explain in more detail the idea's behind my configur
 * [Explanation course setup](Explanation_course_setup.md)
 
 
-## C.1. Setup part of a course for a specific teams configuration
+### 1. Setup part of a course for a specific teams configuration
 
 Below we setup a course part for a teams configuration labeled with the `Team Category` named `teams-config-1`. The same procedure can be repeated for other teams configurations.  
 
 
-### Create teams 
+#### Create teams 
 
 We use scripts to create teams and users. Details about the design choices how we make these teams and users you can read here:
 
@@ -171,7 +171,7 @@ Step by step instructions to create users and teams in DOMjudge:
 
 
 
-### Mailing credentials to students
+#### Mailing credentials to students
 
 When we run the script:
 
@@ -185,9 +185,9 @@ With the following script we  can send out the emails:
     send_emails.bash  "thesender@gmail.com"  "mail/"
 
   
-### Create contest
+#### Create contest
           
-b) then create different contest for each course part
+Then create different contest for each course part
    We take as coursename 'ads2324', but you can
    use any coursename here.
         
@@ -211,12 +211,12 @@ b) then create different contest for each course part
    
 
 
-## C.2. Creating, adding, submitting, and downloading results of a problem 
+### 2. Creating, adding, submitting, and downloading results of a problem 
 
 
 Below we explain how to add a problem to a contest of a course part, how students can practice and submit their final result. Finally we describe how the teacher then can fetch the results of the problem. The same procedure can be used for other problems.
 
-### Create problem for the course
+#### Create problem for the course
  
 We use BACPtools to develop a problem to be used in DOMjudge.
 
@@ -263,7 +263,7 @@ The problem description in `problem.pdf` contains the submission/deadline date b
 Always keep the local BACPtools problem folder, because using that we can easily change and test the problem before exporting to DOMjudge. This folder is the leading folder in this process!
                            
 
-### Add problem to the course
+#### Add problem to the course
 
 
 We need to import the problem twice:
@@ -314,7 +314,7 @@ We can set the evaluation laziness of a problem with:
       version of the problem.    
 
 
-### Students can submit code to the problem    
+#### Students can submit code to the problem    
 
 Now students can submit their code to the **practicing problem**. The practicing problem is **judged lazy**, meaning that if the submission fails on a sample, then all remaining samples are not executed anymore.  The idea is that the team first has to solve that sample first, before executing the remaining samples. The lazy evaluation also makes the load less on the juding server.
 
