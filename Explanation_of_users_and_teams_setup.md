@@ -1,5 +1,21 @@
 # Explanation of Users and Teams setup 
 
+**Table of Contents**
+<!--ts-->
+* [Explanation of Users and Teams setup](Explanation_of_users_and_teams_setup.md#explanation-of-users-and-teams-setup)
+   * [design choices](Explanation_of_users_and_teams_setup.md#design-choices)
+   * [implementation](Explanation_of_users_and_teams_setup.md#implementation)
+      * [user and team in DOMjudge](Explanation_of_users_and_teams_setup.md#user-and-team-in-domjudge)
+      * [Inspect required information](Explanation_of_users_and_teams_setup.md#inspect-required-information)
+      * [The teams.csv input file](Explanation_of_users_and_teams_setup.md#the-teamscsv-input-file)
+      * [Extended teams_domjudge.csv](Explanation_of_users_and_teams_setup.md#extended-teams_domjudgecsv)
+      * [teams.yaml and accounts.yaml](Explanation_of_users_and_teams_setup.md#teamsyaml-and-accountsyaml)
+      * [mailing credentials to students](Explanation_of_users_and_teams_setup.md#mailing-credentials-to-students)
+
+<!-- Created by https://github.com/ekalinin/github-markdown-toc -->
+<!-- Added by: harcok, at: wo jul  3 12:02:44 CEST 2024 -->
+
+<!--te-->
 
 ## design choices
 

@@ -1,5 +1,24 @@
 # Explanation of How to Use DOMjudge for a Course
 
+**Table of Contents**
+<!--ts-->
+* [Explanation of How to Use DOMjudge for a Course](Explanation_course_setup.md#explanation-of-how-to-use-domjudge-for-a-course)
+   * [Requirements](Explanation_course_setup.md#requirements)
+   * [Implementation of requirements](Explanation_course_setup.md#implementation-of-requirements)
+      * [Point 1: students should not be able to see each other results](Explanation_course_setup.md#point-1-students-should-not-be-able-to-see-each-other-results)
+      * [Point 2: submit for practicing and grading separately](Explanation_course_setup.md#point-2-submit-for-practicing-and-grading-separately)
+      * [Point 3: support different teams configurations](Explanation_course_setup.md#point-3-support-different-teams-configurations)
+      * [Point 4: easy fetch grading results](Explanation_course_setup.md#point-4-easy-fetch-grading-results)
+      * [Point 5:  stop submissions to a problem when the deadline expires](Explanation_course_setup.md#point-5--stop-submissions-to-a-problem-when-the-deadline-expires)
+      * [Point 6: the DOMjudge system should be easy installable and upgradable](Explanation_course_setup.md#point-6-the-domjudge-system-should-be-easy-installable-and-upgradable)
+      * [Point 7: data should be easily being backed up for long term storage](Explanation_course_setup.md#point-7-data-should-be-easily-being-backed-up-for-long-term-storage)
+
+<!-- Created by https://github.com/ekalinin/github-markdown-toc -->
+<!-- Added by: harcok, at: wo jul  3 12:02:43 CEST 2024 -->
+
+<!--te-->
+
+
 ## Requirements
 Using DOMjudge for course has some different requirements:
 

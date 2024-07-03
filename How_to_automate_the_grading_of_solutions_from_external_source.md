@@ -1,5 +1,22 @@
 # How to automate the grading of solutions from external source
 
+**Table of Contents**
+<!--ts-->
+* [How to automate the grading of solutions from external source](How_to_automate_the_grading_of_solutions_from_external_source.md#how-to-automate-the-grading-of-solutions-from-external-source)
+   * [setup domjudge for grading which is invisible for students](How_to_automate_the_grading_of_solutions_from_external_source.md#setup-domjudge-for-grading-which-is-invisible-for-students)
+      * [Create a special grading contest with team category "grading"](How_to_automate_the_grading_of_solutions_from_external_source.md#create-a-special-grading-contest-with-team-category-grading)
+      * [create grading teams and users](How_to_automate_the_grading_of_solutions_from_external_source.md#create-grading-teams-and-users)
+   * [Add a problem for grading in the grading contest](How_to_automate_the_grading_of_solutions_from_external_source.md#add-a-problem-for-grading-in-the-grading-contest)
+   * [Collect grading solutions for a problem](How_to_automate_the_grading_of_solutions_from_external_source.md#collect-grading-solutions-for-a-problem)
+      * [cleanup tricks](How_to_automate_the_grading_of_solutions_from_external_source.md#cleanup-tricks)
+   * [How to RUN the grading of solutions in DOMjudge](How_to_automate_the_grading_of_solutions_from_external_source.md#how-to-run-the-grading-of-solutions-in-domjudge)
+   * [Fetch grading results](How_to_automate_the_grading_of_solutions_from_external_source.md#fetch-grading-results)
+
+<!-- Created by https://github.com/ekalinin/github-markdown-toc -->
+<!-- Added by: harcok, at: wo jul  3 12:02:44 CEST 2024 -->
+
+<!--te-->
+
 ## setup domjudge for grading which is invisible for students
 
 ### Create a special grading contest with team category "grading" 

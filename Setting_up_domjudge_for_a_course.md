@@ -1,24 +1,34 @@
+
+
+
 # Setting up DOMjudge for a course
 
-### Table of Contents
+**Table of Contents**
+<!--ts-->
+* [Setting up DOMjudge for a course](Setting_up_domjudge_for_a_course.md#setting-up-domjudge-for-a-course)
+   * [A. Create a fresh and up to date DOMjudge installation](Setting_up_domjudge_for_a_course.md#a-create-a-fresh-and-up-to-date-domjudge-installation)
+      * [A new installation](Setting_up_domjudge_for_a_course.md#a-new-installation)
+      * [Reset and update existing installation](Setting_up_domjudge_for_a_course.md#reset-and-update-existing-installation)
+   * [B. Basic configuration](Setting_up_domjudge_for_a_course.md#b-basic-configuration)
+      * [1. Make demo contest private, and delete demo user](Setting_up_domjudge_for_a_course.md#1-make-demo-contest-private-and-delete-demo-user)
+      * [2. Make DOMjudge use external id's for configuration data](Setting_up_domjudge_for_a_course.md#2-make-domjudge-use-external-ids-for-configuration-data)
+   * [C. Setup and usage DOMjudge for the course](Setting_up_domjudge_for_a_course.md#c-setup-and-usage-domjudge-for-the-course)
+      * [1. Setup part of a course for a specific teams configuration](Setting_up_domjudge_for_a_course.md#1-setup-part-of-a-course-for-a-specific-teams-configuration)
+         * [Create teams](Setting_up_domjudge_for_a_course.md#create-teams)
+         * [Mailing credentials to students](Setting_up_domjudge_for_a_course.md#mailing-credentials-to-students)
+         * [Create contest](Setting_up_domjudge_for_a_course.md#create-contest)
+      * [2. Creating, adding, submitting, and downloading results of a problem](Setting_up_domjudge_for_a_course.md#2-creating-adding-submitting-and-downloading-results-of-a-problem)
+         * [Create problem for the course](Setting_up_domjudge_for_a_course.md#create-problem-for-the-course)
+         * [Add problem to the course](Setting_up_domjudge_for_a_course.md#add-problem-to-the-course)
+         * [Students can submit code to the problem](Setting_up_domjudge_for_a_course.md#students-can-submit-code-to-the-problem)
+      * [When the problem's deadline is reached, the teacher downloads its final submissions](Setting_up_domjudge_for_a_course.md#when-the-problems-deadline-is-reached-the-teacher-downloads-its-final-submissions)
 
- * [A. Create a fresh and up to date DOMjudge installation](#a-create-a-fresh-and-up-to-date-domjudge-installation)
-    * [A new installation](#a-new-installation)
-    * [Reset and update existing installation](#reset-and-update-existing-installation)
- * [B. Basic configuration](#b-basic-configuration)
-    * [1. Make demo contest private, and delete demo user](#1-make-demo-contest-private-and-delete-demo-user)
-    * [2. Make DOMjudge use external id's for configuration data](#2-make-domjudge-use-external-ids-for-configuration-data)
- * [C. Setup and usage DOMjudge for the course](#c-setup-and-usage-domjudge-for-the-course)
-    * [1. Setup part of a course for a specific teams configuration](#1-setup-part-of-a-course-for-a-specific-teams-configuration)
-       * [Create teams](#create-teams)
-       * [Mailing credentials to students](#mailing-credentials-to-students)
-       * [Create contest](#create-contest)
-    * [2. Creating, adding, submitting, and downloading results of a problem](#2-creating-adding-submitting-and-downloading-results-of-a-problem)
-       * [Create problem for the course](#create-problem-for-the-course)
-       * [Add problem to the course](#add-problem-to-the-course)
-       * [Students can submit code to the problem](#students-can-submit-code-to-the-problem)
-       * [When the problem's deadline is reached, the teacher downloads its final submissions](#when-the-problems-deadline-is-reached-the-teacher-downloads-its-final-submissions)
-      
+<!-- Created by https://github.com/ekalinin/github-markdown-toc -->
+<!-- Added by: harcok, at: wo jul  3 12:02:45 CEST 2024 -->
+
+<!--te-->
+
+
 ## A. Create a fresh and up to date DOMjudge installation
 
 You do not want to load of one course to effect another course. So we advice to use per course a separate DOMjudge installation. 

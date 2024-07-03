@@ -2,7 +2,19 @@
 
 # How to handle ending time of a problem?
 
+**Table of Contents**
+<!--ts-->
+* [How to handle ending time of a problem?](How_to_handle_ending_time_of_a_problem.md#how-to-handle-ending-time-of-a-problem)
+   * [Domjudge settings controlling ending time of a problem](How_to_handle_ending_time_of_a_problem.md#domjudge-settings-controlling-ending-time-of-a-problem)
+      * [Per contest](How_to_handle_ending_time_of_a_problem.md#per-contest)
+      * [Per problem](How_to_handle_ending_time_of_a_problem.md#per-problem)
+   * [Brainstorm: how to use these for settings ending time of a problem](How_to_handle_ending_time_of_a_problem.md#brainstorm-how-to-use-these-for-settings-ending-time-of-a-problem)
+* [Conclusion:](How_to_handle_ending_time_of_a_problem.md#conclusion)
 
+<!-- Created by https://github.com/ekalinin/github-markdown-toc -->
+<!-- Added by: harcok, at: wo jul  3 12:02:44 CEST 2024 -->
+
+<!--te-->
 
 
 ## Domjudge settings controlling ending time of a problem 
