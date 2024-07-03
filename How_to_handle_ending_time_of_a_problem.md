@@ -105,7 +105,7 @@ We can also disable submitting to a specific problem within a contest, but then 
         
  
 ## Brainstorm: how to use these for settings ending time of a problem
-============
+
   
    If you really want to control end time per problem in DOMjudge,  we could make a separate contest per problem.
    However then teams can still submit after the endtime of the contest, which still gets judge in background. The team sees 'to late', 
@@ -127,8 +127,8 @@ We then have clear parts in DOMjudge how students cooperated.
    
           
        
-Conclusion:
-============
+## Conclusion:
+
        
 Above brainstorm leads us to take a simple approach:
      
