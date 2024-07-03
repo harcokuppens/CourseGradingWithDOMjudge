@@ -2,18 +2,6 @@
 
 Automatically grade submitted programs in a course using DOMjudge.
 
-**Table of Contents**
-<!--ts-->
-* [CourseGradingWithDOMjudge](README.md#coursegradingwithdomjudge)
-   * [Introduction](README.md#introduction)
-   * [Extra background information](README.md#extra-background-information)
-
-<!-- Created by https://github.com/ekalinin/github-markdown-toc -->
-<!-- Added by: harcok, at: wo jul  3 12:02:45 CEST 2024 -->
-
-<!--te-->
-
-
 ## Introduction
 
 DOMjudge is a system for running programming contests, like the ICPC regional and world finals programming contests.
