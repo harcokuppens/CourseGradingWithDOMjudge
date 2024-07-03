@@ -9,7 +9,7 @@
       * [Per contest](How_to_handle_ending_time_of_a_problem.md#per-contest)
       * [Per problem](How_to_handle_ending_time_of_a_problem.md#per-problem)
    * [Brainstorm: how to use these for settings ending time of a problem](How_to_handle_ending_time_of_a_problem.md#brainstorm-how-to-use-these-for-settings-ending-time-of-a-problem)
-* [Conclusion:](How_to_handle_ending_time_of_a_problem.md#conclusion)
+* [Conclusion](How_to_handle_ending_time_of_a_problem.md#conclusion)
 
 <!-- Created by https://github.com/ekalinin/github-markdown-toc -->
 <!-- Added by: harcok, at: wo jul  3 12:02:44 CEST 2024 -->
@@ -127,7 +127,7 @@ We then have clear parts in DOMjudge how students cooperated.
    
           
        
-## Conclusion:
+## Conclusion
 
        
 Above brainstorm leads us to take a simple approach:
@@ -139,7 +139,7 @@ Above brainstorm leads us to take a simple approach:
       The teams can still see the none-grading practicing problem.
    2. use download script to download results from grading script.
      
-    note: students can still submit to the 'practicing' problem, but they probably won't.
+      note: students can still submit to the 'practicing' problem, but they probably won't.
       It won't effect grading, but only load to the system.
      
  2. If a contest is done, we can disable submitting to the contest: the practicing problems stay visible, but you cannot submit to it anymore. This prevents people submitting to old problems, but let them still see them. This allows students to look back.     
