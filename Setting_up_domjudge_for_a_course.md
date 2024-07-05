@@ -88,12 +88,53 @@ To make DOMjudge use external id's for configuration data instead of internal id
 
     click on 'DOMjudge' in top right corner, to get 'DOMjudge Jury interface'
     click on 'Configuration settings' 
-    on the to click on 'External systems'
+    on the top of the window click on the 'External systems' tab
     at the 'Data source' field change the value 'all local' into the
             value 'configuration data external'    
     click on 'Save all changes' button at bottom of window
 
 Using external id's simplifies setting up teams.
+
+### 3. Setting language timefactors
+
+The python and java languages are higher level languages then C and C++ and thereby having more overhead in executing their code, causing them to have higher execution times for similar code in low level languages. To compare solutions in different languages fairly we correct for higher execution times in higher level languages with a timefactor. 
+We use the following timefactors:
+
+
+| language | timefactor |
+| --------- | ---------- |
+| C | 1 |
+| C++ | 1 |
+| java | 3 |
+| python | 4 |
+
+This means that for a problem with a timelimit of 1 second, a C or C++ program must solve the problem within 1 second,
+but a java program in 3 seconds, and a python program in 4 seconds. 
+
+To set a timefactor for a language in DOMjudge we do:
+
+    click on 'DOMjudge' in top right corner, to get 'DOMjudge Jury interface'
+    click on 'Languages' 
+    click on the edit icon behind the language you want to edit 
+    in the edit form for the language set the timefactor field to the desired value  
+    click on 'Save' button at bottom of window
+
+### 4. Give teams more information about their submissions
+
+DOMjudge by default does not allow teams to see the output of the output validator of a submission to the test samples.
+In below instructions we enable showing them, so that students can see what is wrong with their submission. It can be either that 
+their submission does not compile or has runtime errors. But it can also be possible that the submission just gives back the wrong result
+value, in which case the expect sample output and the submissions output is shown next to each other. The sample outputs are available to the students, so no reason to hide it, and its very convenient to show this information so that students can immediately see what they did wrong.
+In below instructions we also allow to download code from submissions. Can be handy to sometimes go back.
+
+    click on 'DOMjudge' in top right corner, to get 'DOMjudge Jury interface'
+    click on 'Configuration settings' 
+    on the top of the window click on the 'Display' tab      
+    set "Show sample output"  to  "Yes"        
+    set "Allow team submission download"  to Yes
+    click on 'Save' button at bottom of window
+
+
 
 ## C. Setup and usage DOMjudge for the course
 
@@ -301,7 +342,8 @@ We can easily import a problem directly into a contest:
         b) in the "Problem archive" field select the problem zip 
            to import
 
-**IMPORTANT**: it is adviced to import the problem as an user with **admin role** which is also **belonging to a team**, because then on import then directly the solutions in the problem's zipfile are directly judge. We can then directly verify that our solutions are also correct in DOMjudge and are done within the timelimit. It is wise to test also in DOMjudge, but sometimes a little detail can make your solution pass locally, but not in DOMjudge.
+**IMPORTANT**: it is adviced to import the problem as an user with **admin role** which is also **belonging to a team**, because then on import then directly the solutions in the problem's zipfile are directly judge. We can then directly verify that our solutions are also correct in DOMjudge and are done within the timelimit. It is wise to test also in DOMjudge, but sometimes a little detail can make your solution pass locally, but not in DOMjudge. <br> You can also upload the problem with `admin` user not belonging to a team, and later upload  a zipfile containing only the problem's solutions as another user with **admin role**  and which is **belonging to a team** where the zipfile still needs to adhere to the problem format.  Reference: ["Testing jury solutions" section in the DOMjudge documentation](https://www.domjudge.org/snapshot/manual/config-basic.html#testing-jury-solutions).
+
 
 We can set the evaluation laziness of a problem with:
   
