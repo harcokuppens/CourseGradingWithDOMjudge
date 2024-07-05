@@ -5,6 +5,16 @@ This documents contains general information about the use of DOMjudge in the cou
 * As a student you should have received on your student mail the user credentials and the url of the DOMjudge server.
 * After logging in you can submit your source code (you can select multiple files) for a given problem. 
   If your solution fails, you can see what went wrong on the sample test cases. [^1]
+* For each problem ***X*** there are 2 problem entries in DOMjudge:
+  
+  * problem ***X***
+
+    The practicing instance of the problem. The idea is that you test your code on this problem.  You can submit your code as many times as needed. It is even possible to download the sample test cases from the problem, and test your solution locally on your own machine.
+
+  * problem  **grading**_***X***
+
+    The grading instance of the problem. The idea is that you submit your code to this problem. If something goes wrong, you can submit again. The last submission to this problem will be used for the final assessment. This problem will only available until the submission deadline.
+
 * The time limits for the problems are language-dependent, so you should be able to write a correct solution 
   for any sufficiently efficient algorithm in any of the available languages.
 * The scoreboard exists because DOMjudge is made for programming contests, but you can ignore it here. 

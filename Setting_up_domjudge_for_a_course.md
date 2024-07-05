@@ -263,8 +263,15 @@ Below we explain how to add a problem to a contest of a course part, how student
 
 #### Create problem for the course
  
-We use BACPtools to develop a problem to be used in DOMjudge.
+We use [BACPtools](https://github.com/RagnarGrootKoerkamp/BAPCtools) to develop a problem to be used in DOMjudge.
 
+
+In DOMJudge we will import this problem twice:
+
+  1. One version **for grading** containing both the public and secret samples. The judging is set to be done **none-lazy**, meaning all samples are evaluated.  This folder is the leading problem folder. 
+  2. One version **for practicing** which is a copy where we removed all secret samples in the 'data/secret/' folder.  The judging is set to be done **lazy**.
+
+So when developing the problem folder we will first focus on the **grading** leading problem folder. Later we will strip this to create the **practicing** problem.
 
 * use BACPtools to create a problem and develop it : 
        
@@ -272,27 +279,63 @@ We use BACPtools to develop a problem to be used in DOMjudge.
         
   which after several questions generates a new problem in
   the new subfolder `grading_mynewproblem/` with the problem name   `grading_mynewproblem` set in   `grading_mynewproblem/problem.yaml`.
+  
+  **IMPORTANT:** 
+   * prefix your problem name with `grading_` because this folder will be the leading problem folder which we will use for grading. For practicing we make a copy from which we strip the secret samples.
+   * BACPtools generates a file `.timelimit` containing an integer specifying the limelimit of the problem in seconds (default:1). The official problem package format does not support this file, but also does not specify how to specify it. [DOMjudge supports specifying a timelimit](https://www.domjudge.org/docs/manual/main/problem-format.html) in its own specific `domjudge-problem.ini` file. BACPtools does also support this file, but has deprecated it. DOMjudge does also support the `.timelimit` file when importing a problem zipfile. Because we use BACPtools to create a problem we will use the `.timelimit` file! We won't use `domjudge-problem.ini` file. 
       
 * edit your problem: 
 
-    * add generator , 
-    * add input and answer validator, 
-    * add `problem.en.tex` , 
+    * add `problem_statement/problem.en.tex` to describe your problem in English. When exporting the problem as a zipfile it will compile this `tex` file to the file `problem.pdf` at the root of the zipfile.
     * in `submissions/accepted/` folder put good solutions to problem 
-    
-* test your problem with 
+    * add a generator,<br>
+      A generator generates  test samples for a problem.  In the generator config some inputs are choosen, and using a solution the answers are calculated. The generator then delivers these inputs with there answers in  .in files and .ans files in the `data/` folder.
+      See documentation: https://github.com/RagnarGrootKoerkamp/BAPCtools/blob/master/doc/generators.md
+    * optionally add an input and answer validator, <br>
+      These validators validate respectively the `.in` or `.ans` file for every test case, 
+      typically for syntax, format, and range. They are a safety check on you sample files format and syntax. 
+      See documentation: https://github.com/RagnarGrootKoerkamp/BAPCtools/blob/master/doc/validation.md 
+      
+      **Note:** The official problem package format does not specify an answer validator. The answer validator is a  BACPtools specific extension. 
 
-        bt run
+    * use the default output validator,<br> 
+      The output validator checks whether for a given input the output of a solution is correct. <br>
+      In most cases we do not need an specific output validator and can we use the default output validator.
+      The [default output validator](https://icpc.io/problem-package-format/spec/2023-07-draft.html#default-output-validator-specification) is essentially a beefed-up diff on a file with the expect output(`.ans` file), and a file containing the submission's output. In its default mode, it tokenizes the files to compare and compares them token by token. 
+      
+
+
+* generate samples for your problem with:
+
+        bt generate 
 
   The generator generates input and answer files, validates them
-  with an input and answer validator. Then we apply each solution in the 
-  `submissions/accepted/` folder on the generated input files, and validates its output is the same as the generated answer.
+  with an input and answer validator. 
+
+* test your problem with 
+
+        bt run  --no-generate  --verbose  --overview accepted
+
+  We apply each solution in the  `submissions/accepted/` folder on the generated input files, and validates its output is the same as the generated answer, finally displaying an overview in single line  as shown in the DOMjudge website for a submission.
+
+  If your accepted submission does not pass within the timelimit then increase its value in the `.timelimit` file. Otherwise if it passes to easily you can decrease it. In this way you can tune your problem.
+
+  Let us explain the command in more detail:
+  
+  * The `accepted` argument makes `bt` only validate solutions in the  `submissions/accepted/` folder.
+  * The `--no-generate` option makes `bt` to skip the `generate` step, which is not needed because we already generated our sample data in the previous step. 
+  * The `--verbose` option makes `bt` to display a line per test case, and causes it to not stop if a test case fails, but evaluates them all: greedy or none-lazy evaluation. 
+  * The `--overview` option make `bt` to display a per solution a single line result where the line contains per testcase a letter displaying its evaluation result. This is the same line as shown in the DOMjudge website.
+
+  **Note:** in above command we only test the `accepted` solutions. We can also test how the not accepted solutions in the other subfolders of the `submissions/` fail as we would expect.
 
 * if everything is fine can create a zipfile of the problem with        
         
         bt zip -f
-        
-* then you can import this problem zipfile into DOMjudge (see next section)
+
+  The `-f` option makes `bt zip` skip validation of input and answers. This is already done in the previous steps.  
+
+* then you can import this problem zipfile into DOMjudge. For details how we exaclty do this see next section.
 
  
 * on import DOMjudge creates a problem:
@@ -300,7 +343,7 @@ We use BACPtools to develop a problem to be used in DOMjudge.
      - with "problem text"  set to `problem.pdf`
      - and `.in `and `.ans` files from the data folder (both `answers/` and `secrets/`)
 
-  all other data in the zipfile is ignored.      
+  all other data in the zipfile is not imported into the DOMjudge problem.  The submissions/ folder in the zipfile is handled specially. It will not be imported into the problem, but instead submitted to the newly created problem to be judged. This can be convenient to directly evaluate that everything also works the same on the DOMjudge server as on your local machine. **IMPORTANT:** the judging will only happen if the user account doing the import has **admin role** and **belongs to a team**.      
   
  
 The problem description in `problem.pdf` contains the submission/deadline date before which a final solution of the problem must be submitted.
@@ -310,8 +353,7 @@ Always keep the local BACPtools problem folder, because using that we can easily
 
 #### Add problem to the course
 
-
-We need to import the problem twice:
+As explained before we need to import the problem twice:
 
   1. One version **for grading** containing both the public and secret samples. The judging is set to be done **none-lazy**, meaning all samples are evaluated.  This folder is the leading problem folder. 
   2. One version **for practicing** which is a copy where we removed all secret samples in the 'data/secret/' folder.  The judging is set to be done **lazy**.
