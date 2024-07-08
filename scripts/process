@@ -1,0 +1,246 @@
+#!/usr/bin/env python3
+
+#filter_teams=['gradingteam091','gradingteam092']
+filter_teams =  None
+
+inputfile="all_contest_problem_data.txt"
+with open(inputfile, 'r') as f:
+    all_contest_problem_data = eval(f.read())
+
+# all problem's data for a contest is stored in a dict looking like:
+#
+#    all_contest_problem_data = {
+#        "teams" : teams,
+#        "submissions" : submissions,
+#        "judgements" : judgements,
+#        "runs" : runs
+#    }
+
+teams=all_contest_problem_data['teams']
+submissions=all_contest_problem_data['submissions']
+judgements=all_contest_problem_data['judgements']
+runs=all_contest_problem_data['runs']
+
+team_id2team={}
+for team in teams:
+    id=team['id']
+    team_id2team[id]=team
+    
+    team['submissions']=[]
+
+submission_id2submission={}
+for submission in submissions:
+    id=submission['id']
+    submission_id2submission[id]=submission
+
+    submission['judgements']=[]
+
+    team_id=submission['team_id']
+    team=team_id2team[team_id]
+    team['submissions'].append(submission)
+    
+
+judgement_id2judgement={}
+for judgement in judgements: 
+    id=judgement['id']
+    judgement_id2judgement[id]=judgement
+    
+    judgement['runs']=[]
+
+    submission_id=judgement['submission_id']   
+    if submission_id not in submission_id2submission: continue
+    submission=submission_id2submission[submission_id]
+    submission['judgements'].append(judgement)
+
+run_id2run={}
+for run in runs: 
+    id=run['id']
+    run_id2run[id]=run
+    
+    judgement_id=run['judgement_id']   
+    judgement=judgement_id2judgement[judgement_id]
+    judgement['runs'].append(run)
+
+from datetime import datetime
+from pprint import pprint
+
+
+# team -> submissions ; submission -> judgements; judgement -> runs;
+# note: we can have multiple submissions for a single team     -> take latest
+# note: we can have multiple judgements for a single submission -> take latest
+# take all runs of latest judgement (see previous line)
+
+for team in teams:
+    submissions=team['submissions']
+    # get latest submission
+    if submissions:
+        latest_submission=max(submissions, key=lambda submission: datetime.fromisoformat(submission['time']))
+
+        judgements=latest_submission['judgements']   
+        # get latest judgement
+        if judgements:
+            latest_judgement=max(judgements, key=lambda judgement: datetime.fromisoformat(judgement['start_time']))
+        else:
+            latest_judgement=None 
+        latest_submission['judgement']=latest_judgement
+        del latest_submission['judgements']  
+    else:
+        latest_submission=None 
+     
+    team['submission']=latest_submission
+    del team['submissions']
+
+# get only teams with submissions
+teams = [ team for team in teams if team['submission']]
+
+
+
+# only process teams in filter_teams
+if filter_teams:
+    teams = [ team for team in teams if team['name'] in filter_teams]
+
+
+# store only final submission and judgement per team data for the given problem in the given contest
+with open("contest_problem_data_per_team_only_latest_submission_and_judgement.txt", "w") as data_file:
+    pprint(teams, data_file)
+
+# export as csv
+rows=[]
+headers=['team','language','overall_judgement','problems','correct(AC)','wrong_answer(WA)','limit(TLE/MLE/OLE)','error(NO/CE/RTE)','max_run_time']
+for team in teams:
+    row={}
+    row['team']=team['name']
+    
+    submission=team['submission']
+    row['language']=submission['language_id']
+    
+    judgement=submission['judgement']
+    if not judgement:
+        print("WARNING: team '" + team['name'] + "' has no judgement for its latest submission " + submission['id'] )
+        row['overall_judgement']="missing"
+        rows.append(row)
+        continue
+
+    row['overall_judgement']=judgement['judgement_type_id']
+    row['max_run_time']=judgement['max_run_time']
+    
+    runs=judgement['runs']
+    verdict_count={"CE":0,"MLE":0,"OLE":0,"RTE":0,"TLE":0,"WA":0,"NO":0,"AC":0}
+    runnum2label={}
+    
+    for run in runs:
+        verdict=run['judgement_type_id']
+        num=run['ordinal']
+        run_time=run['run_time']
+        
+        verdict_count[verdict]=verdict_count[verdict]+1
+        runnum2label[num]=verdict + "/" + str(run_time)
+   
+    
+    problems=[  item[0] for item in verdict_count.items() if item[1] != 0 and item[0] != "AC" ]
+    row['problems']= "/".join(problems)   
+    row['correct(AC)']=verdict_count["AC"]
+    row['wrong_answer(WA)']=verdict_count["WA"]
+    row['limit(TLE/MLE/OLE)']= str(verdict_count["TLE"]) + "/" + str(verdict_count["MLE"]) +  "/" + str(verdict_count["OLE"])
+    row['error(NO/CE/RTE)']= str(verdict_count["NO"]) + "/" + str(verdict_count["CE"]) +  "/" + str(verdict_count["RTE"])
+    
+    
+    keys=list(runnum2label.keys())
+    keys.sort()
+    for num in keys:
+        key="t"+str(num)
+        row[key]=runnum2label[num]
+        #headers.append(key)
+    
+    rows.append(row)
+
+headers=rows[0].keys()     
+
+# types=["CE","MLE","OLE","RTE","TLE","WA","NO","AC"]
+   
+# 'https://domjudge.science.ru.nl/api/v4/contests/6/judgement-types?strict=false'
+# [
+#   {
+#     "id": "CE",
+#     "name": "compiler error",
+#     "penalty": false,
+#     "solved": false
+#   },
+#   {
+#     "id": "MLE",
+#     "name": "memory limit",
+#     "penalty": true,
+#     "solved": false
+#   },
+#   {
+#     "id": "OLE",
+#     "name": "output limit",
+#     "penalty": true,
+#     "solved": false
+#   },
+#   {
+#     "id": "RTE",
+#     "name": "run error",
+#     "penalty": true,
+#     "solved": false
+#   },
+#   {
+#     "id": "TLE",
+#     "name": "timelimit",
+#     "penalty": true,
+#     "solved": false
+#   },
+#   {
+#     "id": "WA",
+#     "name": "wrong answer",
+#     "penalty": true,
+#     "solved": false
+#   },
+#   {
+#     "id": "NO",
+#     "name": "no output",
+#     "penalty": true,
+#     "solved": false
+#   },
+#   {
+#     "id": "AC",
+#     "name": "correct",
+#     "penalty": false,
+#     "solved": true
+#   }
+# ]
+    
+
+
+import csv
+
+outputfile="gradings.details.csv"
+
+with open(outputfile, 'wt') as f:
+    writer = csv.DictWriter(f, fieldnames=headers,quoting=csv.QUOTE_NONNUMERIC)
+    csvheaders = dict( (n,n) for n in headers )
+    # change headers in next line if you want different headers then keys in the dictionary!!
+    writer.writerow(csvheaders)
+    for row in rows:
+        writer.writerow(row)
+
+outputfile="gradings.csv"
+
+# filter 
+filter_headers=['team','language','overall_judgement','problems','correct(AC)']
+
+if filter_headers:
+    headers=filter_headers
+    for row in rows:
+        unwanted = set(row) - set(filter_headers)
+        for unwanted_key in unwanted: del row[unwanted_key]
+
+
+with open(outputfile, 'wt') as f:
+    writer = csv.DictWriter(f, fieldnames=headers,quoting=csv.QUOTE_NONNUMERIC)
+    csvheaders = dict( (n,n) for n in headers )
+    # change headers in next line if you want different headers then keys in the dictionary!!
+    writer.writerow(csvheaders)
+    for row in rows:
+        writer.writerow(row)
+

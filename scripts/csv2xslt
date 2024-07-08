@@ -1,0 +1,139 @@
+#!/usr/bin/env python3
+
+# https://openpyxl.readthedocs.io/en/stable/usage.html
+# see  https://pymotw.com/3/csv/ for DictReader
+
+# see  https://pymotw.com/3/csv/ for DictReader
+import csv
+import sys
+from pathlib import Path
+
+inputfile=sys.argv[1]
+outputfile=Path(inputfile).stem + ".xlsx"
+
+
+rows=[]
+f = open(inputfile, 'rt')
+try:
+    # reader assumes numbers not quoted, but strings are
+    #  https://docs.python.org/3/library/csv.html#csv.QUOTE_NONNUMERIC
+    reader = csv.DictReader(f,quoting=csv.QUOTE_NONNUMERIC)
+    for row in reader:
+        rows.append(row)
+        
+        
+finally:
+    f.close()
+
+
+
+
+headers=list(rows[0].keys())
+rowsize=len(headers)
+header_first_cell_column=1
+header_last_cell_column=rowsize
+first_row_num=1
+last_row_num=len(rows)+1
+# extra width per column so we can also have sort icon not overlap header name
+extra_column_width=3 
+
+
+# determine column_widths from data in rows
+column_widths = []
+listrows=[headers] + [ dictrow.values()  for dictrow in rows ]
+for listrow in listrows:   
+  for i, cell in enumerate(listrow):
+      if len(column_widths) > i:
+          if len(str(cell)) > column_widths[i]:
+              column_widths[i] = len(str(cell))
+      else:
+          column_widths += [len(str(cell))] 
+
+# To start, let’s load in openpyxl and create a new workbook. and get the active sheet.
+from openpyxl import Workbook
+wb = Workbook()
+ws = wb.active
+
+
+
+
+# Enter data,headers and rows, onto the worksheet.  We can simply use the Worksheet.append() function.
+ws.append(headers)
+for row in rows:
+    ws.append(list(row.values()))
+
+# apply column widths
+from openpyxl.utils import get_column_letter
+
+for i, column_width in enumerate(column_widths,1):  # ,1 to start at 1
+  ws.column_dimensions[get_column_letter(i)].width = column_width + extra_column_width
+
+## translate row column indexes to spreadsheet coordinate using a ws.cell object
+# >>> ws.cell(row=1, column=1).coordinate
+# 'A1'
+# >>> ws.cell(row=1, column=2).coordinate
+# 'B1'
+# >>> ws.cell(row=13, column=2).coordinate
+# 'B13'
+
+
+# create table
+#--------------
+
+# first add data, otherwise below code will add a row
+table_topleft_cell_coordinate=ws.cell(row=first_row_num, column=header_first_cell_column).coordinate
+table_bottomright_cell_coordinate=ws.cell(row=last_row_num, column=header_last_cell_column).coordinate
+
+
+from openpyxl.worksheet.table import Table, TableStyleInfo
+
+tablerange=table_topleft_cell_coordinate  + ":" + table_bottomright_cell_coordinate
+tab = Table(displayName="Table1", ref=tablerange)
+
+# Add a default style with striped rows and banded columns
+style = TableStyleInfo(name="TableStyleMedium9", showFirstColumn=False,
+                       showLastColumn=False, showRowStripes=True, showColumnStripes=True)
+tab.tableStyleInfo = style
+
+'''
+Table must be added using ws.add_table() method to avoid duplicate names.
+Using this method ensures table name is unique through out defined names and all other table name. 
+'''
+ws.add_table(tab)
+
+wb.save(outputfile)
+
+
+# # freeze first row as header  (simple alternative over table)
+# #---------------------------
+
+# header_first_cell_coordinate=ws.cell(row=first_row_num, column=header_first_cell_column).coordinate
+# header_last_cell_coordinate=ws.cell(row=first_row_num, column=header_last_cell_column).coordinate
+
+# freeze_cell=ws.cell(row=2, column=header_last_cell_column+1).coordinate
+
+# # Now we should make our heading Bold to make it stand out a bit more, to do that we’ll need to create a styles.
+# # Font and apply it to all the cells in our header row.
+# from openpyxl.styles import Font, PatternFill,Alignment
+# ft = Font(bold=True)
+# #ft = Font(bold=True,color='FF000000')
+
+# # https://www.blog.pythonlibrary.org/2021/08/11/styling-excel-cells-with-openpyxl-and-python/
+# # changing background color
+# yellow = "00FFFF00"
+# fill = PatternFill(start_color=yellow, end_color=yellow, fill_type = "solid")
+# alignment = Alignment(horizontal='center')
+
+
+# header_range=header_first_cell_coordinate  + ":" + header_last_cell_coordinate
+# for row in ws[ header_range ]:
+#     for cell in row:
+#         cell.font = ft
+#         cell.fill = fill
+#         cell.alignment = alignment
+
+# # https://stackoverflow.com/questions/25588918/how-to-freeze-entire-header-row-in-openpyxl
+# # freeze_panes will freeze rows above the given cell and columns to the left.
+# ws.freeze_panes = freeze_cell
+
+# wb.save(outputfile)

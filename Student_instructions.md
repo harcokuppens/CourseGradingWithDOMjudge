@@ -4,7 +4,7 @@ This documents contains general information about the use of DOMjudge in the cou
 
 * As a student you should have received on your student mail the user credentials and the url of the DOMjudge server.
 * After logging in you can submit your source code (you can select multiple files) for a given problem. 
-  If your solution fails, you can see what went wrong on the sample test cases. [^1]
+  If your solution fails, you can see what went wrong on the sample test cases. [^1]  
 * For each problem ***X*** there are 2 problem entries in DOMjudge:
   
   * problem ***X***
@@ -20,6 +20,14 @@ This documents contains general information about the use of DOMjudge in the cou
 * The scoreboard exists because DOMjudge is made for programming contests, but you can ignore it here. 
   The only thing that matters is whether or not your solution passes all test cases for a problem. [^2]
 * Do not use the clarification request system in DOMjudge, but just send us an email if you have any questions or issues.
+* The DOMjudge version used is 8.2.3 and it supports the following language versions:
+
+      * Python 3.9.16 (7.3.11+dfsg-2+deb12u1, Feb 02 2024, 18:54:53) [PyPy 7.3.11 with GCC 12.2.0]
+      * javac 17.0.11
+      * gcc (Debian 12.2.0-14) 12.2.0
+      * g++ (Debian 12.2.0-14) 12.2.0
+
+  You can easily fetch these results with the script [domjudge-language-versions](https://raw.githubusercontent.com/harcokuppens/CourseGradingWithDOMjudge/main/scripts/domjudge-language-versions) on any machine running docker.
 
 
  [^1]: If you cannot figure out your mistake, feel free to contact us.
