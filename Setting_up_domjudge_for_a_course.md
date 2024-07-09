@@ -236,7 +236,9 @@ With the following script we  can send out the emails:
 
     send_emails.bash  "thesender@gmail.com"  "mail/"
 
-  
+If somehow this method does not work for you, you can use one of the alternative methods described in the page 
+[Sending batch of personalized emails](Sending_batch_of_personalized_emails.md).
+
 #### Create contest
           
 Then create different contest for each course part.
