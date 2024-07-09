@@ -16,7 +16,20 @@ fi
 
 printf "\nchecking language versions on docker image domjudge/judgehost:$DOMJUDGE_VERSION\n\n"
 
-docker run --rm -it --entrypoint bash --privileged -v /sys/fs/cgroup:/sys/fs/cgroup:ro  domjudge/judgehost:$DOMJUDGE_VERSION\
-             /opt/domjudge/judgehost/bin/dj_run_chroot \
-             "echo "" &&  pypy3 --version && echo "" && javac --version && echo "" && gcc --version && g++ --version"
+## first attempt copying where I translated command from docker-compose.yml file
+#docker run --rm -it --entrypoint bash --privileged -v /sys/fs/cgroup:/sys/fs/cgroup:ro  domjudge/judgehost:$DOMJUDGE_VERSION\
+#             /opt/domjudge/judgehost/bin/dj_run_chroot \
+#             "echo "" &&  pypy3 --version && echo "" && javac --version && echo "" && gcc --version && g++ --version"
   
+# notes: 
+#  - cgroup volume binding not needed for checking versions
+#  - however we still need priviliged rights to run /opt/domjudge/judgehost/bin/dj_run_chroot to do chroot
+#  - MSYS_NO_PATHCONV=1 is needed when running docker command on bash on msys on windows to prevent it 
+#    to automatically converting Linux looking paths to their Windows equivalent.
+#  - for running scripts we do not need  an interactive terminal (no -it option)
+
+# improved versions working on all platforms with docker without needing to enable cgroup in kernel
+MSYS_NO_PATHCONV=1 docker  run --rm  --entrypoint bash --privileged  domjudge/judgehost:$DOMJUDGE_VERSION\
+             "/opt/domjudge/judgehost/bin/dj_run_chroot" \
+             "echo "" &&  pypy3 --version && echo "" && javac --version && echo "" && gcc --version && g++ --version"
+
