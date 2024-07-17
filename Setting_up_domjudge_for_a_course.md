@@ -162,16 +162,16 @@ We use scripts to create teams and users. Details about the design choices how w
 
 Step by step instructions to create users and teams in DOMjudge:
 
-   1. first add different 'Team Categories' which we can use for each course part
+   1. first add the `Team Category` named `teams-config-1` which we can use for the first course part
 
 
-	      click on 'DOMjudge' in top right corner, to get 'DOMjudge Jury interface'
-              click on 'Team Categories'
-	      click on 'Add new category' button
-	        in 'Name' box enter text "teams-config-1"
-	        and set 'Visible' radio button to "No"
-	        note: self-registration is by default 'No'
-	      click on 'Save' button at bottom of window 
+          click on 'DOMjudge' in top right corner, to get 'DOMjudge Jury interface'
+          click on 'Team Categories'
+          click on 'Add new category' button
+          in 'Name' box enter text "teams-config-1"
+          and set 'Visible' radio button to "No"
+          note: self-registration is by default 'No'
+          click on 'Save' button at bottom of window 
 
 	
    2. create a `teams.csv` file with two columns:
@@ -196,13 +196,13 @@ Step by step instructions to create users and teams in DOMjudge:
    3. generate loginname/password and team category for DOMjudge in `teams_domjudge.csv`
  
           TEAM_CONFIGURATION_NUMBER=1 
-          generate_domjudge_data.py teams.csv $TEAM_CONFIGURATION_NUMBER > "teams_domjudge.csv"
+          generate_domjudge_data teams.csv $TEAM_CONFIGURATION_NUMBER  teams_domjudge.csv"
    
       The  `TEAM_CONFIGURATION_NUMBER` is used to generate a team category which is unique. For the first part of the course we would use 1, for the second part of the course 2 etc...
 
    4. use `teams_domjudge.csv` to generate the `teams.yaml` and `users.yaml` import files by running the script:
 
-          create_domjudge_import_files.py  "teams_domjudge.csv" 
+          create_domjudge_import_files  "teams_domjudge.csv" 
 
    
    5. Import `teams.yaml` and `users.yaml` import files into DOMjudge.
@@ -258,7 +258,7 @@ We take as coursename 'ads2324', but you can use any coursename here.
        
     
 
-### 2. Creating, adding, submitting, and downloading results of a problem 
+### 2. Creating, testing and importing a problem 
 
 
 Below we explain how to add a problem to a contest of a course part, how students can practice and submit their final result. Finally we describe how the teacher then can fetch the results of the problem. The same procedure can be used for other problems.
@@ -292,11 +292,13 @@ So when developing the problem folder we will first focus on the **grading** lea
     * in `submissions/accepted/` folder put good solutions to problem 
     * add a generator,<br>
       A generator generates  test samples for a problem.  In the generator config some inputs are choosen, and using a solution the answers are calculated. The generator then delivers these inputs with there answers in  .in files and .ans files in the `data/` folder.
-      See documentation: https://github.com/RagnarGrootKoerkamp/BAPCtools/blob/master/doc/generators.md
+      See documentation: https://github.com/RagnarGrootKoerkamp/BAPCtools/blob/master/doc/generators.md .
+      An example generator you can find at https://github.com/RagnarGrootKoerkamp/BAPCtools/blob/master/test/problems/identity/generators/generators.yaml 
     * optionally add an input and answer validator, <br>
       These validators validate respectively the `.in` or `.ans` file for every test case, 
       typically for syntax, format, and range. They are a safety check on you sample files format and syntax. 
-      See documentation: https://github.com/RagnarGrootKoerkamp/BAPCtools/blob/master/doc/validation.md 
+      See documentation: https://github.com/RagnarGrootKoerkamp/BAPCtools/blob/master/doc/validation.md . 
+      A good example problem with an input and answer valicator you can find at https://github.com/RagnarGrootKoerkamp/BAPCtools/tree/master/test/problems/different/ 
       
       **Note:** The official problem package format does not specify an answer validator. The answer validator is a  BACPtools specific extension. 
 
@@ -327,7 +329,7 @@ So when developing the problem folder we will first focus on the **grading** lea
   * The `accepted` argument makes `bt` only validate solutions in the  `submissions/accepted/` folder.
   * The `--no-generate` option makes `bt` to skip the `generate` step, which is not needed because we already generated our sample data in the previous step. 
   * The `--verbose` option makes `bt` to display a line per test case, and causes it to not stop if a test case fails, but evaluates them all: greedy or none-lazy evaluation. 
-  * The `--overview` option make `bt` to display a per solution a single line result where the line contains per testcase a letter displaying its evaluation result. This is the same line as shown in the DOMjudge website.
+  * The `--overview` option make `bt` to display a per solution a single line result where the line contains per testcase a letter displaying its evaluation result. Lowercase letters are used for the public samples, and  uppercase letters for secret test cases. This is almost the same line as shown in the DOMjudge website. In the website icons are used instead of letters, and the public and private samples are separated with a bar.
 
   **Note:** in above command we only test the `accepted` solutions. We can also test how the not accepted solutions in the other subfolders of the `submissions/` fail as we would expect.
 
@@ -351,10 +353,14 @@ So when developing the problem folder we will first focus on the **grading** lea
 The problem description in `problem.pdf` contains the submission/deadline date before which a final solution of the problem must be submitted.
   
 Always keep the local BACPtools problem folder, because using that we can easily change and test the problem before exporting to DOMjudge. This folder is the leading folder in this process!
-                           
+
+**IMPORTANT**: the **name** of the problem is on import to DOMjudge set to value of the `name` field in `problem.yaml`. The basename of the zipfile is used  as the problem **shortname**.  See https://www.domjudge.org/snapshot/manual/problem-format.html). The command `bt zip -f` creates a zipfile with its basename set to directory name of the problem. Using directory name and the basename of a zipfile is a very implicit way of configuring the shortname of the problem. I rather would have preferred that there was a special shortname field in the `problem.yaml` config file.
+
+**KISS**:  To prevent any confusion I advise to always set the (long)name and shortname of the problem the same.  That is use the same name for the problem's directory, and its derivated zipfile, setting the problem's shortname, as for the name field in the `problem.yaml` config file, setting the problem's (long)name.                            
 
 #### Add problem to the course
 
+##### create practicing problem from grading problem
 As explained before we need to import the problem twice:
 
   1. One version **for grading** containing both the public and secret samples. The judging is set to be done **none-lazy**, meaning all samples are evaluated.  This folder is the leading problem folder. 
@@ -369,11 +375,20 @@ We create both versions from the leading local BACPtools `grading_$PROBLEM/` by 
     cd "$PROBLEM/"; bt zip -f; cd ..
     cd "grading_$PROBLEM/"; bt zip -f; cd ..
 
+
+**NOTE**: in above instructions we assume that the problem folder is set to the same name, as the name field in `problem.yaml` file. In the previous section we explained that this is the best policy.
+
 The `grading_$PROBLEM/` folder is our leading BACPtools problem folder contain both public as secret samples.   We make a copy of the `grading_$PROBLEM/` folder calling it just `$PROBLEM` from which we strip the secret sample. We create then  2 zipfiles `$PROBLEM.zip` and  `grading_$PROBLEM.zip` where the first is used for practicing and the latter for grading.
+
+
 
 We then import both zipfiles into DOMjudge. We then configure the practicing problem to be evaluated lazy to reduce the load on the DOMjudge server. We configure the grading problem as non-lazy so that
 all our secret grading samples are evaluated.
-  
+
+ 
+
+##### import problem
+
 We can easily import a problem directly into a contest:
 
 
@@ -382,27 +397,40 @@ We can easily import a problem directly into a contest:
     - on bottom of the page click on the 'Import problem' button
     - now we are redirect to the "Import and export" page 
     - in this page on the "Problems; Import archive" 
-        a) select the contest where to import the problem
+        a) select the contest where to import the problem.  
+           Either select a contest's name or you can also select no contest, 
+           by selecting the value 'Do not add / update contest data'.
         b) in the "Problem archive" field select the problem zip 
            to import
 
-**IMPORTANT**: it is adviced to import the problem as an user with **admin role** which is also **belonging to a team**, because then on import then directly the solutions in the problem's zipfile are directly judge. We can then directly verify that our solutions are also correct in DOMjudge and are done within the timelimit. It is wise to test also in DOMjudge, but sometimes a little detail can make your solution pass locally, but not in DOMjudge. <br> You can also upload the problem with `admin` user not belonging to a team, and later upload  a zipfile containing only the problem's solutions as another user with **admin role**  and which is **belonging to a team** where the zipfile still needs to adhere to the problem format.  Reference: ["Testing jury solutions" section in the DOMjudge documentation](https://www.domjudge.org/snapshot/manual/config-basic.html#testing-jury-solutions).
 
+It is wise to test a new problem also in DOMjudge, because sometimes a little detail can make your solution pass locally, but not in DOMjudge. It is advice to test the **grading** version of the problem because this one has both public and secret samples and is set to run non-lazy.
+
+**Best Practice:** import a problem without selecting a contest.   You add a problem to a contest at the bottom of the contest's edit form. Make a special test contest in which you add a problem to test, and test it with a test user which submits the solutions. By using a special test contest we separate the course contests used in production from the testing contest. Otherwise we would need to filter out the submissions of the testuser from the student users when doing the grading. You can also import the problem directly to test contest if it needs testing.
+
+
+
+**REMARK**: when importing a problem as an user with **admin role** which is also **belonging to a team**, then on import the solutions in the problem's zipfile are directly judge. We can then directly verify that our solutions are also correct in DOMjudge and are done within the timelimit.  Reference: ["Testing jury solutions" section in the DOMjudge documentation](https://www.domjudge.org/snapshot/manual/config-basic.html#testing-jury-solutions). 
+DOMjudge claims you can also later upload  a zipfile containing only the problem's solutions as another user with **admin role**  and which is **belonging to a team** where the zipfile still needs to adhere to the problem format. However I never succeeded to get this to work! Maybe there is a bug breaking this feature?? This feature is also underdocumented. I personally prefer separating importing and testing, and do the testing in a separate test contest which separates testing concern from production concern. See 'Best practice' above.
+
+
+
+##### set laziness of problem
 
 We can set the evaluation laziness of a problem with:
   
-    - click on 'DOMjudge' in top right corner, to get 'DOMjudge Jury interface'
-    - click on 'Contests'       
-    - on the bottom of the page click in the table on the contest of interest
-      causing a details page of the contest is shown
-    - on bottom of the page click on the 'Edit' button
-    - on the edit page of the contest is a table with all problems in the contest
-    - for the problem of interest edit the in the last column "Lazy eval" to "Yes"
-      for the "practicing" version of the problem, and to "No" for the "grading" 
-      version of the problem.    
+  - click on 'DOMjudge' in top right corner, to get 'DOMjudge Jury interface'
+  - click on '**Contests**'       
+  - on the bottom of the page click in the table on the contest of interest
+    causing a details page of the contest is shown
+  - on bottom of the page click on the 'Edit' button
+  - on the edit page of the contest is a table with all problems in the contest
+  - for the problem of interest edit the in the last column "**Lazy eval**" to "**Yes**"
+    for the "**practicing**" version of the **problem**, and to "**No**" for the "**grading**" 
+    version of the **problem**.    
 
 
-#### Students can submit code to the problem    
+### 3. Students can submit code to the problem    
 
 Now students can submit their code to the **practicing problem**. The practicing problem is **judged lazy**, meaning that if the submission fails on a sample, then all remaining samples are not executed anymore.  The idea is that the team first has to solve that sample first, before executing the remaining samples. The lazy evaluation also makes the load less on the juding server.
 
@@ -413,7 +441,7 @@ be evaluated for the grading.
 
 A team should only submit once per grading problem, however if something went wrong, they are allowed to submit again. For grading the latest submission is used.
  
-### When the problem's deadline is reached, the teacher downloads its final submissions  
+### 4. When the problem's deadline is reached, the teacher downloads its final submissions  
 
 In [our approach of applying a deadline to a problem](How_to_handle_ending_time_of_a_problem.md) we do not use any deadline timers in DOMjudge to specify the deadline a problem's final submission, but instead we just inform the students of the deadline, and when its passed we disable submitting to the 'grading' problem, and fetch the results from it. 
  
@@ -422,42 +450,49 @@ The problem's deadline is communicated to the students during the course and in 
    1. **Disable submission** to the grading version of the problem: 
 
          - click on 'DOMjudge' in top right corner, to get 'DOMjudge Jury interface'
-         - click on 'Contests'       
+         - click on '**Contests**'       
          - on the bottom of the page click in the table on the contest of interest
            causing a details page of the contest is shown
          - on bottom of the page click on the 'Edit' button
-         - on the bottom of the page in the problems table set 'Allow submit'  
-           field to 'No' for the "grading" problem of interest.
+         - on the bottom of the page in the problems table set '**Allow submit**'  
+           field to '**No**' for the "grading" problem of interest.
          - on bottom of the page click on the 'Save' button          
        
-      This makes the grading problem invisible for teams, and they cannot 
+      This makes the **grading problem invisible** for teams, and they cannot 
       submit to it anymore!
-      However the teams can still see the none-grading practicing problem.
-      
-   2. Use download script to **download results** from grading script. 
- 
+      However the teams can **still see the none-grading practicing problem**.
 
-          export CODEDIR="./scripts/"
+   2. **Add scripts** of the CourseGradingWithDOMjudge repo to your **PATH**
+
+          # add scripts to PATH
+          REPO_PATH=..path where CourseGradingWithDOMjudge git repo is cloned...
+          export PATH="$REPO_PATH/scripts/:$PATH"
+
+   3. Use download script to **download results** from grading problem: 
+ 
+   
           # create a new directory to collect all data there
           mkdir grading_data_processed_using_domjudge
           cd grading_data_processed_using_domjudge  
           user=userwithadminrights; password='mypassword'; 
-          python3  $CODEDIR/fetch  --auth "${user}:${password}" --url https://domjudge.science.ru.nl/ --contest grading --problem boxesgrading
+          fetch  --auth "${user}:${password}" --url https://domjudge.science.ru.nl/ \
+                 --contest yourcontest --problem grading_yourproblem --files --last-per-team
   
+      The `fetch` script by default will download data about all submissions to a problem in a data file `contest_problem_data.pod`. By using the `--files` option it will also download the files in each submission as a zip file. We  also use the `--last-per-team` option to limit the number of submisssions downloaded to only the last submission per team, because we are only interested in the last submission of each team to the grading problem.  
 
-   3. **Process results** of problem and format to excel
+   4. **Process results** of problem and format to excel
 
-          
-
-       Reprocess downloaded data where we take per team only 
+       Process the downloaded data where we take per team only 
        the latest judgement of the latest submission and
        output this list as a csv file:
      
-           python3 $CODEDIR/reprocess.py
-  
-       We output two `csv` files one with more and with less details.
+           NUMBER_OF_PUBLIC_SAMPLES=40
+           process --skip $NUMBER_OF_PUBLIC_SAMPLES
        
-       Convert these `csv` files to nice excel files containing a table:
+       We skip the public samples when doing the grading, because we only want to grade on the secret samples.
+       The `process` scripts outputs two `csv` files a basic one `gradings.csv` and one with more details `gradings.details.csv`. 
+       
+  5. **Convert** these `csv` files to nice **excel** files containing a table:
   
-           python3 $CODEDIR/csv2xslt.py gradings.csv
-           python3 $CODEDIR/csv2xslt.py gradings.details.csv  
+           csv2xslt gradings.csv
+           csv2xslt gradings.details.csv  

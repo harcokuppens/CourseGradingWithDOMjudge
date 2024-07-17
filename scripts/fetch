@@ -155,6 +155,61 @@ def read_problems() -> list:
 
     return problems
 
+def read_submission_sources_as_json(id,team) -> list:
+    '''Read all submissions for the current problem in the current contest from the API.
+    
+    Returns:
+        The submissions or None if an error occurred.
+    '''
+
+    try:
+        endpoint = 'contests/' + my_contest['id'] + '/submissions/' + id + '/source-code'
+        data = do_api_request(endpoint)
+    except RuntimeError as e:
+        logging.warning(e)
+        return None
+
+    if not isinstance(data, list):
+        logging.warning("DOMjudge's API returned unexpected JSON data for endpoint 'submissions/ID/source-code'.")
+        return None
+    
+    sources = []
+
+    for source in data:
+        if not verify_fields('source',source,['id','source']):
+            continue
+        source['team_id']=team['id']
+        source['team_name']=team['name']
+        source['team_display_name']=team['display_name']
+        sources.append(source)
+
+    logging.info(f'Read {len(problems)} problem(s) from the API.')
+
+    return sources
+
+
+def read_submission_files_as_zip(id,zipfile) -> list:
+    '''Read all submissions for the current problem in the current contest from the API.
+    
+    Returns:
+        The submissions or None if an error occurred.
+    '''
+
+    try:
+        endpoint = 'contests/' + my_contest['id'] + '/submissions/' + id + '/files'
+        data = do_api_request(endpoint,binary=True)
+    except RuntimeError as e:
+        logging.warning(e)
+        return None
+
+    f = open(zipfile, "wb")
+    f.write(data)
+    f.close()
+
+    logging.info(f'Read {zipfile} from the API.')
+
+    return 
+
 
 def read_submissions() -> list:
     '''Read all submissions for the current problem in the current contest from the API.
@@ -197,11 +252,13 @@ def read_submissions() -> list:
 
 
     logging.info(f'Read {len(submissions)} submission(s) from the API.')
-
+    
+    
+    submissions=sorted(submissions, key=lambda submission: submission['time'], reverse=True) 
     return submissions
 
 
-def read_judgements() -> list:
+def read_judgements(submission_ids) -> list:
     '''Read all judgements for the current problem in the current contest from the API.
     
     Returns:
@@ -238,12 +295,17 @@ def read_judgements() -> list:
             continue          
         judgements.append(judgement)
 
+
+    # now still all judgements in contest are returned, but 
+    # should be only them belonging to a specific problem.
+    # Filter by submission_id for submissions belonging to a problem:
+    judgements=[judgement for judgement in judgements if judgement['submission_id'] in submission_ids ]
     logging.info(f'Read {len(judgements)} judgement(s) from the API.')
 
     return judgements
 
 
-def read_runs() -> list:
+def read_runs(judgement_ids) -> list:
     '''Read all runs for the current problem in the current contest from the API.
     
     Returns:
@@ -275,6 +337,12 @@ def read_runs() -> list:
         if not verify_fields('run',run,['id','judgement_type_id']):
             continue        
         runs.append(run)
+
+
+    # now still all runs in contest are returned, but 
+    # should be only them belonging to a specific problem.
+    # Filter by judgement_id for judgements belonging to a problem:
+    runs=[run for run in runs if run['judgement_id'] in judgement_ids ]
 
     logging.info(f'Read {len(runs)} run(s) from the API.')
 
@@ -388,7 +456,7 @@ def verify_fields(label,obj,fields):
 
     return True    
 
-def do_api_request(name: str):
+def do_api_request(name: str,binary=False):
     '''Perform an API call to the given endpoint and return its data.
     
     Parameters:
@@ -409,7 +477,7 @@ def do_api_request(name: str):
     logging.info(f'Connecting to {url}')
     
     try:
-        response = requests.get(url, headers=headers, auth=(user,password))
+        response = requests.get(url, headers=headers, auth=user_password_tuple)
     except requests.exceptions.RequestException as e:
         raise RuntimeError(e)
     
@@ -421,9 +489,13 @@ def do_api_request(name: str):
         else:
             raise RuntimeError(f'API request {name} failed (code {response.status_code}).')
 
-    logging.debug(f"API call '{name}' returned:\n{response.text}")
+    if binary:
+        logging.debug(f"API call '{name}' returned: binary data")
+        return response.content
+    else: 
+        logging.debug(f"API call '{name}' returned:\n{response.text}")
+        return json.loads(response.text)
 
-    return json.loads(response.text)
 
 
 
@@ -466,64 +538,19 @@ drop-down box in the web interface.'''
         "Explanation of submission options:",
         contests_part_one,
         contests_part_two,
-        problem_part
+        problem_part,
+        "\nYou must specify a PROBLEM!\nYou must specify a CONTEST except when there is only one active contest."
         ]
 
-    return "\n\n".join(part for part in epilog_parts if part)
+    return "\n\n".join(part for part in epilog_parts if part) 
 
-
-
-def do_api_fetch():
-    '''get judges with runs from  problem'''
-
-    data = {
-        'problem': my_problem['id'],
-#       'language': my_language['id'],
-    }
-    # if entry_point:
-    #     data['entry_point'] = entry_point
-
-    #files = [('code[]', open(filename, 'rb')) for filename in filenames]
-
-    url = f"{baseurl}api/{api_version}contests/{my_contest['id']}/submissions"
-    logging.info(f'connecting to {url}')
-
-    response = requests.post(url, data=data, headers=headers, auth=(user,password))
-
-    logging.debug(f"API call 'submissions' returned:\n{response.text}")
-
-    # The connection worked, but we may have received an HTTP error
-    if response.status_code >= 300:
-        print(response.text)
-        if response.status_code == 401:
-            raise RuntimeError('Authentication failed, please check your DOMjudge credentials in ~/.netrc.')
-        else:
-            raise RuntimeError(f'Submission failed (code {response.status_code})')
-
-    # We got a successful HTTP response. It worked.
-    # But check that we indeed received a submission ID.
-
-    try:
-        submission = json.loads(response.text)
-    except json.decoder.JSONDecodeError as e:
-        error(f'Parsing DOMjudge\'s API output failed: {e}')
-
-    if (not isinstance(submission, dict)
-        or not 'id' in submission
-        or not isinstance(submission['id'], str)):
-        error('DOMjudge\'s API returned unexpected JSON data.')
-
-    time = datetime.datetime.fromisoformat(submission['time']).strftime('%H:%M:%S')
-    sid = submission['id']
-    print(f"Submission received: id = s{sid}, time = {time}")
-    print(f"Check {baseurl}team/submission/{sid} for the result.")
 
 
 version_text = '''
-submit -- part of DOMjudge
-Written by the DOMjudge developers
+fetch -- fetch data from DOMjudge
+Written by Harco Kuppens
 
-DOMjudge comes with ABSOLUTELY NO WARRANTY.  This is free software, and you
+Fetch comes with ABSOLUTELY NO WARRANTY.  This is free software, and you
 are welcome to redistribute it under certain conditions.  See the GNU
 General Public Licence for details.
 '''
@@ -540,7 +567,7 @@ loglevels = {
 # parsing flags, since the help contains data needed from the API.
 parser = argparse.ArgumentParser(
         formatter_class=argparse.RawTextHelpFormatter,
-        description='Fetch students final solutions for a problem in a contest',
+        description='Fetch students final solutions for a problem in a contest into a data file.',
         add_help=False)
 parser.add_argument('--version', action='version', version=version_text, help='output version information and exit')
 parser.add_argument('-h', '--help', help='display this help and exit', action='store_true')
@@ -551,9 +578,11 @@ parser.add_argument('-c', '--contest', help='''fetch from contest with ID or sho
 parser.add_argument('-p', '--problem', help='fetch from problem with ID or label PROBLEM', default='')
 parser.add_argument('-v', '--verbose', help='increase verbosity', choices=loglevels.keys(), nargs='?', const='INFO', default='WARNING')
 parser.add_argument('-q', '--quiet', help='suppress warning/info messages', action='store_true')
-parser.add_argument('-y', '--assume-yes', help='suppress user input and assume yes', action='store_true')
+parser.add_argument('-l', '--last-per-team', help='only fetch the last submission per team', action='store_true')
+parser.add_argument('-f', '--files', help='also fetch the files belonging to a team submission as a zipfile', action='store_true')
 parser.add_argument('-u', '--url', help='''submit to server with base address URL
     (should not be necessary for normal use)''')
+parser.add_argument('-o', '--outputfile', help='''output file where fetched data is stored. Default: contest_problem_data.pod ''', default='contest_problem_data.pod')
 parser.add_argument('-a', '--auth', help='user:password value to authenticate with basic auth', default='')
 
 args = parser.parse_args()
@@ -562,6 +591,9 @@ verbosity = args.verbose
 if args.quiet:
     verbosity = 'ERROR'
 
+last_per_team=args.last_per_team
+files=args.files
+
 logging.basicConfig(format=f'%(message)s', level=loglevels[verbosity])
 logging.info(f'set verbosity to {verbosity}')
 
@@ -569,9 +601,13 @@ problem_id = args.problem
 
 userpassword = args.auth
 
+user_password_tuple=None # fallback to .netrc file
 if userpassword:
    user, password = userpassword.split(':')
+   user_password_tuple=(user,password)
 
+
+filename=args.outputfile
 
 if args.url:
     baseurl = args.url
@@ -591,7 +627,7 @@ else:
 contests = read_contests() if baseurl else None
 
 if not contests and not args.help:
-    logging.warning('Could not obtain active contests.')
+    logging.warning('Obtained an empty list of active contests. For none public contests you have to provide credentials to fetch them.')
 
 
 my_contest = None
@@ -614,13 +650,9 @@ elif contests:
             my_contest = contest
             break
 
-
 languages = None
 problems = None
 if my_contest and baseurl:
-    if 'allow_submit' in my_contest and not my_contest['allow_submit']:
-        warn_user('Submissions for contest (temporarily) disabled')
-        exit(1)
     languages = read_languages()
     problems = read_problems()
 
@@ -638,7 +670,11 @@ if not baseurl:
     usage('No contest url specified, pass it as --url or set as SUBMITBASEURL environment variable.')
 
 if not my_contest:
-    usage('No (valid) contest specified, pass it as --contest or set as SUBMITCONTEST environment variable.')
+    shortnames=[]
+    for contest in contests:
+        shortnames.append(contest['shortname'].lower())
+    print("available contests: " + ", ".join(shortnames))
+    usage('No (valid) contest specified, pass it as --contest or set as SUBMITCONTEST environment variable. Or maybe you need to supply credentials, because for none public contests you must authenticate.')
 
 if not languages:
     logging.warning('Could not obtain language data.')
@@ -656,7 +692,11 @@ for problem in problems:
         break
 
 if not my_problem:
-     usage('No known problem specified or detected.')
+    names=[]
+    for problem in problems:
+        names.append(problem['label'].lower())
+    print("available problems: " + ", ".join(names))
+    usage('No known problem specified or detected.')
 
  
 
@@ -668,19 +708,77 @@ logging.debug(f"url is `{baseurl}'")
 
 from pprint import pprint
 teams=read_teams()
+id2team={}
+for team in teams:
+    id2team[team['id']]=team
 
 # read all submissions / judgements / runs for  contest and problem
 submissions=read_submissions()
-judgements=read_judgements()
-runs=read_runs()
 
-# store all problem's data for a contest 
+
+
+
+# only get latest submission per team (and one zip per team if files option used)
+# note: per submission there could be multiple judgements; we don't take the latest here.
+#       the 'process' script only looks at latest submission and judgement
+#       We do look at latest submission already here, because we only want to download
+#       files for the latest submissions. We just want one zip per team to evaluate! 
+#
+if last_per_team:
+    result=[]
+    team2submission={}
+    for submission in submissions:
+        teamid = submission['team_id']
+        if teamid in team2submission:
+            othertime=submission['time']
+            currenttime=team2submission[teamid]['time']
+            if othertime > currenttime:
+                team2submission[teamid]=submission
+        else:
+            team2submission[teamid] = submission   
+    submissions=list(team2submission.values())
+
+
+if files:
+    ## read sources and add as data to output file;  => we decided as separate zipfiles was more convenient
+    # sources=[]
+    # for submission in submissions:
+    #     sources += read_submission_sources_as_json(submission['id'],id2team[submission['team_id']])
+
+    import os
+    directory="files"
+    if not os.path.exists(directory):
+       os.makedirs(directory)
+
+    for submission in submissions:
+        team=id2team[submission['team_id']]
+        name=team['name'] or "none"  
+        displayname=team['display_name'] or "none"
+        zipfile="files/" + name + "__" + displayname + "__s"+submission['id'] + ".zip"
+        zipfile=zipfile.replace(" ", "_")
+        zipfile=zipfile.replace(",", "_")
+        data = read_submission_files_as_zip(submission['id'],zipfile)
+
+    print("written zipfiles of submission code in files/ folder")    
+
+judgements=read_judgements([submission['id'] for submission in submissions])
+runs=read_runs([judgement['id'] for judgement in judgements])
+
+# store all problem's data within a contest 
 all_contest_problem_data = {
+    "url"  : baseurl,
+    "contest" : my_contest,
+    "problem" : my_problem,
+    "languages" : languages,
     "teams" : teams,
     "submissions" : submissions,
     "judgements" : judgements,
     "runs" : runs
 }
-with open("all_contest_problem_data.txt", "w") as data_file:
+
+# write all data in a plain old data file (.pod file)
+with open(filename, "w") as data_file:
     pprint(all_contest_problem_data, data_file)
+
+print("written data in python plain old data file: " + filename)    
 

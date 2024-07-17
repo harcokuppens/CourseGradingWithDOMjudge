@@ -1,9 +1,59 @@
 #!/usr/bin/env python3
 
+#
+# process -- command-line process program for processing already fetched submissions from data file
+#
+#
+
+import argparse
+import os
+
 #filter_teams=['gradingteam091','gradingteam092']
 filter_teams =  None
 
-inputfile="all_contest_problem_data.txt"
+
+version_text = '''
+process -- process final solutions for a problem in a DOMjudge contest
+Written by Harco Kuppens
+
+Fetch comes with ABSOLUTELY NO WARRANTY.  This is free software, and you
+are welcome to redistribute it under certain conditions.  See the GNU
+General Public Licence for details.
+'''
+# Note: we set add_help to false since we can only print the help text after
+# parsing flags, since the help contains data needed from the API.
+parser = argparse.ArgumentParser(
+        formatter_class=argparse.RawTextHelpFormatter,
+        description='Process final solutions for a problem in a DOMjudge contest',
+        add_help=False)
+parser.add_argument('--version', action='version', version=version_text, help='output version information and exit')
+parser.add_argument('-h', '--help', help='display this help and exit', action='store_true')
+parser.add_argument('datafile',nargs='?', help='datafile we got from fetch command. Default: contest_problem_data.pod', default="contest_problem_data.pod" )
+parser.add_argument('--skip', type=int, default=0, help='number of public samples we have to skip, because we only evaluated on secret samples')  
+
+args = parser.parse_args()
+
+#inputfile="contest_problem_data.pod"
+
+numsamples=args.skip
+inputfile=args.datafile
+
+#print(numsamples)
+
+if args.help:
+    if 'BATS_VERSION' in os.environ:
+        # print_help adds line breaks depending on the number of available columns.
+        # To make it deterministic under test, we set it to 100 here if we are testing.
+        os.environ['COLUMNS'] = '100'
+    parser.print_help()
+    exit(0)
+
+import os
+if not os.path.isfile(inputfile):
+    import sys
+    print("ERROR: missing inputfile '" + inputfile + "'")
+    sys.exit(1)
+
 with open(inputfile, 'r') as f:
     all_contest_problem_data = eval(f.read())
 
@@ -53,6 +103,10 @@ for judgement in judgements:
     submission['judgements'].append(judgement)
 
 run_id2run={}
+
+if numsamples != 0 :
+   runs=runs[numsamples:]
+
 for run in runs: 
     id=run['id']
     run_id2run[id]=run
@@ -109,8 +163,9 @@ rows=[]
 headers=['team','language','overall_judgement','problems','correct(AC)','wrong_answer(WA)','limit(TLE/MLE/OLE)','error(NO/CE/RTE)','max_run_time']
 for team in teams:
     row={}
-    row['team']=team['name']
-    
+    row['team']=team['name'] or "none"
+    row['name']=team['display_name']  or "none"
+
     submission=team['submission']
     row['language']=submission['language_id']
     
@@ -142,8 +197,10 @@ for team in teams:
     row['correct(AC)']=verdict_count["AC"]
     row['wrong_answer(WA)']=verdict_count["WA"]
     row['limit(TLE/MLE/OLE)']= str(verdict_count["TLE"]) + "/" + str(verdict_count["MLE"]) +  "/" + str(verdict_count["OLE"])
-    row['error(NO/CE/RTE)']= str(verdict_count["NO"]) + "/" + str(verdict_count["CE"]) +  "/" + str(verdict_count["RTE"])
-    
+    # row['error(NO/CE/RTE)']= str(verdict_count["NO"]) + "/" + str(verdict_count["CE"]) +  "/" + str(verdict_count["RTE"])
+    # note: CE verdict is always per submission, there are no runs then! So we will never see CE in column 'error(NO/CE/RTE)'
+    row['error(NO/RTE)']= str(verdict_count["NO"]) +  "/" + str(verdict_count["RTE"])
+
     
     keys=list(runnum2label.keys())
     keys.sort()
@@ -223,6 +280,7 @@ with open(outputfile, 'wt') as f:
     writer.writerow(csvheaders)
     for row in rows:
         writer.writerow(row)
+    print("detailed output written to: " + outputfile)
 
 outputfile="gradings.csv"
 
@@ -243,4 +301,4 @@ with open(outputfile, 'wt') as f:
     writer.writerow(csvheaders)
     for row in rows:
         writer.writerow(row)
-
+    print("summary output written to: " + outputfile)

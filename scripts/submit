@@ -188,7 +188,7 @@ def do_api_request(name: str):
     logging.info(f'Connecting to {url}')
 
     try:
-        response = requests.get(url, headers=headers, auth=(user,password))
+        response = requests.get(url, headers=headers, auth=user_password_tuple)
     except requests.exceptions.RequestException as e:
         raise RuntimeError(e)
 
@@ -302,7 +302,8 @@ def do_api_submit():
     url = f"{baseurl}api/{api_version}contests/{my_contest['id']}/submissions"
     logging.info(f'connecting to {url}')
 
-    response = requests.post(url, data=data, files=files, headers=headers, auth=(user,password))
+    response = requests.post(url, data=data, files=files, headers=headers, auth=user_password_tuple)
+
 
     logging.debug(f"API call 'submissions' returned:\n{response.text}")
 
@@ -334,7 +335,7 @@ def do_api_submit():
 
 version_text = '''
 submit -- part of DOMjudge
-Written by the DOMjudge developers
+Written by the DOMjudge developers, enhanced by Harco Kuppens.
 
 DOMjudge comes with ABSOLUTELY NO WARRANTY.  This is free software, and you
 are welcome to redistribute it under certain conditions.  See the GNU
@@ -387,8 +388,10 @@ entry_point = args.entry_point
 
 userpassword = args.auth
 
+user_password_tuple=None # fallback to .netrc file
 if userpassword:
    user, password = userpassword.split(':')
+   user_password_tuple=(user,password)
 
 
 if args.url:
@@ -408,7 +411,7 @@ else:
 
 contests = read_contests() if baseurl else None
 if not contests and not args.help:
-    logging.warning('Could not obtain active contests.')
+    logging.warning('Obtained an empty list of active contests. For none public contests you have to provide credentials to fetch them.')
 
 my_contest = None
 my_language = None
@@ -453,13 +456,15 @@ if not baseurl:
     usage('No contest url specified, pass it as --url or set as SUBMITBASEURL environment variable.')
 
 if not my_contest:
-    usage('No (valid) contest specified, pass it as --contest or set as SUBMITCONTEST environment variable.')
+    usage('No (valid) contest specified, pass it as --contest or set as SUBMITCONTEST environment variable. Or maybe you need to supply credentials, because for none public contests you must authenticate.')
+
 
 if not languages:
     logging.warning('Could not obtain language data.')
 
 if not problems:
     logging.warning('Could not obtain problem data.')
+
 
 if len(args.filename) == 0:
     usage('No file(s) specified.')

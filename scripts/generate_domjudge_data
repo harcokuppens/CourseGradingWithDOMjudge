@@ -1,0 +1,44 @@
+#!/usr/bin/env python3
+
+#
+# generate_domjudge_data -- generate loginname/password and team category for teams  
+#
+
+import csv
+import argparse
+
+import pprint
+
+parser = argparse.ArgumentParser()
+
+parser.add_argument("TEAMS_CSV_FILE")
+parser.add_argument("TEAM_CONFIGURATION_NUMBER", type=int)
+args = parser.parse_args()
+
+teams_csv_file=args.TEAMS_CSV_FILE
+teams_csv_file_handle = open(teams_csv_file, 'rt')
+
+# input csv file has no header, so we supply them ourselves
+fieldnames = ["name","email"]
+reader = csv.DictReader(teams_csv_file_handle, delimiter=",", fieldnames=fieldnames, quotechar='"', quoting=csv.QUOTE_NONNUMERIC,skipinitialspace=True)
+# note: skipinitialspace makes the reader to ignore spaces around delimiter
+
+
+rows=[]
+for row in reader:
+    rows.append(row)
+ 
+
+
+
+
+
+with open('teams.domjudge.csv', 'w') as csvfile:
+    writer = csv.DictWriter(csvfile, quotechar='"',delimiter=",", fieldnames=fieldnames, quoting=csv.QUOTE_NONNUMERIC, lineterminator="\n")
+    # The setting quoting=csv.QUOTE_NONNUMERIC causes all data except numbers to be quoted when output to csv file
+    # It determines this automatically from the data in a column.
+    headerrow = dict( (n,n) for n in fieldnames )    
+    writer.writerow(headerrow)
+    for row in rows:
+        writer.writerow(row)
+   

@@ -1,17 +1,12 @@
     
-# Sending a batch of mails each personalized towards the receiver
+# Sending a batch of personalized emails
 
+The general method to send personalized emails, is to use a template with variables that are replaced with specific values for each recipient. These values can be stored in a simple `.csv` file, with each row corresponding to a recipient. The first row in the .csv file is a special row, also called the header row, which specifies the variable name for each column. All other rows are receiver data.  This `.csv` file can be easily parsed to fill the template for each user.
 
-The general method to make a personalized mail is by using a template mail in which we have variables.
-For each receiver we have different values for these variables. We collect all data for all receivers in 
-a simple `.csv` file, which contains a row per receiver. This can be easily parsed to fill the template per user.
+There are two main methods to send personalized emails using data from a .csv file:
 
-Two ways to send emails using data from `.csv` file:    
-
-* scripting the generation of `.eml` files yourself, and then send these files with a **mail commandline tool**
-* using special **mail merge** software
-
-
+1. Scripting the generation of `.eml` files yourself and then sending these files with a **mail command-line tool**.
+2. Using specialized **mail merge** software.
 
 ## Scripting the generation of `.eml` files from a `.csv file`, then send .eml files
 
@@ -41,12 +36,12 @@ Two ways to send emails using data from `.csv` file:
 ## Use a "mail merge" tool with data from .csv file directly:
     
 
-Below we refer 2 "mail merge" tools where Thunderbird with the "mail merge" extension works the best.
+Below we refer 2 "mail merge" tools, where **Thunderbird** with the `mail merge` extension works the best.
 
-   * using Thunderbird with the `mail merge` extension
+   * using **Thunderbird** with the `mail merge` extension
        https://addons.thunderbird.net/thunderbird/addon/mail-merge/
     
-   * using `mail merge` tooling builtin Word on Windows or MacOS.
+   * using `mail merge` tooling builtin **Word** on Windows or MacOS.
       This works best if you make Outlook your default email application.
       see article "use mail merge to send bulk email messages"
        https://support.microsoft.com/en-us/office/use-mail-merge-to-send-bulk-email-messages-0f123521-20ce-4aa8-8b62-ac211dedefa4
