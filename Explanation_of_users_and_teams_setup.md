@@ -17,32 +17,40 @@
 
 <!--te-->
 
-## design choices
+In this document we describe our choosen design of how to setup teams and users in DOMjudge, and how an admin user of DOMjudge, by providing minimal information in a CSV file, can setup and mail around these credentials using automated scripts. The admin's work is made easy.
 
-When using DOMjudge for grading in a course we use the following design choices to setup teams and users in DOMjudge:
-      
-   * students **work together in teams**
-      
-   * students in a specific team get a **shared login** to that team. By having one user per team, we effectively only have teams to which we can login. We simplify things by not caring about the separate users. (KISS principle).
-      
-     We assume students cooperate fairly in a team. We do not want to use DOMjudge to check which student did the most work by counting submissions per student in a team.
-        If therr are problems with cooperation in a team, a student should discuss this with the teacher.
-
-   * if logged in it should be clear which users are logged in by **displaying** their **names** and their **team id**.
-      
-   * all students get **per email the credentials of the team** they are in. Students in the same team get the same team credentials send.     
-
-
-## implementation
-
-
-### user and team in DOMjudge
+## Users and teams 
 
 In DOMjudge you need both a user and a team because:
 
 * a user without team cannot submit code
 * a team without user cannot login into DOMjudge
 
+DOMjudge also has the limitation that an user can only belong to one team. So it is not possible to assign a user to multiple teams. 
+
+If you want to have different teams per course part, then either you have to make a new user account for each user for the new course part, or you have to update the user account it belongs to the new team and removing it from the old team. The user cannot see old work done under the old team anymore.  
+
+That's why we decided to just make per team a single dummy account, which gets shared by the team members. For each course part we create new teams, and the new credentials are send to the new team members. A user then can still login to all the different teams it belonged to for the different course parts, meaning he can still see all work he has done in DOMjudge.
+
+## Design choices
+
+When using DOMjudge for grading in a course we use the following design choices to setup teams and users in DOMjudge:
+      
+   * students **work together in teams**
+      
+   * students in a specific team get a **shared login** to that team. By having one user per team, we effectively only have teams to which we can login. We simplify things by not caring about the separate users. (KISS principle). 
+      
+     We assume students cooperate fairly in a team. We do not want to use DOMjudge to check which student did the most work by counting submissions per student in a team. If there are problems with cooperation in a team, a student should discuss this with the teacher.
+
+   * if logged in it should be clear which users are logged in by **displaying** their **names** and their **team id**.
+      
+   * all students get **per email the credentials of the team** they are in. Students in the same team get the same team credentials send.     
+
+
+## User and teams setup 
+
+
+### user and team in DOMjudge
 
 We create per team only one user, so the user account and its team account are basicly the same.
 So we configure them also with the same data:
@@ -84,15 +92,15 @@ The first two fields can be generated, but the third field we have to supply. Ho
 
 ### The `teams.csv` input file
 
-
 Create a `csv` file with two columns:
 
-   1. the first column is  the name of the team. We use as team name a string containing a comma separated set of student names.
-   2. the second column we set with a string containing a comma separated set of emails, one per student.
+   1. the first column 'names' is  the name of the team. We use as team name a string containing a comma separated set of student names.
+   2. the second column 'emails' we set with a string containing a comma separated set of emails, one per student.
 
 Example:
 
     $ cat teams.csv
+    "names","emails"
     "Piet Venema, Jan Jansen", "pietvenema@gmail.com,janjansen@gmail.com"
     "Henk Hier, Piet Praat", "henkhier@gmail.com, pietpraat@gmail.com"
     ....
@@ -101,71 +109,14 @@ Example:
    
    Often you can export a list of students from some source, eg. brightspace,  and automatically generate the `teams.csv` file with a script. If you then want to combine students in teams you can edit this file manually to group them then in teams.
 
+This is the minimal input required, all other fields like loginname,password and team-category can be generated and added to this `teams.csv`.
+Once all data is generate we can use it to create import files for teams and accounts in DOMjudge, and to generate emails to send the team member their credentials. 
 
-###  Extended `teams_domjudge.csv`
-Using `teams.cvs` file as input we can generate the extra information that DOMjudge needs:
+When generating a team's login we can use something like "teamXpartY" so that its clear from the login name to which part of the course the team belongs.
 
+The scripts doing this work are not explained in this document. The aim of this document is to describe the design of how setting teams in DOMjudging can be made easy using scripts.
 
-    generate_domjudge_data.py teams.csv TEAM_CONFIGURATION_NUMBER  > "teams_domjudge.csv"
-   
-The  `TEAM_CONFIGURATION_NUMBER` is used to generate a team category which is unique. For the first part of the course we would use 1, for the second part of the course 2 etc...
+## Conclusion
 
-Then we generated a file  "accounts.domjudge.csv" containing also the fields
-  
- * loginname
- * password
- * team category
+The `teams.csv` file explained above is the only information an end user has to supply to create users and teams in DOMjudge. Using information in this file we can use scripts to generate accounts and teams in DOMjudge and inform students of the credentials with generated emails. 
 
-This file we use a input for generating users and account for DOMjudge, and emails we will send to the students to give them the login credentials to DOMjudge.
-
-### teams.yaml and accounts.yaml
-
-When we run the script:
-
-    create_domjudge_import_files.py  "teams_domjudge.csv" 
-
-we generate two files `teams.yaml` and `users.yaml` which we can import to DOMjudge to create the teams and users in DOMjudge. We can do the import manually 
-via the "Import / export" page linked on the "DOMjudge Jury interface". But we can also do it using the [REST API](https://www.domjudge.org/docs/manual/main/develop.html#api) using the [httpie tool](https://httpie.io):
-
-    DOMJUDGE_SERVER="http://localhost:12345"    
-    PASSWORD="secret" 
-    # admin password can be read from ./data/passwords/admin.pw 
-    # see https://github.com/harcokuppens/DOMjudgeDockerCompose/
-    
-    # import teams (hack: using json@teams.yaml to allow still import yaml)
-    https -a "admin:$PASSWORD" --check-status -b -f POST "$DOMJUDGE_SERVER/api/v4/users/teams" json@teams.yaml
-
-    # import accounts
-    https -a "admin:$PASSWORD" --check-status -b -f POST "$DOMJUDGE_SERVER/api/v4/users/accounts" yaml@accounts.yaml
-
-
-### mailing credentials to students
-
-When we run the script:
-
-    create_domjudge_credentials_mails.py  "teams_domjudge.csv". "mail/" 
-
-we generate in the `mail/` subfolder the mails to be send to the students.
-We do not directly send the emails, because we want to be able to inspect the emails before sending.
-
-With the following script we  can send out the emails:
-
-    send_emails.bash  "thesender@gmail.com"  "mail/"
-
-
-The send_emails.bash script:
-
-          #!/bin/bash
-
-          from_email="$1"
-          
-          for mailfile in mails/*
-          do 
-              printf "\n\n"
-              to_email=$(basename $mailfile)
-              printf "sending $mailfile to $to_email\n"
-              printf -- "--------------------------\n"
-              # prefer sendmail, because then also subject and recipient in mailfile
-              sendmail -t -i   -f $from_email  < $mailfile
-              sleep 1 # not to overflow mail server
-          done

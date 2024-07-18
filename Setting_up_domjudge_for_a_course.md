@@ -199,28 +199,48 @@ Step by step instructions to create users and teams in DOMjudge:
        1. the first column is  the name of the team. We use as team name a string containing a comma separated set of student names.
        2. the second column we set with a string containing a comma separated set of emails, one per student.
 
+      You can offcourse also make teams with only one student with only a single name and email in the columns.           
    
       Example:
    
           $ cat teams.csv
+          "names", "emails"
           "Piet Venema, Jan Jansen", "pietvenema@gmail.com,janjansen@gmail.com"
           "Henk Hier, Piet Praat", "henkhier@gmail.com, pietpraat@gmail.com"
           ....
           
-          
-      You can offcourse also make teams with only one student with only a single name and email in the columns.           
+      The first line in the `teams.csv` file is the header row which declares the names of the different columns.
    
-      Often you can export a list of students from some source, eg. brightspace,  and automatically generate the `teams.csv` file with a script. If you then want to combine students in teams you can edit this file manually to group them then in teams.
-             
+      Often you can export groups of students from some source, eg. brightspace,  and automatically generate the `teams.csv` file with a script. 
+      Sometimes we want the same numbering scheme of groups as in an external system such as brightspace, so that teamX in DOMjudge matches groupX in brightspace. To make this possible we allow also a "login" column in our `teams.csv` file:
     
-   3. generate loginname/password and team category for DOMjudge in `teams_domjudge.csv`
+      Example:
+  
+          $ cat teams.csv
+          "login","names", "emails"
+          "group1","Piet Venema, Jan Jansen", "pietvenema@gmail.com,janjansen@gmail.com"
+          "group2","Henk Hier, Piet Praat", "henkhier@gmail.com, pietpraat@gmail.com"
+          ....    
+    
+
+   3. generate "login","password" and "team category" for DOMjudge in `teams_domjudge.csv`
  
-          TEAM_CONFIGURATION_NUMBER=1 
-          generate-domjudge-data teams.csv $TEAM_CONFIGURATION_NUMBER  teams_domjudge.csv"
+          COURSEPART_NUMBER=1
+          generate-domjudge-data teams.csv $COURSEPART_NUMBER  teams_domjudge.csv
    
-      The  `TEAM_CONFIGURATION_NUMBER` is used to generate a team category which is unique. For the first part of the course we would use 1, for the second part of the course 2 etc...
+      The  `COURSEPART_NUMBER` is used to generate a team category which is unique per course part. For the first part of the course we would use 1 for `team-config-1`, for the second part of the course 2 for `team-config-2` etc... 
+
+      The  `COURSEPART_NUMBER` is also used to generate a suffix for the login name, such that we get distinct team logins per coursepart.
+      E.g. in course part 1 we have teams  'team1part1, team2part1,...' and in coursepart 2 we have teams 'team1part2, team2part2,...'. 
+
+      In case the `teams.csv` already contains a "login" column the script only adds the suffix to the existing loginname. So for a given login "group3" in course part 2 we would get a login "group3part2".
+
+      After this step we have all the data we need in the `teams_domjudge.csv` file. The remaining steps is only importing this
+      data into DOMjudge and mailing the credentials around. 
+
 
    4. use `teams_domjudge.csv` to generate the `teams.yaml` and `users.yaml` import files by running the script:
+
 
           create-domjudge-import-files  "teams_domjudge.csv" 
 
@@ -242,33 +262,33 @@ Step by step instructions to create users and teams in DOMjudge:
           https -a "$ADMINUSER:$PASSWORD" --check-status -b -f POST "$DOMJUDGE_SERVER/api/v4/users/accounts" yaml@accounts.yaml
 
 
-
-
 #### Mailing credentials to students
+
+Here we explain how to mail the credentials to the students. This step can off course also be done later when actual problems are added to the course.  But because in the previous sections we explained how to create the teams in DOMjudge this is the most logical place to explain the mailing procedure.
 
 When we run the script:
 
-    create-domjudge-credentials-mails  "teams_domjudge.csv". "mail/" 
+    create-domjudge-credentials-mails  "teams_domjudge.csv" "mail/" 
 
 we generate in the `mail/` subfolder the mails to be send to the students.
 We do not directly send the emails, because we want to be able to inspect the emails before sending.
 
-With the following script we  can send out the emails:
+With the following script we use the linux `sendmail` command to send out the emails:
 
-    send-emails  "thesender@gmail.com"  "mail/"
+    send-emails "thesender@gmail.com" "mail/"
 
 If somehow this method does not work for you, you can use one of the alternative methods described in the page 
 [Sending batch of personalized emails](Sending_batch_of_personalized_emails.md).
 
 #### Create contest
           
-Then create different contest for each course part.
-We take as coursename 'ads2324', but you can use any coursename here.
+Then create a different contest for each course part.
+We take as coursename 'mycourse', but you can use any coursename here.
         
     click on 'DOMjudge' in top right corner, to get 'DOMjudge Jury interface'
     click on 'Contests'       
     click on 'Add new contest' button
-       in 'Shortname' and 'Name' boxes enter 'ads2324-part-1'
+       in 'Shortname' and 'Name' boxes enter 'mycourse-part-1'
        select value in "Activate time" and 
        paste it into "Start time" and "End time" fields.
        In the "End time" field increase the date by 1 year.

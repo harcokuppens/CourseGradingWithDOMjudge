@@ -33,3 +33,9 @@ for idx, fieldname in enumerate(fieldnames):
         print("ERROR: missing header '" +  fieldname + "'")
         exit(1)  
 
+
+teams = open("teams.yaml", "w")
+teams.write("File_Version\t2\n")
+
+accounts = open("accounts.yaml", "w")
+accounts.write("accounts\t1\n")
