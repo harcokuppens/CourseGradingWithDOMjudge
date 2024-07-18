@@ -2,18 +2,18 @@
 
 **Table of Contents**
 <!--ts-->
-* [Explanation of Users and Teams setup](Explanation_of_users_and_teams_setup.md#explanation-of-users-and-teams-setup)
-   * [design choices](Explanation_of_users_and_teams_setup.md#design-choices)
-   * [implementation](Explanation_of_users_and_teams_setup.md#implementation)
-      * [user and team in DOMjudge](Explanation_of_users_and_teams_setup.md#user-and-team-in-domjudge)
-      * [Inspect required information](Explanation_of_users_and_teams_setup.md#inspect-required-information)
-      * [The teams.csv input file](Explanation_of_users_and_teams_setup.md#the-teamscsv-input-file)
-      * [Extended teams_domjudge.csv](Explanation_of_users_and_teams_setup.md#extended-teams_domjudgecsv)
-      * [teams.yaml and accounts.yaml](Explanation_of_users_and_teams_setup.md#teamsyaml-and-accountsyaml)
-      * [mailing credentials to students](Explanation_of_users_and_teams_setup.md#mailing-credentials-to-students)
+* [Explanation of Users and Teams setup](#explanation-of-users-and-teams-setup)
+   * [design choices](#design-choices)
+   * [implementation](#implementation)
+      * [user and team in DOMjudge](#user-and-team-in-domjudge)
+      * [Inspect required information](#inspect-required-information)
+      * [The teams.csv input file](#the-teamscsv-input-file)
+      * [Extended teams_domjudge.csv](#extended-teams_domjudgecsv)
+      * [teams.yaml and accounts.yaml](#teamsyaml-and-accountsyaml)
+      * [mailing credentials to students](#mailing-credentials-to-students)
 
 <!-- Created by https://github.com/ekalinin/github-markdown-toc -->
-<!-- Added by: harcok, at: wo jul  3 12:02:44 CEST 2024 -->
+<!-- Added by: harcok, at: wo jul 17 20:21:17 CEST 2024 -->
 
 <!--te-->
 

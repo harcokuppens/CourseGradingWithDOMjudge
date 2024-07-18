@@ -4,17 +4,17 @@
 
 **Table of Contents**
 <!--ts-->
-* [Overview programming contests, specifications and tooling](Programming_contests_specifications_and_tooling.md#overview-programming-contests-specifications-and-tooling)
-   * [The ICPC](Programming_contests_specifications_and_tooling.md#the-icpc)
-      * [Examples of ICPC contests](Programming_contests_specifications_and_tooling.md#examples-of-icpc-contests)
-   * [ICPC Specifications](Programming_contests_specifications_and_tooling.md#icpc-specifications)
-   * [Contest Control Systems   (following ICPC specs)](Programming_contests_specifications_and_tooling.md#contest-control-systems---following-icpc-specs)
-      * [Kattis](Programming_contests_specifications_and_tooling.md#kattis)
-      * [DOMjudge](Programming_contests_specifications_and_tooling.md#domjudge)
-   * [Tools to make problem/contest data](Programming_contests_specifications_and_tooling.md#tools-to-make-problemcontest-data)
+* [Overview programming contests, specifications and tooling](#overview-programming-contests-specifications-and-tooling)
+   * [The ICPC](#the-icpc)
+      * [Examples of ICPC contests](#examples-of-icpc-contests)
+   * [ICPC Specifications](#icpc-specifications)
+   * [Contest Control Systems   (following ICPC specs)](#contest-control-systems---following-icpc-specs)
+      * [Kattis](#kattis)
+      * [DOMjudge](#domjudge)
+   * [Tools to make problem/contest data](#tools-to-make-problemcontest-data)
 
 <!-- Created by https://github.com/ekalinin/github-markdown-toc -->
-<!-- Added by: harcok, at: wo jul  3 12:02:44 CEST 2024 -->
+<!-- Added by: harcok, at: wo jul 17 20:21:18 CEST 2024 -->
 
 <!--te-->
 
