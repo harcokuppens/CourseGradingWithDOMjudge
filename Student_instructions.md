@@ -27,7 +27,7 @@ This documents contains general information about the use of DOMjudge in the cou
       * gcc (Debian 12.2.0-14) 12.2.0
       * g++ (Debian 12.2.0-14) 12.2.0
 
-  You can easily fetch these results with the script [domjudge-language-versions](https://raw.githubusercontent.com/harcokuppens/CourseGradingWithDOMjudge/main/scripts/domjudge-language-versions) on any machine running docker.
+  You can easily fetch the language versions supported by a specific DOMjudge version with the script [domjudge-language-versions](https://raw.githubusercontent.com/harcokuppens/CourseGradingWithDOMjudge/main/scripts/domjudge-language-versions) on any machine running docker.
 
 
  [^1]: If you cannot figure out your mistake, feel free to contact us.

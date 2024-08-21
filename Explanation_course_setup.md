@@ -2,19 +2,19 @@
 
 **Table of Contents**
 <!--ts-->
-* [Explanation of How to Use DOMjudge for a Course](#explanation-of-how-to-use-domjudge-for-a-course)
-   * [Requirements](#requirements)
-   * [Implementation of requirements](#implementation-of-requirements)
-      * [Point 1: students should not be able to see each other results](#point-1-students-should-not-be-able-to-see-each-other-results)
-      * [Point 2: submit for practicing and grading separately](#point-2-submit-for-practicing-and-grading-separately)
-      * [Point 3: support different teams configurations](#point-3-support-different-teams-configurations)
-      * [Point 4: easy fetch grading results](#point-4-easy-fetch-grading-results)
-      * [Point 5:  stop submissions to a problem when the deadline expires](#point-5--stop-submissions-to-a-problem-when-the-deadline-expires)
-      * [Point 6: the DOMjudge system should be easy installable and upgradable](#point-6-the-domjudge-system-should-be-easy-installable-and-upgradable)
-      * [Point 7: data should be easily being backed up for long term storage](#point-7-data-should-be-easily-being-backed-up-for-long-term-storage)
+* [Explanation of How to Use DOMjudge for a Course](Explanation_course_setup.md#explanation-of-how-to-use-domjudge-for-a-course)
+   * [Requirements](Explanation_course_setup.md#requirements)
+   * [Implementation of requirements](Explanation_course_setup.md#implementation-of-requirements)
+      * [Point 1: students should not be able to see each other results](Explanation_course_setup.md#point-1-students-should-not-be-able-to-see-each-other-results)
+      * [Point 2: submit for practicing and grading separately](Explanation_course_setup.md#point-2-submit-for-practicing-and-grading-separately)
+      * [Point 3: support different teams configurations](Explanation_course_setup.md#point-3-support-different-teams-configurations)
+      * [Point 4: easy fetch grading results](Explanation_course_setup.md#point-4-easy-fetch-grading-results)
+      * [Point 5:  stop submissions to a problem when the deadline expires](Explanation_course_setup.md#point-5--stop-submissions-to-a-problem-when-the-deadline-expires)
+      * [Point 6: the DOMjudge system should be easy installable and upgradable](Explanation_course_setup.md#point-6-the-domjudge-system-should-be-easy-installable-and-upgradable)
+      * [Point 7: data should be easily being backed up for long term storage](Explanation_course_setup.md#point-7-data-should-be-easily-being-backed-up-for-long-term-storage)
 
 <!-- Created by https://github.com/ekalinin/github-markdown-toc -->
-<!-- Added by: harcok, at: wo jul 17 20:21:16 CEST 2024 -->
+<!-- Added by: harcok, at: wo aug 21 15:03:35 CEST 2024 -->
 
 <!--te-->
 
@@ -86,9 +86,9 @@ We use a fetch script to automatically fetch the data from DOMjudge. Then we use
 
 ### Point 5:  stop submissions to a problem when the deadline expires
   
-Each problem has two instances a `practice` problem, and a `grading` problem. We disable submitting to the `grading` problem when its deadline expires. In DOMjudge disable submitting to a problem causes also that the problem becomes invisible for the teams, making any new submissions to it impossible. The students cannot see `grading` problem anymore, however they can still see the `practice` problem containing there results.  In this way after the deadline the `grading` problems dissapears, so that students **cannot submit for grading anymore**. But all contests and its `practice` problems are always kept visible for the students,  and therefore they **keep having an overview of the work they did**. 
+Each problem has two instances a `practice` problem, and a `grading` problem. We disable submitting to the `grading` problem when its deadline expires. In DOMjudge disable submitting to a problem causes also that the problem becomes invisible for the teams, making any new submissions to it impossible. The students cannot see `grading` problem anymore, however they can still see the `practice` problem containing there results.  In this way after the deadline the `grading` problems disappears, so that students **cannot submit for grading anymore**. But all contests and its `practice` problems are always kept visible for the students,  and therefore they **keep having an overview of the work they did**. 
 
-If all problems in  course part, represented by a contest, are graded then we can also disable submitting to contest as a whole. Then also submissions to the `practice` problems in the contest become disabled.
+If all problems in a course part, represented by a contest, are graded then we can also disable submitting to contest as a whole. Then also submissions to the `practice` problems in the contest become disabled.
 
 Finally if the whole course is ended, we can disable all the contests in the course, making everything disabled. From then on a team sees no contests at all anymore. This is a quick method to disable the course, and still allow us to activate parts of it if really necessary.
 

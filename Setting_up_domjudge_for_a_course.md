@@ -4,6 +4,11 @@
 # Setting up DOMjudge for a course
 
 **Table of Contents**
+
+<!---
+update toc by running command:
+   markdown_insert_github_toc Setting_up_domjudge_for_a_course.md
+-->
 <!--ts-->
 * [Setting up DOMjudge for a course](#setting-up-domjudge-for-a-course)
    * [A. Create a fresh and up to date DOMjudge installation](#a-create-a-fresh-and-up-to-date-domjudge-installation)
@@ -14,8 +19,8 @@
       * [2. Make DOMjudge use external id's for configuration data](#2-make-domjudge-use-external-ids-for-configuration-data)
       * [3. Setting language timefactors](#3-setting-language-timefactors)
       * [4. Give teams more information about their submissions](#4-give-teams-more-information-about-their-submissions)
-      * [5. Add scripts of the CourseGradingWithDOMjudge repo to your PATH](#5-add-scripts-of-the-coursegradingwithdomjudge-repo-to-your-path)
-   * [C. Setup and usage DOMjudge for the course](#c-setup-and-usage-domjudge-for-the-course)
+   * [C. Install helper scripts of CourseGradingWithDOMjudge repo](#c-install-helper-scripts-of-coursegradingwithdomjudge-repo)
+   * [D. Setup and usage DOMjudge for the course](#d-setup-and-usage-domjudge-for-the-course)
       * [1. Setup part of a course for a specific teams configuration](#1-setup-part-of-a-course-for-a-specific-teams-configuration)
          * [Create teams](#create-teams)
          * [Mailing credentials to students](#mailing-credentials-to-students)
@@ -34,9 +39,10 @@
             * [Test problem in DOMjudge](#test-problem-in-domjudge)
       * [3. Students can submit code to the problem](#3-students-can-submit-code-to-the-problem)
       * [4. When the problem's deadline is reached, the teacher downloads its final submissions](#4-when-the-problems-deadline-is-reached-the-teacher-downloads-its-final-submissions)
+      * [5. Ending contest and course](#5-ending-contest-and-course)
 
 <!-- Created by https://github.com/ekalinin/github-markdown-toc -->
-<!-- Added by: harcok, at: do jul 18 09:24:25 CEST 2024 -->
+<!-- Added by: harcok, at: wo aug 21 15:04:09 CEST 2024 -->
 
 <!--te-->
 
@@ -69,7 +75,7 @@ For more explanation see the github project https://github.com/harcokuppens/DOMj
 
 ## B. Basic configuration
 
-The default installation of DOMjudge needs some tweaking before we can use it. For example we disable the demo user for security reasonse. 
+The default installation of DOMjudge needs some tweaking before we can use it. For example we disable the demo user for security reasons. 
 
 ### 1. Make demo contest private, and delete demo user
 
@@ -147,19 +153,25 @@ In below instructions we also allow to download code from submissions. Can be ha
     click on 'Save' button at bottom of window
 
 
-### 5. Add scripts of the CourseGradingWithDOMjudge repo to your PATH
+## C. Install helper scripts of CourseGradingWithDOMjudge repo 
 
-In your `.bashrc` add:
+To set up DOMjudge for a course we implemented some helper scripts in 
+the [CourseGradingWithDOMjudge repo](https://github.com/harcokuppens/CourseGradingWithDOMjudge) to help you with this task.
+
+To use the scripts of the CourseGradingWithDOMjudge repo we need to clone the repo. We take `REPO_PATH` as the location where the repository gets cloned:
+
+    cd "$REPO_PATH"
+    git clone https://github.com/harcokuppens/CourseGradingWithDOMjudge
+ 
+Then add its scripts folder to your PATH by adding to your `.bashrc`:
 
     # add scripts to PATH
-    REPO_PATH=..path where CourseGradingWithDOMjudge git repo is cloned...
     export PATH="$REPO_PATH/scripts/:$PATH"
 
-
-## C. Setup and usage DOMjudge for the course
+## D. Setup and usage DOMjudge for the course
 
 The course will be given in different parts with each part different team configurations.
-For each part we make a separate contest to which only teams of a specific team configuration have access. Within each course part we can add several problems, where each problem has its own sumbmission deadline.
+For each part we make a separate contest to which only teams of a specific team configuration have access. Within each course part we can add several problems, where each problem has its own submission deadline.
 
 Below we explain first how to setup a part of the course. Other course parts can repeat the procedure. Then we explain how to add a problem to a contest of a course part, how students can practice and submit their final result. Finally we describe how the teacher then can fetch the results of the problem. The same procedure can be used for other problems.
 
@@ -482,7 +494,11 @@ DOMjudge claims you can also later upload  a zipfile containing only the problem
 
 ### 3. Students can submit code to the problem    
 
-Now students can submit their code to the **practicing problem**. The practicing problem is **judged lazy**, meaning that if the submission fails on a sample, then all remaining samples are not executed anymore.  The idea is that the team first has to solve that sample first, before executing the remaining samples. The lazy evaluation also makes the load less on the juding server.
+When a problem is added to DOMjudge, the students can start working on it. 
+We provide the students with 
+[instructions](Student_instructions.md)  of how to use DOMjudge in the course.
+
+From then on students can submit their code to the **practicing problem**. The practicing problem is **judged lazy**, meaning that if the submission fails on a sample, then all remaining samples are not executed anymore.  The idea is that the team first has to solve that sample first, before executing the remaining samples. The lazy evaluation also makes the load less on the juding server.
 
 A team can also download the samples of the practicing problem, and evaluate all the samples locally on their solution without using DOMjudge.
 
@@ -495,7 +511,7 @@ A team should only submit once per grading problem, however if something went wr
 
 In [our approach of applying a deadline to a problem](How_to_handle_ending_time_of_a_problem.md) we do not use any deadline timers in DOMjudge to specify the deadline a problem's final submission, but instead we just inform the students of the deadline, and when its passed we disable submitting to the 'grading' problem, and fetch the results from it. 
  
-The problem's deadline is communicated to the students during the course and in the problem description. If the deadline of the problem is passed, the teacher can fetch his results this way:
+The problem's deadline is communicated to the students during the course and in the problem description. If the deadline of the problem is passed, the teacher can disable the problem and fetch its results by doing:
 
    1. **Disable submission** to the grading version of the problem: 
 
@@ -537,7 +553,16 @@ The problem's deadline is communicated to the students during the course and in 
        We skip the public samples when doing the grading, because we only want to grade on the secret samples.
        The `process` scripts outputs two `csv` files a basic one `gradings.csv` and one with more details `gradings.details.csv`. 
        
-  5. **Convert** these `csv` files to nice **excel** files containing a table:
+  4. **Convert** these `csv` files to nice **excel** files containing a table:
   
            csv2xslt gradings.csv
            csv2xslt gradings.details.csv  
+
+
+### 5. Ending contest and course  
+
+If the contest is done, we **disable submitting** to the contest: the practicing problems stay visible, but you cannot submit to it anymore. This prevents people submitting to old problems, but let them still see them. This allows students to look back.
+
+If the course is done, you can **disable all contests**: then all contests are hidden. Teams can login but do not see anything anymore. Course is over, students do not need to look back anymore.
+
+Every year start DOMjudge fresh! Don't use a system with old teams and old contests, because this could only lead to unnecessary conflicts and confusion.           
