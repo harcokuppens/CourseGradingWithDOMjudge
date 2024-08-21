@@ -108,7 +108,7 @@ At the end off the course, if all resits are done,  we do a combined **backup**,
    1. `docker compose down`
    2. `sudo cp -a . $BACKUPFOLDER`
    3. `sudo rm -r ./data`
-   4. Optionally update to a newer domjudge version by updating DOMJUDGE_VERSION/MARIADB_VERSION in .env file,
+   4. Optionally update to a newer domjudge version by updating `DOMJUDGE_VERSION/MARIADB_VERSION` in `.env` file,
       which can be also done by `git pull` if the versions in the github repo are updated.
    6. `docker compose up -d`
 
