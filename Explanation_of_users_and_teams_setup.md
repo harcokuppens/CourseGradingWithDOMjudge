@@ -134,7 +134,7 @@ Example:
    
 The `teams.csv` file contains the minimal information required to create users and teams in DOMjudge.
 We use scripts to generate from this `teams.csv` file a  `users.yaml` and `teams.yaml` to import users and teams into DOMjudge, and to generate
-emails which sends users their credentials.  The scripts only need the `teams.csv` and the course part's number as input. The course part number
+emails which sends users their credentials and team info.  The scripts only need the `teams.csv` and the course part's number as input. The course part number
 is required because as we can see above its used in the user's `Id` and `Username`, and the team's `Id`, `Name`, and `Display name`, because
 as explained above for each coursepart we generate a different user account for each user.
   
@@ -143,5 +143,5 @@ Using the scripts doing this work are not explained in this document. The aim of
 
 ## Conclusion
 
-The `teams.csv` file explained above is the only information an end user has to supply to create users and teams in DOMjudge. Using information in this file we can use scripts to generate accounts and teams in DOMjudge and inform students of the credentials with generated emails. 
+The `teams.csv` file explained above is the only information an end user has to supply to create users and teams in DOMjudge. Using information in this file we can use scripts to generate accounts and teams in DOMjudge and inform students of their credentials and team with generated emails. 
 

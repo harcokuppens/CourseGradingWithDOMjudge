@@ -186,7 +186,7 @@ In the following document I explain in more detail the idea's behind my configur
 Below we setup a course part for a teams configuration labeled with the `Team Category` named `part1-teams-config`. The same procedure can be repeated for other teams configurations.  
 
 
-#### Create teams 
+#### Create user and teams in DOMjudge 
 
 We use scripts to create teams and users. Details about the design choices how we make these teams and users you can read here:
 
@@ -241,44 +241,36 @@ Step by step instructions to create users and teams in DOMjudge:
       emails which sends users their credentials.  The scripts only need the `teams.csv` and the course part's number as input. The course part number
       is required because,  as explained in the document ["Explanation of users and teams setup"](Explanation_of_users_and_teams_setup.md), for each coursepart we generate a different user account for each user.
 
-   3. From the `teams.csv` file create users and teans in DOMjudge.
 
-      We do this in 3 steps:
+3. From the `teams.csv` file create users and teans in DOMjudge.
 
-        1. From minimal  `teams.csv`  generate `teams_domjudge.csv` with all derived data needed for DOMjudge.
+      We do this in 2 steps:
+
+    1. Then from `teams.csv` we generate the `teams.yaml` and `users.yaml` import files by running the script:
+
+
+            create-domjudge-import-files  "teams_domjudge.csv" 
+
+        In case the `teams.csv` already contains a `teamname` column the script only adds the prefix `partX` to the existing `teamname`. So for a given teamname "group3" in course part 2 we would get a team name  "part2-group3" in DOMjudge.
+
+        The generated `teams.yaml` and `users.yaml` files are also used later to generate emails which sends users their credentials and team info.
+
+    2. Import `teams.yaml` and `accounts.yaml` import files into DOMjudge.
+
+        We can do the import manually via the "Import / export" page linked on the "DOMjudge Jury interface". But we can also do it using the [REST API](https://www.domjudge.org/docs/manual/main/develop.html#api) using the [httpie tool](https://httpie.io):
+
+            DOMJUDGE_SERVER="http://localhost:12345"    
+            ADMINUSER="admin"
+            PASSWORD="secret" 
+            # admin password can be read from ./data/passwords/admin.pw 
+            # see https://github.com/harcokuppens/DOMjudgeDockerCompose/
         
+            # import teams (hack: using json@teams.yaml still allows import of yaml)
+            https -a "$ADMINUSER:$PASSWORD" --check-status -b -f POST "$DOMJUDGE_SERVER/api/v4/users/teams" json@teams.yaml
 
-                COURSEPART_NUMBER=1
-                generate-domjudge-data teams.csv $COURSEPART_NUMBER  teams_domjudge.csv
-        
-            In case the `teams.csv` already contains a `teamname` column the script only adds the prefix `partX` to the existing `teamname`. So for a given teamname "group3" in course part 2 we would get a team name  "part2-group3" in DOMjudge.
+            # import accounts
+            https -a "$ADMINUSER:$PASSWORD" --check-status -b -f POST "$DOMJUDGE_SERVER/api/v4/users/accounts" yaml@accounts.yaml
 
-            After this step we have all the data we need in the `teams_domjudge.csv` file. The remaining steps is only importing this
-            data into DOMjudge and mailing the credentials around. 
-
-            The `teams_domjudge.csv` file is also used later to generate emails which sends users their credentials. 
-
-
-        2. Then from `teams_domjudge.csv` we generate the `teams.yaml` and `users.yaml` import files by running the script:
-
-
-                create-domjudge-import-files  "teams_domjudge.csv" 
-
-        3. Import `teams.yaml` and `accounts.yaml` import files into DOMjudge.
-
-            We can do the import manually via the "Import / export" page linked on the "DOMjudge Jury interface". But we can also do it using the [REST API](https://www.domjudge.org/docs/manual/main/develop.html#api) using the [httpie tool](https://httpie.io):
-
-                DOMJUDGE_SERVER="http://localhost:12345"    
-                ADMINUSER="admin"
-                PASSWORD="secret" 
-                # admin password can be read from ./data/passwords/admin.pw 
-                # see https://github.com/harcokuppens/DOMjudgeDockerCompose/
-            
-                # import teams (hack: using json@teams.yaml still allows import of yaml)
-                https -a "$ADMINUSER:$PASSWORD" --check-status -b -f POST "$DOMJUDGE_SERVER/api/v4/users/teams" json@teams.yaml
-
-                # import accounts
-                https -a "$ADMINUSER:$PASSWORD" --check-status -b -f POST "$DOMJUDGE_SERVER/api/v4/users/accounts" yaml@accounts.yaml
 
 
 #### Mailing credentials to students
@@ -287,7 +279,7 @@ Here we explain how to mail the credentials to the students. This step can off c
 
 When we run the script:
 
-    create-domjudge-credentials-mails  "teams_domjudge.csv" "mail/" 
+    create-domjudge-credentials-mails  "accounts.yaml" "teams.yaml" "mail/" 
 
 we generate in the `mail/` subfolder the mails to be send to the students.
 We do not directly send the emails, because we want to be able to inspect the emails before sending.
