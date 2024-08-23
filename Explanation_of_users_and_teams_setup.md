@@ -26,10 +26,15 @@ In DOMjudge you need both a user and a team because:
 * a team without user cannot login into DOMjudge
 
 DOMjudge also has the limitation that an user can only belong to one team. So it is not possible to assign a user to multiple teams. 
+Probably the reason for this is that in a programming contest a user always belongs to a single team, and then when a user 
+submits a solution it is immediately clear to which team the submission belongs. 
 
-If you want to have different teams per course part, then either you have to make a new user account for each user for the new course part, or you have to update the user account it belongs to the new team and removing it from the old team. The user cannot see old work done under the old team anymore.  
+If you want to have different teams per course part, then either you have to make a new user account for each user for the new course part, 
+or you have to update the user account it belongs to the new team and removing it from the old team. 
+The user then cannot see old work done under the old team anymore, because he is removed from that team.  
 
-That's why we decided to just make per team a single dummy account, which gets shared by the team members. For each course part we create new teams, and the new credentials are send to the new team members. A user then can still login to all the different teams it belonged to for the different course parts, meaning he can still see all work he has done in DOMjudge.
+That's why we decided to just make a new user account for each user for the new course part. 
+The user can then still see als its  work in the all course parts just by using the different credentials it got per course part.
 
 ## Design choices
 
@@ -37,64 +42,73 @@ When using DOMjudge for grading in a course we use the following design choices 
       
    * students **work together in teams**
       
-   * students in a specific team get a **shared login** to that team. By having one user per team, we effectively only have teams to which we can login. We simplify things by not caring about the separate users. (KISS principle). 
-      
-     We assume students cooperate fairly in a team. We do not want to use DOMjudge to check which student did the most work by counting submissions per student in a team. If there are problems with cooperation in a team, a student should discuss this with the teacher.
+   * students in a specific team each get its   **own login** to that team. An admin then can see in which student did  which submissions in a team. 
 
-   * if logged in it should be clear which users are logged in by **displaying** their **names** and their **team id**.
+   * if an user is logged in it should be clear to which team the user belongs  by **displaying** the **team ID** and the **team's member names**.
       
-   * all students get **per email the credentials of the team** they are in. Students in the same team get the same team credentials send.     
+   * all students get **per email their user credentials of the team** they are in.    
 
 
 ## User and teams setup 
 
 
-### user and team in DOMjudge
+### User and team in DOMjudge
 
 We create per team only one user, so the user account and its team account are basicly the same.
 So we configure them also with the same data:
 
       for User
-       * Username:           "teamX"    => used as login name            
-                                  `-> X is group id for our own administration! 
-         Full name:          "one/multiple full names of team members"     
-         Password:           .....
-         
-         
+      +  ID:                 "u-1-005"                => the ID of 5th user in part 1 of the course
+      +  Username:           "part1-<email addres of user>"   => used as login name            
+         Password:           .....                         
+         Full name:          "full name of user"  
+         Email:              "email addres of user"
+         TeamId:             "t-1-003"                => the team the user belongs to (can only be one team)
+          
       for Team 
-          Name:              "teamX"                                     
-       *  Display Name:      "one/multiple full names of team members"
-   
-  The fields with `*` are shown on top of the submission page. 
-  So when viewing a submission we see at top:
-     
-      team: one/multiple full names of team members       user: team-X     
-                |                                                 `-> "Username" is shown here, not Full name
-                `-> Team's "Display Name" is shown here
+      +   ID:                "t-1-003"                => the ID of 3th team in part 1 of the course
+          Name:              "part1-team003"          => the team 3th team  in part 1 of the course     
+      +*  Display Name:      "part1-team003: <one or multiple full names of team members>"
 
- Information about the team is very clearly displayed because we see both "full names of team members" and its "team id"!
- 
- 
-The team id  is an external id we give ourself to the team!  We configured DOMjudge to allow external id's for configuration data.  
 
-Using internal id's was inconvenient for creating users and teams. Because for creating a user we needed the the team id it belong to.  If using internal id's in DOMjudge we then first needed to create the teams. Then after creating the teams we had to get the internal id's of the teams from DOMjugde before we could create the users belonging to those teams. With external id's we can choose our own team id's and can we directly create the users belonging to them.
+
+An user logs in with its `Username` and `Password` and then only sees its team's  `Display Name` (marked by `*`).
+
+An admin sees both the user's `Id` and `Username`, and its team's `Id` and `Display name`  when he views a submission of an user (marked by `+`).
+
+We use the user's email address to define also its `Username` because an email address is unique for an user. We prefix it
+with `partX-` so that we have a separate user account per course part X. Most student accounts in most education institutes
+also have a reasonable email address containing the user's full name. This helps an admin a lot, because When he looks at a submission 
+he only sees the user's `Username` which then already reflects the user's full name. 
+
+The  user's and team's IDs  are external IDs we give ourself to the team!  We configured DOMjudge to allow external IDs for configuration data.  
+
+Using internal IDs was inconvenient for creating users and teams. Because for creating a user we needed the the team ID it belong to.  
+If using internal IDs in DOMjudge we then first needed to create the teams. Then after creating the teams we had to get the internal IDs 
+of the teams from DOMjugde before we could create the users belonging to those teams. With external IDs we can choose our own team IDs 
+and can we directly create the users belonging to them.
+
 
 ### Inspect required information
 
-So for each user/team pair in DOMjudge we need to following information:
+If we look at all the information for setting up teams and users we see that some fields like IDs can
+be just generated, and other fields like `Username` can be derived from other information. After looking
+carefully we constructed a list of the minimal information required:
 
-1. Username(user)/Name(team):  loginname set with value "teamX", where X is integer specifing team number
-2. Password(user): password for login
-3. Full name(user)/Display name(team):	 written out name of single student/multiples students in team
+   Full name of  user
+   Email  addres of user
+   Which users belong to the same team
 
-The first two fields can be generated, but the third field we have to supply. However in our design choices we also require to email the credentials to  each team member. So we need also per team the email addresses of its team members. This leads us to a simple input file we base our scripts on: `teams.csv`.
+This leads us to a simple input file we base our scripts on: `teams.csv`.
 
 ### The `teams.csv` input file
 
-Create a `csv` file with two columns:
+Create a `csv` file, where each line represents a team, with the two columns:
 
    1. the first column 'names' is  the name of the team. We use as team name a string containing a comma separated set of student names.
    2. the second column 'emails' we set with a string containing a comma separated set of emails, one per student.
+
+You can offcourse also make teams with only one student with only a single name and email in the columns. 
 
 Example:
 
@@ -103,17 +117,29 @@ Example:
     "Piet Venema, Jan Jansen", "pietvenema@gmail.com,janjansen@gmail.com"
     "Henk Hier, Piet Praat", "henkhier@gmail.com, pietpraat@gmail.com"
     ....
-          
-   You can offcourse also make teams with only one student with only a single name and email in the columns.           
+
+
+Often you can export groups of students from some source, eg. brightspace,  and automatically generate the `teams.csv` file with a script. 
+Sometimes we want the same numbering scheme of groups as in an external system such as brightspace, so that teamX in DOMjudge matches groupX in brightspace. 
+To make this possible we allow also a `teamname` column in our `teams.csv` file:
+
+Example:
+
+      $ cat teams.csv
+      "teamname","names", "emails"
+      "group1","Piet Venema, Jan Jansen", "pietvenema@gmail.com,janjansen@gmail.com"
+      "group2","Henk Hier, Piet Praat", "henkhier@gmail.com, pietpraat@gmail.com"
+      ....    
+
    
-   Often you can export a list of students from some source, eg. brightspace,  and automatically generate the `teams.csv` file with a script. If you then want to combine students in teams you can edit this file manually to group them then in teams.
+The `teams.csv` file contains the minimal information required to create users and teams in DOMjudge.
+We use scripts to generate from this `teams.csv` file a  `users.yaml` and `teams.yaml` to import users and teams into DOMjudge, and to generate
+emails which sends users their credentials.  The scripts only need the `teams.csv` and the course part's number as input. The course part number
+is required because as we can see above its used in the user's `Id` and `Username`, and the team's `Id`, `Name`, and `Display name`, because
+as explained above for each coursepart we generate a different user account for each user.
+  
+Using the scripts doing this work are not explained in this document. The aim of this document is to describe the design of how setting teams in DOMjudging can be made easy using scripts.
 
-This is the minimal input required, all other fields like loginname,password and team-category can be generated and added to this `teams.csv`.
-Once all data is generate we can use it to create import files for teams and accounts in DOMjudge, and to generate emails to send the team member their credentials. 
-
-When generating a team's login we can use something like "teamXpartY" so that its clear from the login name to which part of the course the team belongs.
-
-The scripts doing this work are not explained in this document. The aim of this document is to describe the design of how setting teams in DOMjudging can be made easy using scripts.
 
 ## Conclusion
 

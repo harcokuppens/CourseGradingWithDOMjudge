@@ -170,8 +170,9 @@ Then add its scripts folder to your PATH by adding to your `.bashrc`:
 
 ## D. Setup and usage DOMjudge for the course
 
-The course will be given in different parts with each part different team configurations.
-For each part we make a separate contest to which only teams of a specific team configuration have access. Within each course part we can add several problems, where each problem has its own submission deadline.
+The course will be given in different parts, where each part arranges the students differently over the teams. Each part has a different teams configuration. 
+
+We implement each course part with DOMjudge using a separate contest only accessible by a specific teams configuration. Each team in that teams configuration is given the same `Team Category` in DOMjudge, and we give only access to the contest to teams in that `Team Category`. We also set the `visible` property of that `Team Category` to false, causing the different teams to become invisible to each other in the contest.  Finally, each course part can have several problems to solve, which we implement by adding several problems to that course part's contest. Although several problems are in the same contest, each problem has still its own submission deadline.
 
 Below we explain first how to setup a part of the course. Other course parts can repeat the procedure. Then we explain how to add a problem to a contest of a course part, how students can practice and submit their final result. Finally we describe how the teacher then can fetch the results of the problem. The same procedure can be used for other problems.
 
@@ -182,7 +183,7 @@ In the following document I explain in more detail the idea's behind my configur
 
 ### 1. Setup part of a course for a specific teams configuration
 
-Below we setup a course part for a teams configuration labeled with the `Team Category` named `teams-config-1`. The same procedure can be repeated for other teams configurations.  
+Below we setup a course part for a teams configuration labeled with the `Team Category` named `part1-teams-config`. The same procedure can be repeated for other teams configurations.  
 
 
 #### Create teams 
@@ -194,19 +195,19 @@ We use scripts to create teams and users. Details about the design choices how w
 
 Step by step instructions to create users and teams in DOMjudge:
 
-   1. first add the `Team Category` named `teams-config-1` which we can use for the first course part
+   1. first add the `Team Category` named `part1-teams-config` which we can use for the first course part
 
 
           click on 'DOMjudge' in top right corner, to get 'DOMjudge Jury interface'
           click on 'Team Categories'
           click on 'Add new category' button
-          in 'Name' box enter text "teams-config-1"
+          in 'Name' box enter text "part1-teams-config"
           and set 'Visible' radio button to "No"
           note: self-registration is by default 'No'
           click on 'Save' button at bottom of window 
 
 	
-   2. create a `teams.csv` file with two columns:
+   2. create a `teams.csv` file, where each line represents a team, with the two columns:
 
        1. the first column is  the name of the team. We use as team name a string containing a comma separated set of student names.
        2. the second column we set with a string containing a comma separated set of emails, one per student.
@@ -224,54 +225,60 @@ Step by step instructions to create users and teams in DOMjudge:
       The first line in the `teams.csv` file is the header row which declares the names of the different columns.
    
       Often you can export groups of students from some source, eg. brightspace,  and automatically generate the `teams.csv` file with a script. 
-      Sometimes we want the same numbering scheme of groups as in an external system such as brightspace, so that teamX in DOMjudge matches groupX in brightspace. To make this possible we allow also a "login" column in our `teams.csv` file:
+      Sometimes we want the same numbering scheme of groups as in an external system such as brightspace, so that teamX in DOMjudge matches groupX in brightspace. 
+      To make this possible we allow also a `teamname` column in our `teams.csv` file:
     
       Example:
   
           $ cat teams.csv
-          "login","names", "emails"
+          "teamname","names", "emails"
           "group1","Piet Venema, Jan Jansen", "pietvenema@gmail.com,janjansen@gmail.com"
           "group2","Henk Hier, Piet Praat", "henkhier@gmail.com, pietpraat@gmail.com"
           ....    
-    
 
-   3. generate "login","password" and "team category" for DOMjudge in `teams_domjudge.csv`
- 
-          COURSEPART_NUMBER=1
-          generate-domjudge-data teams.csv $COURSEPART_NUMBER  teams_domjudge.csv
-   
-      The  `COURSEPART_NUMBER` is used to generate a team category which is unique per course part. For the first part of the course we would use 1 for `team-config-1`, for the second part of the course 2 for `team-config-2` etc... 
+      The `teams.csv` file contains the minimal information required to create users and teams in DOMjudge.
+      We use scripts to generate from this `teams.csv` file a  `users.yaml` and `teams.yaml` to import users and teams into DOMjudge, and to generate
+      emails which sends users their credentials.  The scripts only need the `teams.csv` and the course part's number as input. The course part number
+      is required because,  as explained in the document ["Explanation of users and teams setup"](Explanation_of_users_and_teams_setup.md), for each coursepart we generate a different user account for each user.
 
-      The  `COURSEPART_NUMBER` is also used to generate a suffix for the login name, such that we get distinct team logins per coursepart.
-      E.g. in course part 1 we have teams  'team1part1, team2part1,...' and in coursepart 2 we have teams 'team1part2, team2part2,...'. 
+   3. From the `teams.csv` file create users and teans in DOMjudge.
 
-      In case the `teams.csv` already contains a "login" column the script only adds the suffix to the existing loginname. So for a given login "group3" in course part 2 we would get a login "group3part2".
+      We do this in 3 steps:
 
-      After this step we have all the data we need in the `teams_domjudge.csv` file. The remaining steps is only importing this
-      data into DOMjudge and mailing the credentials around. 
+        1. From minimal  `teams.csv`  generate `teams_domjudge.csv` with all derived data needed for DOMjudge.
+        
+
+                COURSEPART_NUMBER=1
+                generate-domjudge-data teams.csv $COURSEPART_NUMBER  teams_domjudge.csv
+        
+            In case the `teams.csv` already contains a `teamname` column the script only adds the prefix `partX` to the existing `teamname`. So for a given teamname "group3" in course part 2 we would get a team name  "part2-group3" in DOMjudge.
+
+            After this step we have all the data we need in the `teams_domjudge.csv` file. The remaining steps is only importing this
+            data into DOMjudge and mailing the credentials around. 
+
+            The `teams_domjudge.csv` file is also used later to generate emails which sends users their credentials. 
 
 
-   4. use `teams_domjudge.csv` to generate the `teams.yaml` and `users.yaml` import files by running the script:
+        2. Then from `teams_domjudge.csv` we generate the `teams.yaml` and `users.yaml` import files by running the script:
 
 
-          create-domjudge-import-files  "teams_domjudge.csv" 
+                create-domjudge-import-files  "teams_domjudge.csv" 
 
-   
-   5. Import `teams.yaml` and `accounts.yaml` import files into DOMjudge.
+        3. Import `teams.yaml` and `accounts.yaml` import files into DOMjudge.
 
-      We can do the import manually via the "Import / export" page linked on the "DOMjudge Jury interface". But we can also do it using the [REST API](https://www.domjudge.org/docs/manual/main/develop.html#api) using the [httpie tool](https://httpie.io):
+            We can do the import manually via the "Import / export" page linked on the "DOMjudge Jury interface". But we can also do it using the [REST API](https://www.domjudge.org/docs/manual/main/develop.html#api) using the [httpie tool](https://httpie.io):
 
-          DOMJUDGE_SERVER="http://localhost:12345"    
-          ADMINUSER="admin"
-          PASSWORD="secret" 
-          # admin password can be read from ./data/passwords/admin.pw 
-          # see https://github.com/harcokuppens/DOMjudgeDockerCompose/
-    
-          # import teams (hack: using json@teams.yaml still allows import of yaml)
-          https -a "$ADMINUSER:$PASSWORD" --check-status -b -f POST "$DOMJUDGE_SERVER/api/v4/users/teams" json@teams.yaml
+                DOMJUDGE_SERVER="http://localhost:12345"    
+                ADMINUSER="admin"
+                PASSWORD="secret" 
+                # admin password can be read from ./data/passwords/admin.pw 
+                # see https://github.com/harcokuppens/DOMjudgeDockerCompose/
+            
+                # import teams (hack: using json@teams.yaml still allows import of yaml)
+                https -a "$ADMINUSER:$PASSWORD" --check-status -b -f POST "$DOMJUDGE_SERVER/api/v4/users/teams" json@teams.yaml
 
-          # import accounts
-          https -a "$ADMINUSER:$PASSWORD" --check-status -b -f POST "$DOMJUDGE_SERVER/api/v4/users/accounts" yaml@accounts.yaml
+                # import accounts
+                https -a "$ADMINUSER:$PASSWORD" --check-status -b -f POST "$DOMJUDGE_SERVER/api/v4/users/accounts" yaml@accounts.yaml
 
 
 #### Mailing credentials to students
@@ -307,7 +314,7 @@ We take as coursename 'mycourse', but you can use any coursename here.
        "Record balloons" set to "No"
        "Enable public scoreboard" set to "No"
        "Open contest to all teams" set to "No"
-       select in "Team categories" the value 'teams-config-1'
+       select in "Team categories" the value 'part1-teams-config'
        
     
 
@@ -328,7 +335,7 @@ In DOMJudge we will import this problem twice:
 
 So when developing the problem folder we will first focus on the **grading** leading problem folder. Later we will strip this to create the **practicing** problem.
 
-##### use BACPtools to create a problem   
+##### Use BACPtools to create a problem   
 
   
 Use BACPtools to create a problem: 
@@ -338,12 +345,51 @@ Use BACPtools to create a problem:
 which after several questions generates a new problem in
 the new subfolder `grading_mynewproblem/` with the problem name   `grading_mynewproblem` set in   `grading_mynewproblem/problem.yaml`.
 
-**IMPORTANT:** 
-  * prefix your problem name with `grading_` because this folder will be the leading problem folder which we will use for grading. For practicing we make a copy from which we strip the secret samples.
-  * BACPtools generates a file `.timelimit` containing an integer specifying the limelimit of the problem in seconds (default:1). The official problem package format does not support this file, but also does not specify how to specify it. [DOMjudge supports specifying a timelimit](https://www.domjudge.org/docs/manual/main/problem-format.html) in its own specific `domjudge-problem.ini` file. BACPtools does also support this file, but has deprecated it. DOMjudge does also support the `.timelimit` file when importing a problem zipfile. Because we use BACPtools to create a problem we will use the `.timelimit` file! We won't use `domjudge-problem.ini` file. 
-    
-##### edit your problem 
+It is **important** to prefix your problem name with `grading_` because this folder will be the leading problem folder which we will use for grading. For practicing we make a copy from which we strip the secret samples.
 
+The new generated problem folder now looks like:
+
+    $ tree -aF --filesfirst grading_mynewproblem
+    grading_mynewproblem/
+    ├── problem.yaml
+    ├── .timelimit
+    ├── answer_validators/
+    │   └── answer_validator/
+    │       ├── answer_validator.cpp
+    │       └── validation.h
+    ├── generators/
+    │   ├── example.py
+    │   └── generators.yaml
+    ├── input_validators/
+    │   └── input_validator/
+    │       ├── input_validator.cpp
+    │       └── validation.h
+    ├── problem_statement/
+    │   ├── problem.en.tex
+    │   └── solution.en.tex
+    └── submissions/
+        ├── accepted/
+        │   └── .gitkeep
+        ├── run_time_error/
+        │   └── .gitkeep
+        ├── time_limit_exceeded/
+        │   └── .gitkeep
+        └── wrong_answer/
+            └── .gitkeep
+
+
+where the `problem.yaml` file contains the metadata about the project, and the `.gitkeep` files are only added to allow you to push an empty folder to git.  
+BACPtools generates the problem as described by [the official icpc standard for the problem format](https://icpc.io/problem-package-format/spec/legacy-icpc.html).  BAPCtools extends the standard by adding a `.timelimit` file and supporting also an answer validator. By default it doesn't add an output validator because the default diff-based output validator suffices for most cases. See 'Edit your problem' below for more details.
+
+BACPtools generates a file `.timelimit` containing an integer specifying the limelimit of the problem in seconds (default:1). The official problem package format does not support this file, but also does not specify how to specify a timelimit. [DOMjudge supports specifying a timelimit](https://www.domjudge.org/docs/manual/main/problem-format.html) in its own specific `domjudge-problem.ini` file. BACPtools does also support this file, but has deprecated it. DOMjudge does also support the `.timelimit` file when importing a problem zipfile. Because we use BACPtools to create a problem we will use the `.timelimit` file! We won't use a `domjudge-problem.ini` file, only a `problem.yaml` file.
+   
+
+##### Edit your problem 
+
+When creating a new problem it is always nice to have a good example to look at. I recommend to look at the example at the BAPCtools [different problem example](https://github.com/RagnarGrootKoerkamp/BAPCtools/tree/master/test/problems/different/). 
+The different problem provides the input and output samples statically. For an example where a generator is used look at the  BAPCtools [identity problem example](https://github.com/RagnarGrootKoerkamp/BAPCtools/blob/master/test/problems/identity/).
+ 
+ Steps to follow to define your new problem:
   * add `problem_statement/problem.en.tex` to describe your problem in English. When exporting the problem as a zipfile it will compile this `tex` file to the file `problem.pdf` at the root of the zipfile.
   * in `submissions/accepted/` folder put good solutions to problem 
   * add a generator,<br>
@@ -365,7 +411,7 @@ the new subfolder `grading_mynewproblem/` with the problem name   `grading_mynew
     
 
 
-##### generate samples for your problem
+##### Generate samples for your problem
 
 Generate samples for your problem with:
 
@@ -374,7 +420,7 @@ Generate samples for your problem with:
 The generator generates input and answer files, validates them
 with an input and answer validator. 
 
-##### test your problem  
+##### Test your problem  
 
 Test your problem with:
 
@@ -394,7 +440,7 @@ Let us explain the command in more detail:
 **Note:** in above command we only test the `accepted` solutions. We can also test how the not accepted solutions in the other subfolders of the `submissions/` fail as we would expect.
 
 
- ##### create zip file
+ ##### Create a zip file
 
 If everything is fine can create a zipfile of the problem with        
       
@@ -402,28 +448,31 @@ If everything is fine can create a zipfile of the problem with
 
 The `-f` option makes `bt zip` skip validation of input and answers. This is already done in the previous steps.  
 
-Now you can import this problem zipfile into DOMjudge. For details how we exaclty do this see next section.
-
+Now you can import this problem zipfile into DOMjudge. For details how we exactly do this see next section.
 
 On import DOMjudge creates a problem:
-    - with "name" from `problem.yaml`
-    - with "problem text"  set to `problem.pdf`
-    - and `.in `and `.ans` files from the data folder (both `answers/` and `secrets/`)
 
-all other data in the zipfile is not imported into the DOMjudge problem.  The submissions/ folder in the zipfile is handled specially. It will not be imported into the problem, but instead submitted to the newly created problem to be judged. This can be convenient to directly evaluate that everything also works the same on the DOMjudge server as on your local machine. **IMPORTANT:** the judging will only happen if the user account doing the import has **admin role** and **belongs to a team**.      
-  
- 
-The problem description in `problem.pdf` contains the submission/deadline date before which a final solution of the problem must be submitted.
-  
-Always keep the local BACPtools problem folder, because using that we can easily change and test the problem before exporting to DOMjudge. This folder is the leading folder in this process!
+- with "name" from `problem.yaml`
+- with "problem text"  set to `problem.pdf`
+- and `.in `and `.ans` files from the data folder (both `answers/` and `secrets/`)
 
-**IMPORTANT**: the **name** of the problem is on import to DOMjudge set to value of the `name` field in `problem.yaml`. The basename of the zipfile is used  as the problem **shortname**.  See https://www.domjudge.org/snapshot/manual/problem-format.html). The command `bt zip -f` creates a zipfile with its basename set to directory name of the problem. Using directory name and the basename of a zipfile is a very implicit way of configuring the shortname of the problem. I rather would have preferred that there was a special shortname field in the `problem.yaml` config file.
+All other data in the zipfile is not imported into the DOMjudge problem. 
 
-**KISS**:  To prevent any confusion I advise to always set the (long)name and shortname of the problem the same.  That is use the same name for the problem's directory, and its derivated zipfile, setting the problem's shortname, as for the name field in the `problem.yaml` config file, setting the problem's (long)name.                            
+
+**IMPORTANT**: 
+* Always keep the local BACPtools problem folder, because using that we can easily change and test the problem before exporting to DOMjudge.  This folder is the leading folder in this process!
+
+* Add the submission/deadline date, before which a final solution of the problem must be submitted, in the problem description in `problem.pdf` contains.
+
+* The **name** of the problem is on import to DOMjudge set to value of the `name` field in `problem.yaml`. The basename of the zipfile is used  as the problem **shortname**.  See https://www.domjudge.org/snapshot/manual/problem-format.html). The command `bt zip -f` creates a zipfile with its basename set to directory name of the problem. Using the directory name and the basename of a zipfile is a very implicit way of configuring the shortname of the problem. I rather would have preferred that there was a special shortname field in the `problem.yaml` config file.
+<br> **KISS**:  To prevent any confusion I advise to always set the (long)name and shortname of the problem the same.  That is use the same name for the problem's directory, and its derivated zipfile [setting the problem's shortname], as for the name field in the `problem.yaml` config file [setting the problem's (long)name].  
+
+* The `submissions/` folder in the zipfile is handled specially if the user account doing the import has **admin role** , **belongs to a team** and **imports the problem to a contest directly**. Then `submissions/` folder will not be imported into the problem, but instead submitted to the newly created problem to be judged. This can be convenient to directly evaluate that everything also works the same on the DOMjudge server as on your local machine.  However as describe below in the 'Test problem in DOMjudge' section I prefer to do the testing separately in a
+separate test contest, because then testing submissions are then not included in the student contests, so we then later do not have to filter out test submissions when processing the student results.
 
 #### Add problem to the course
 
-##### create practicing problem from grading problem
+##### Create practicing problem from grading problem
 As explained before we need to import the problem twice:
 
   1. One version **for grading** containing both the public and secret samples. The judging is set to be done **none-lazy**, meaning all samples are evaluated.  This folder is the leading problem folder. 
@@ -488,7 +537,7 @@ It is wise to test a new problem also in DOMjudge, because sometimes a little de
 
 **Best Practice:** import a problem without selecting a contest.   You add a problem to a contest at the bottom of the contest's edit form. Make a special test contest in which you add a problem to test, and test it with a test user which submits the solutions. By using a special test contest we separate the course contests used in production from the testing contest. Otherwise we would need to filter out the submissions of the testuser from the student users when doing the grading. You can also import the problem directly to test contest if it needs testing.
 
-**REMARK**: when importing a problem as an user with **admin role** which is also **belonging to a team**, then on import the solutions in the problem's zipfile are directly judge. We can then directly verify that our solutions are also correct in DOMjudge and are done within the timelimit.  Reference: ["Testing jury solutions" section in the DOMjudge documentation](https://www.domjudge.org/snapshot/manual/config-basic.html#testing-jury-solutions). 
+**REMARK**: when importing a problem **into a contest** as an user with **admin role** which is also **belonging to a team**, then on import the solutions in the problem's zipfile are directly judge. We can then directly verify that our solutions are also correct in DOMjudge and are done within the timelimit.  Reference: ["Testing jury solutions" section in the DOMjudge documentation](https://www.domjudge.org/snapshot/manual/config-basic.html#testing-jury-solutions). 
 DOMjudge claims you can also later upload  a zipfile containing only the problem's solutions as another user with **admin role**  and which is **belonging to a team** where the zipfile still needs to adhere to the problem format. However I never succeeded to get this to work! Maybe there is a bug breaking this feature?? This feature is also underdocumented. I personally prefer separating importing and testing, and do the testing in a separate test contest which separates testing concern from production concern. See 'Best practice' above.
 
 
@@ -507,11 +556,13 @@ be evaluated for the grading.
 
 A team should only submit once per grading problem, however if something went wrong, they are allowed to submit again. For grading the latest submission is used.
  
-### 4. When the problem's deadline is reached, the teacher downloads its final submissions  
+### 4. At problem's deadline fetch and process student results. 
 
-In [our approach of applying a deadline to a problem](How_to_handle_ending_time_of_a_problem.md) we do not use any deadline timers in DOMjudge to specify the deadline a problem's final submission, but instead we just inform the students of the deadline, and when its passed we disable submitting to the 'grading' problem, and fetch the results from it. 
- 
-The problem's deadline is communicated to the students during the course and in the problem description. If the deadline of the problem is passed, the teacher can disable the problem and fetch its results by doing:
+When problem's deadline reached the teacher fetches and processes the judgements of the students final grading submissions to easily grade the students.
+
+In [our approach of applying a deadline to a problem](How_to_handle_ending_time_of_a_problem.md) we do not use any deadline timers in DOMjudge to specify the deadline a problem's final submission, but instead we just inform the students of the deadline, and when its passed we disable submitting to the 'grading' problem, and fetch the results from it. The problem's deadline is communicated to the students during the course and in the problem description. 
+
+When the deadline of the problem is passed, the teacher has enfore the deadline on the problem and fetch its results by doing:
 
    1. **Disable submission** to the grading version of the problem: 
 
