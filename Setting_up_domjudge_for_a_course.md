@@ -207,10 +207,10 @@ Step by step instructions to create users and teams in DOMjudge:
       
       All teams in the first part of the course get the same `Category` value `part1-teams-config`. This category is used in two ways:
 
-        1. for this specific category we set the `visible` field to false causing
-        all teams unable to see each others submissions.
+        1. For this specific category we set the `visible` field to "No" causing
+        all teams unable to see each others submissions. See above.
 
-        2. we allow that course part's contest only be accessible by teams with that category. 
+        2. We allow that course part's contest only be accessible by teams with that category. See [Create contest](#create-contest).
 
       For details see [Explanation of users and teams setup](Explanation_of_users_and_teams_setup.md).   
 	
@@ -271,7 +271,7 @@ Step by step instructions to create users and teams in DOMjudge:
             in which it generates  `teams.yaml` and `users.yaml` files.
 
             In the generate `teams.yaml` all teams are assigned to 
-            the Team Category named `part${COURSEPART_NUMBER}-teams-config`.
+            the Team Category named `part${COURSEPART_NUMBER}-teams-config`. That is `part1-teams-config` for the first course part.
 
             In case the `teams.csv` already contains a `teamname` column the script only adds the prefix `part${COURSEPART_NUMBER}` to the existing `teamname`.  For example for a given teamname "group3" in course part 2 we would get a team name  "part2-group3" in DOMjudge.
 
