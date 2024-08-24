@@ -22,27 +22,27 @@ update toc by running command:
    * [C. Install helper scripts of CourseGradingWithDOMjudge repo](#c-install-helper-scripts-of-coursegradingwithdomjudge-repo)
    * [D. Setup and usage DOMjudge for the course](#d-setup-and-usage-domjudge-for-the-course)
       * [1. Setup part of a course for a specific teams configuration](#1-setup-part-of-a-course-for-a-specific-teams-configuration)
-         * [Create teams](#create-teams)
+         * [Create user and teams in DOMjudge](#create-user-and-teams-in-domjudge)
          * [Mailing credentials to students](#mailing-credentials-to-students)
          * [Create contest](#create-contest)
       * [2. Creating, testing and importing a problem](#2-creating-testing-and-importing-a-problem)
          * [Create problem for the course](#create-problem-for-the-course)
-            * [use BACPtools to create a problem](#use-bacptools-to-create-a-problem)
-            * [edit your problem](#edit-your-problem)
-            * [generate samples for your problem](#generate-samples-for-your-problem)
-            * [test your problem](#test-your-problem)
-            * [create zip file](#create-zip-file)
+            * [Use BACPtools to create a problem](#use-bacptools-to-create-a-problem)
+            * [Edit your problem](#edit-your-problem)
+            * [Generate samples for your problem](#generate-samples-for-your-problem)
+            * [Test your problem](#test-your-problem)
+            * [Create a zip file](#create-a-zip-file)
          * [Add problem to the course](#add-problem-to-the-course)
-            * [create practicing problem from grading problem](#create-practicing-problem-from-grading-problem)
+            * [Create practicing problem from grading problem](#create-practicing-problem-from-grading-problem)
             * [Import problem](#import-problem)
             * [Set laziness of problem](#set-laziness-of-problem)
             * [Test problem in DOMjudge](#test-problem-in-domjudge)
       * [3. Students can submit code to the problem](#3-students-can-submit-code-to-the-problem)
-      * [4. When the problem's deadline is reached, the teacher downloads its final submissions](#4-when-the-problems-deadline-is-reached-the-teacher-downloads-its-final-submissions)
+      * [4. At problem's deadline fetch and process student results.](#4-at-problems-deadline-fetch-and-process-student-results)
       * [5. Ending contest and course](#5-ending-contest-and-course)
 
 <!-- Created by https://github.com/ekalinin/github-markdown-toc -->
-<!-- Added by: harcok, at: wo aug 21 15:04:09 CEST 2024 -->
+<!-- Added by: harcok, at: za aug 24 09:47:14 CEST 2024 -->
 
 <!--te-->
 
@@ -195,8 +195,7 @@ We use scripts to create teams and users. Details about the design choices how w
 
 Step by step instructions to create users and teams in DOMjudge:
 
-   1. first add the `Team Category` named `part1-teams-config` which we can use for the first course part
-
+   1. First add the `Team Category` named `part1-teams-config` which we can use for the first course part
 
           click on 'DOMjudge' in top right corner, to get 'DOMjudge Jury interface'
           click on 'Team Categories'
@@ -205,9 +204,25 @@ Step by step instructions to create users and teams in DOMjudge:
           and set 'Visible' radio button to "No"
           note: self-registration is by default 'No'
           click on 'Save' button at bottom of window 
+      
+      All teams in the first part of the course get the same `Category` value `part1-teams-config`. This category is used in two ways:
 
+        1. for this specific category we set the `visible` field to false causing
+        all teams unable to see each others submissions.
+
+        2. we allow that course part's contest only be accessible by teams with that category. 
+
+      For details see [Explanation of users and teams setup](Explanation_of_users_and_teams_setup.md).   
 	
-   2. create a `teams.csv` file, where each line represents a team, with the two columns:
+   2. Create data folder per course part
+   
+          COURSEPART_NUMBER=1
+          mkdir part${COURSEPART_NUMBER}
+          cd part${COURSEPART_NUMBER}
+
+      It is a good practice to store the files to setup users and teams in a separate folder per coursepart eg. `part${COURSEPART_NUMBER}`. Then we have all user and team data for all courseparts nicely stored on disk as backup. 
+
+   3. Create a `teams.csv` file, where each line represents a team, with the two columns:
 
        1. the first column is  the name of the team. We use as team name a string containing a comma separated set of student names.
        2. the second column we set with a string containing a comma separated set of emails, one per student.
@@ -241,47 +256,54 @@ Step by step instructions to create users and teams in DOMjudge:
       emails which sends users their credentials.  The scripts only need the `teams.csv` and the course part's number as input. The course part number
       is required because,  as explained in the document ["Explanation of users and teams setup"](Explanation_of_users_and_teams_setup.md), for each coursepart we generate a different user account for each user.
 
-
-3. From the `teams.csv` file create users and teans in DOMjudge.
-
-      We do this in 2 steps:
-
-    1. Then from `teams.csv` we generate the `teams.yaml` and `users.yaml` import files by running the script:
-
-
-            create-domjudge-import-files  "teams_domjudge.csv" 
-
-        In case the `teams.csv` already contains a `teamname` column the script only adds the prefix `partX` to the existing `teamname`. So for a given teamname "group3" in course part 2 we would get a team name  "part2-group3" in DOMjudge.
-
-        The generated `teams.yaml` and `users.yaml` files are also used later to generate emails which sends users their credentials and team info.
-
-    2. Import `teams.yaml` and `accounts.yaml` import files into DOMjudge.
-
-        We can do the import manually via the "Import / export" page linked on the "DOMjudge Jury interface". But we can also do it using the [REST API](https://www.domjudge.org/docs/manual/main/develop.html#api) using the [httpie tool](https://httpie.io):
-
-            DOMJUDGE_SERVER="http://localhost:12345"    
-            ADMINUSER="admin"
-            PASSWORD="secret" 
-            # admin password can be read from ./data/passwords/admin.pw 
-            # see https://github.com/harcokuppens/DOMjudgeDockerCompose/
+   4. From the `teams.csv` file create users and teams in DOMjudge.
         
-            # import teams (hack: using json@teams.yaml still allows import of yaml)
-            https -a "$ADMINUSER:$PASSWORD" --check-status -b -f POST "$DOMJUDGE_SERVER/api/v4/users/teams" json@teams.yaml
+        We do this in 2 steps:
 
-            # import accounts
-            https -a "$ADMINUSER:$PASSWORD" --check-status -b -f POST "$DOMJUDGE_SERVER/api/v4/users/accounts" yaml@accounts.yaml
+        1. Then from `teams.csv` and the `COURSEPART_NUMBER` we generate the `teams.yaml` and `users.yaml` import files by running the script:
+
+                COURSEPART_NUMBER=1
+                create-domjudge-import-files  "teams.csv" $COURSEPART_NUMBER
+
+            The `COURSEPART_NUMBER` is required to generate unique user and team IDs for that course's part.
+
+            The script first creates a subfolder `part${COURSEPART_NUMBER}`
+            in which it generates  `teams.yaml` and `users.yaml` files.
+
+            In the generate `teams.yaml` all teams are assigned to 
+            the Team Category named `part${COURSEPART_NUMBER}-teams-config`.
+
+            In case the `teams.csv` already contains a `teamname` column the script only adds the prefix `part${COURSEPART_NUMBER}` to the existing `teamname`.  For example for a given teamname "group3" in course part 2 we would get a team name  "part2-group3" in DOMjudge.
+
+            The generated `teams.yaml` and `users.yaml` files are also used later to generate emails which sends users their credentials and team info.
+
+        2. Import `teams.yaml` and `accounts.yaml` import files into DOMjudge.
+
+            We can do the import manually via the "Import / export" page linked on the "DOMjudge Jury interface". But we can also do it using the [REST API](https://www.domjudge.org/docs/manual/main/develop.html#api) using the [httpie tool](https://httpie.io):
+
+                DOMJUDGE_SERVER="http://localhost:12345"    
+                ADMINUSER="admin"
+                PASSWORD="secret" 
+                # admin password can be read from ./data/passwords/admin.pw 
+                # see https://github.com/harcokuppens/DOMjudgeDockerCompose/
+            
+                # import teams (hack: using json@teams.yaml still allows import of yaml)
+                https -a "$ADMINUSER:$PASSWORD" --check-status -b -f POST "$DOMJUDGE_SERVER/api/v4/users/teams" json@teams.yaml
+
+                # import accounts
+                https -a "$ADMINUSER:$PASSWORD" --check-status -b -f POST "$DOMJUDGE_SERVER/api/v4/users/accounts" yaml@accounts.yaml
 
 
 
 #### Mailing credentials to students
 
-Here we explain how to mail the credentials to the students. This step can off course also be done later when actual problems are added to the course.  But because in the previous sections we explained how to create the teams in DOMjudge this is the most logical place to explain the mailing procedure.
+Here we explain how to mail the credentials to the students. This step can off course also be done later when actual problems are added to the course.  But because in the previous sections we explained how to create the teams in DOMjudge this is the most logical place to explain the mailing procedure. 
 
-When we run the script:
+We run the script with the `teams.yaml` and `accounts.yaml` DOMjudge import files which we generated in the previous section:
 
     create-domjudge-credentials-mails  "accounts.yaml" "teams.yaml" "mail/" 
 
-we generate in the `mail/` subfolder the mails to be send to the students.
+This will generate in the `mail/` subfolder the mails which we will send to the students.
 We do not directly send the emails, because we want to be able to inspect the emails before sending.
 
 With the following script we use the linux `sendmail` command to send out the emails:

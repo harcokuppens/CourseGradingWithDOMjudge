@@ -4,17 +4,17 @@
 
 **Table of Contents**
 <!--ts-->
-* [How to handle ending time of a problem?](How_to_handle_ending_time_of_a_problem.md#how-to-handle-ending-time-of-a-problem)
-   * [Domjudge settings controlling ending time of a problem](How_to_handle_ending_time_of_a_problem.md#domjudge-settings-controlling-ending-time-of-a-problem)
-      * [Per contest](How_to_handle_ending_time_of_a_problem.md#per-contest)
-      * [Per problem](How_to_handle_ending_time_of_a_problem.md#per-problem)
-   * [Brainstorm: how to use these settings to apply and ending time for a problem](How_to_handle_ending_time_of_a_problem.md#brainstorm-how-to-use-these-settings-to-apply-and-ending-time-for-a-problem)
-      * [Method 1: create a contest per problem to have the end time of the contest apply for the problem](How_to_handle_ending_time_of_a_problem.md#method-1-create-a-contest-per-problem-to-have-the-end-time-of-the-contest-apply-for-the-problem)
-      * [Method 2: manually enforce end time per problem](How_to_handle_ending_time_of_a_problem.md#method-2-manually-enforce-end-time-per-problem)
-   * [Conclusion](How_to_handle_ending_time_of_a_problem.md#conclusion)
+* [How to handle ending time of a problem?](#how-to-handle-ending-time-of-a-problem)
+   * [Domjudge settings controlling ending time of a problem](#domjudge-settings-controlling-ending-time-of-a-problem)
+      * [Per contest](#per-contest)
+      * [Per problem](#per-problem)
+   * [Brainstorm: how to use these settings to apply and ending time for a problem](#brainstorm-how-to-use-these-settings-to-apply-and-ending-time-for-a-problem)
+      * [Method 1: create a contest per problem to have the end time of the contest apply for the problem](#method-1-create-a-contest-per-problem-to-have-the-end-time-of-the-contest-apply-for-the-problem)
+      * [Method 2: manually enforce end time per problem](#method-2-manually-enforce-end-time-per-problem)
+   * [Conclusion](#conclusion)
 
 <!-- Created by https://github.com/ekalinin/github-markdown-toc -->
-<!-- Added by: harcok, at: wo aug 21 15:03:35 CEST 2024 -->
+<!-- Added by: harcok, at: za aug 24 09:47:13 CEST 2024 -->
 
 <!--te-->
 

@@ -2,17 +2,17 @@
 
 **Table of Contents**
 <!--ts-->
-* [Explanation of Users and Teams setup](Explanation_of_users_and_teams_setup.md#explanation-of-users-and-teams-setup)
-   * [Users and teams](Explanation_of_users_and_teams_setup.md#users-and-teams)
-   * [Design choices](Explanation_of_users_and_teams_setup.md#design-choices)
-   * [User and teams setup](Explanation_of_users_and_teams_setup.md#user-and-teams-setup)
-      * [user and team in DOMjudge](Explanation_of_users_and_teams_setup.md#user-and-team-in-domjudge)
-      * [Inspect required information](Explanation_of_users_and_teams_setup.md#inspect-required-information)
-      * [The teams.csv input file](Explanation_of_users_and_teams_setup.md#the-teamscsv-input-file)
-   * [Conclusion](Explanation_of_users_and_teams_setup.md#conclusion)
+* [Explanation of Users and Teams setup](#explanation-of-users-and-teams-setup)
+   * [Users and teams](#users-and-teams)
+   * [Design choices](#design-choices)
+   * [User and teams setup](#user-and-teams-setup)
+      * [user and team in DOMjudge](#user-and-team-in-domjudge)
+      * [Inspect required information](#inspect-required-information)
+      * [The teams.csv input file](#the-teamscsv-input-file)
+   * [Conclusion](#conclusion)
 
 <!-- Created by https://github.com/ekalinin/github-markdown-toc -->
-<!-- Added by: harcok, at: wo aug 21 15:03:35 CEST 2024 -->
+<!-- Added by: harcok, at: za aug 24 09:47:12 CEST 2024 -->
 
 <!--te-->
 
