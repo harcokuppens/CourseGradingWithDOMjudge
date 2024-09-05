@@ -94,7 +94,6 @@ demo contest:
         'Enable public scoreboard' set from 'Yes' to 'No'
     click on 'Save' button at bottom of window
 
-
 For security reasons we also remove the `demo` user by:
 
     click on 'DOMjudge' in top right corner, to get 'DOMjudge Jury interface'
@@ -345,7 +344,7 @@ procedure.
 We run the script with the `teams.yaml` and `accounts.yaml` DOMjudge import files which we generated
 in the previous section:
 
-    create-domjudge-credentials-mails  "accounts.yaml" "teams.yaml" "mail/"
+    create-domjudge-credentials-mails  "accounts.yaml" "teams.yaml" "mail/" "thesender@gmail.com" "The Sender Name"
 
 This will generate in the `mail/` subfolder the mails which we will send to the students. We do not
 directly send the emails, because we want to be able to inspect the emails before sending.
@@ -374,7 +373,6 @@ use any coursename here.
        "Open contest to all teams" set to "No"
        select in "Team categories" the value 'part1-teams-config'
 
-
 ### 2. Creating, testing and importing a problem
 
 Below we explain how to add a problem to a contest of a course part, how students can practice and
@@ -402,7 +400,6 @@ Later we will strip this to create the **practicing** problem.
 Use BACPtools to create a problem:
 
       bt new_problem  grading_mynewproblem
-
 
 which after several questions generates a new problem in the new subfolder `grading_mynewproblem/`
 with the problem name `grading_mynewproblem` set in `grading_mynewproblem/problem.yaml`.
