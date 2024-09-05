@@ -1,41 +1,228 @@
 #!/usr/bin/env python3
 
-#
-# create-domjudge-import-files --from a teams CSV file create DOMjudge import files accounts.yaml and teams.yaml   
-#
+"""
+NAME
+  create-domjudge-import-files --from a teams.csv file create DOMjudge import files accounts.yaml and teams.yaml   
+
+USAGE
+  create-domjudge-import-files [-h] TEAMS_CSV_FILE COURSEPART_NUMBER
+
+  positional arguments:
+    TEAMS_CSV_FILE     CSV file with ("teamname",)"names","emails" header. The "teamname" field is optional.
+    COURSEPART_NUMBER  Integer specifying the course part for which we generate teams and users.
+
+  options:
+    -h, --help         show this help message and exit
+
+below is a sample input file and the generated output files:
+
+    teams.csv        input file
+    -----------
+    "names", "emails", "bla"
+    "Piet Venema, Jan Jansen", "pietvenema@gmail.com,janjansen@gmail.com"
+    "Henk Hier, Piet Praat", "henkhier@gmail.com, pietpraat@gmail.com"
+    ...
+
+    teams.yaml       teams outputfile
+    -----------
+      - id: "t-1-001"
+        group_ids: ['part1-teams-config']
+        name: "part1-group1"                
+        display_name: "part1-group1: Piet Venema, Jan Jansen"
+        ...
+          
+    accounts.yaml    users outputfile
+    ---------------
+        - id: u-1-001
+          username: "part1-pietvenema@gmail.com"  
+          password: "NNFC9X7BZD"                                              
+          type: team
+          email: pietvenema@gmail.com
+          name: "Piet Venema"   (fullname)
+          team_id: "t-1-001" 
+        - id: "u-2-002"
+          username: "part2-janjansen@gmail.com"
+          password: "6H39VLLKY8"
+          type: "team"
+          name: "Jan Jansen"
+          email: "janjansen@gmail.com"
+          team_id: "t-2-001"          
+        ...  
+"""
 
 import csv
 import argparse
+import random
+import string
 
 
-parser = argparse.ArgumentParser(description="from a teams CSV file create DOMjudge import files accounts.yaml and teams.yaml")
-
-parser.add_argument("EXTENDED_TEAMS_CSV_FILE",help='CSV file with "login","names","emails","password","team-category" header.')
-args = parser.parse_args()
-
-teams_csv_file=args.EXTENDED_TEAMS_CSV_FILE
-
-# input csv file must have a header
-teams_csv_file_handle = open(teams_csv_file, 'rt')
-reader = csv.DictReader(teams_csv_file_handle, delimiter=",",  quotechar='"', quoting=csv.QUOTE_NONNUMERIC,skipinitialspace=True)
-# note: skipinitialspace makes the reader to ignore spaces around delimiter
-
-# getting rows; each row is a dictionary
-rows=[]
-for row in reader:
-    rows.append(row)
-
-# checking headers 
-fieldnames = ["login","names","emails","password","team-category"]
-headers=rows[0].keys()
-for idx, fieldname in enumerate(fieldnames):
-    if fieldname not in headers:
-        print("ERROR: missing header '" +  fieldname + "'")
-        exit(1)  
+def parseargs():
+    parser = argparse.ArgumentParser(
+        description="from a teams.csv file create DOMjudge import files accounts.yaml and teams.yaml"
+    )
+    parser.add_argument(
+        "TEAMS_CSV_FILE",
+        help='CSV file with ("teamname",)"names","emails" header. The "teamname" field is optional.',
+    )
+    parser.add_argument(
+        "COURSEPART_NUMBER",
+        type=int,
+        help="Integer specifying the course part for which we generate teams and users.",
+    )
+    args = parser.parse_args()
+    return (args.TEAMS_CSV_FILE, args.COURSEPART_NUMBER)
 
 
-teams = open("teams.yaml", "w")
-teams.write("File_Version\t2\n")
+def check_headers(
+    required_headers, optional_headers, given_headers, allow_extra_headers=True
+):
+    check_headers = list(required_headers)
+    # teamname header not required
+    for header in optional_headers:
+        if header not in given_headers:
+            check_headers.remove(header)
 
-accounts = open("accounts.yaml", "w")
-accounts.write("accounts\t1\n")
+    num_headers = len(check_headers)
+    # checking headers : check each required fieldname present
+    for idx, header in enumerate(given_headers):
+        if header in check_headers:
+            check_headers.remove(header)
+        else:
+            if not allow_extra_headers:
+                print("ERROR: wrong header '" + header + "'")
+                print("       header row should contain ONlY the fields :")
+                print("        " + str(required_headers))
+                print('       where "teamname" header is optional')
+                exit(1)
+
+    if len(check_headers) != 0:
+        print("ERROR: missing headers '" + str(check_headers) + "'")
+        print("       header row should contain the fields :")
+        print("        " + str(required_headers))
+        print('       where "teamname" header is optional')
+        exit(1)
+
+    return num_headers
+
+
+def read_csv_file(teams_csv_file, required_headers, optional_headers=[]):
+
+    # read rows csv file
+    teams_csv_file_handle = open(teams_csv_file, "rt")
+    reader = csv.DictReader(
+        teams_csv_file_handle,
+        delimiter=",",
+        quotechar='"',
+        # quoting=csv.QUOTE_NONNUMERIC,
+        skipinitialspace=True,
+    )
+    # note: skipinitialspace makes the reader to ignore spaces around delimiter
+
+    # getting rows; each row is a dictionary
+    rows = []
+    for row in reader:
+        if any(value == None for value in row.values()):
+            index = list(row.values()).index(None)
+            field = list(row.keys())[index]
+            print(
+                f"ERROR: Missing value for field '{field}' in '{teams_csv_file}' at line {reader.line_num}"
+            )
+            exit(1)
+        rows.append(row)
+
+    # csv file must have a header in the first row:
+    found_headers = list(rows[0].keys())
+    # we are checking the found header is correct
+    check_headers(required_headers, optional_headers, found_headers)
+
+    return (rows, found_headers)
+
+
+def get_users_teams_from_rows(rows, coursepart, found_headers):
+
+    users = []
+    teams = []
+    user_number = 1
+    team_number = 1
+    has_teamname = "teamname" in found_headers
+    for row in rows:
+        if has_teamname:
+            name = "part{}-{}".format(coursepart, row["teamname"])
+        else:
+            name = "part{}-team{}".format(coursepart, "{:03}".format(team_number))
+        team_id = "t-{}-{}".format(coursepart, "{:03}".format(team_number))
+        team = {
+            "id": team_id,
+            "group_ids": "part{}-teams-config".format(coursepart),
+            "name": name,
+            "display_name": "{}: {}".format(name, row["names"]),
+        }
+        teams.append(team)
+        team_number = team_number + 1
+
+        names = [name.strip() for name in row["names"].split(",")]
+        emails = [email.strip() for email in row["emails"].split(",")]
+        for index, name in enumerate(names):
+            password = "".join(
+                random.choice(string.ascii_uppercase + string.digits) for _ in range(10)
+            )
+            user = {
+                "id": "u-{}-{}".format(coursepart, "{:03}".format(user_number)),
+                "username": "part{}-{}".format(coursepart, emails[index]),
+                "password": password,
+                "type": "team",
+                "email": emails[index],
+                "name": name,
+                "team_id": team_id,
+            }
+            users.append(user)
+            user_number = user_number + 1
+    return (users, teams)
+
+
+def write_domdjudge_import_files(users, teams):
+    #   - id: "t-1-001"
+    #     group_ids: ['part1-teams-config']
+    #     name: "part1-group1"
+    #     display_name: "part1-group1: Piet Venema, Jan Jansen"
+    teamsfile = open("teams.yaml", "w")
+    for team in teams:
+        teamsfile.write(
+            '- id: "{id}"\n  group_ids: ["{group_ids}"]\n  name: "{name}"\n  display_name: "{display_name}"\n'.format(
+                **team
+            )
+        )
+    teamsfile.close()
+
+    #     - id: u-1-001
+    #       username: "part1-pietvenema@gmail.com"   (login)         -> OR pietvenema@gmail.com-1    BECAUSE shorter
+    #       password: ...                                               NO clearer names more important and anyway browser caches credentials anyway
+    #       type: team
+    #       email: pietvenema@gmail.com
+    #       name: "Piet Venema"   (fullname)
+    #       team_id: "t-1-001"
+    usersfile = open("accounts.yaml", "w")
+    for user in users:
+        usersfile.write(
+            '- id: "{id}"\n  username: "{username}"\n  password: "{password}"\n  type: "team"\n  name: "{name}"\n  email: "{email}"\n  team_id: "{team_id}"\n'.format(
+                **user
+            )
+        )
+    usersfile.close()
+
+
+def main():
+    (teams_csv_file, coursepart) = parseargs()
+    # defined required and optional headers
+    required_headers = ["teamname", "names", "emails"]
+    optional_headers = ["teamname"]
+    (rows, found_headers) = read_csv_file(
+        teams_csv_file, required_headers, optional_headers
+    )
+    get_users_teams_from_rows(rows, coursepart, found_headers)
+    (users, teams) = get_users_teams_from_rows(rows, coursepart, found_headers)
+    write_domdjudge_import_files(users, teams)
+
+
+if __name__ == "__main__":
+    main()
