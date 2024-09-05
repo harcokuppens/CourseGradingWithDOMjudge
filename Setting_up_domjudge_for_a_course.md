@@ -239,8 +239,8 @@ Step by step instructions to create users and teams in DOMjudge:
           
       The first line in the `teams.csv` file is the header row which declares the names of the different columns.
    
-      Often you can export groups of students from some source, eg. brightspace,  and automatically generate the `teams.csv` file with a script. 
-      Sometimes we want the same numbering scheme of groups as in an external system such as brightspace, so that teamX in DOMjudge matches groupX in brightspace. 
+      Often you can export groups of students from some source, eg. [Brightspace](Import_teams_from_brightspace_groups_into_DOMjudge.md),  and automatically generate the `teams.csv` file with a script. 
+      Sometimes we want the same numbering scheme of groups as in an external system such as Brightspace, so that teamX in DOMjudge matches groupX in Brightspace. 
       To make this possible we allow also a `teamname` column in our `teams.csv` file:
     
       Example:

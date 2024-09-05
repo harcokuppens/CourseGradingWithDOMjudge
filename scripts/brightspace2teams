@@ -1,9 +1,19 @@
 #!/usr/bin/env python3
 
 # NAME
-#     create-domjudge-credentials-mails -- from DOMjudge import files accounts.yaml and teams.yaml we generate credential emails in a local mail/ directory
+#     create-domjudge-credentials-mails -- from DOMjudge import files accounts.yaml and teams.yaml
+#                                          we generate credential emails in a local mail/ directory
 #
 # USAGE
+#     usage: brightspace2teams [-h] BRIGHTSPACE_CSV_FILE GROUPS_CATEGORY TEAMS_CSV_FILE
+#
+#     positional arguments:
+#       BRIGHTSPACE_CSV_FILE  CSV file with user data exported from DOMjudge (includes Group Membership)
+#       GROUPS_CATEGORY       the groups category used when exporting the exported CSV file
+#       TEAMS_CSV_FILE        the teams CSV output file used for DOMjudge
+#
+#     options:
+#       -h, --help            show this help message and exit
 
 # brightspace2teams  BRIGHTSPACE_CSV_FILE  GROUPS_CATEGORY TEAMS_CSV_FILE
 
