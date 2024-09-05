@@ -1,0 +1,167 @@
+#!/usr/bin/env python3
+
+# NAME
+#     create-domjudge-credentials-mails -- from DOMjudge import files accounts.yaml and teams.yaml we generate credential emails in a local mail/ directory
+#
+# USAGE
+
+# brightspace2teams  BRIGHTSPACE_CSV_FILE  GROUPS_CATEGORY TEAMS_CSV_FILE
+
+import argparse
+import os
+import csv
+
+
+def parseargs():
+    # define parser for arguments of cmdline script
+    parser = argparse.ArgumentParser(
+        description="from DOMjudge import files accounts.yaml and teams.yaml we generate credential emails in a local mail/ directory"
+    )
+    parser.add_argument(
+        "BRIGHTSPACE_CSV_FILE",
+        help="CSV file with user data exported from DOMjudge (includes Group Membership)",
+    )
+    parser.add_argument(
+        "GROUPS_CATEGORY",
+        help="the groups category used when exporting the exported CSV file",
+    )
+
+    parser.add_argument(
+        "TEAMS_CSV_FILE", help="the teams CSV output file used for DOMjudge"
+    )
+
+    # parse cmdline args
+    args = parser.parse_args()
+    return (args.BRIGHTSPACE_CSV_FILE, args.GROUPS_CATEGORY, args.TEAMS_CSV_FILE)
+
+
+def check_headers(
+    required_headers, optional_headers, given_headers, allow_extra_headers=True
+):
+    check_headers = list(required_headers)
+    # teamname header not required
+    for header in optional_headers:
+        if header not in given_headers:
+            check_headers.remove(header)
+
+    num_headers = len(check_headers)
+    # checking headers : check each required fieldname present
+    for idx, header in enumerate(given_headers):
+        if header in check_headers:
+            check_headers.remove(header)
+        else:
+            if not allow_extra_headers:
+                print("ERROR: wrong header '" + header + "'")
+                print("       header row should contain ONlY the fields :")
+                print("        " + str(required_headers))
+                print('       where "teamname" header is optional')
+                exit(1)
+
+    if len(check_headers) != 0:
+        print("ERROR: missing headers '" + str(check_headers) + "'")
+        print("       header row should contain the fields :")
+        print("        " + str(required_headers))
+        print('       where "teamname" header is optional')
+        exit(1)
+
+    return num_headers
+
+
+def read_csv_file(teams_csv_file, required_headers, optional_headers=[]):
+
+    # read rows csv file
+    teams_csv_file_handle = open(teams_csv_file, "rt")
+    reader = csv.DictReader(
+        teams_csv_file_handle,
+        delimiter=",",
+        quotechar='"',
+        #  quoting=csv.QUOTE_NONNUMERIC,
+        skipinitialspace=True,
+    )
+    # note: skipinitialspace makes the reader to ignore spaces around delimiter
+
+    # getting rows; each row is a dictionary
+    rows = []
+    for row in reader:
+        if any(value == None for value in row.values()):
+            index = list(row.values()).index(None)
+            field = list(row.keys())[index]
+            print(
+                f"ERROR: Missing value for field '{field}' in '{teams_csv_file}' at line {reader.line_num}"
+            )
+            exit(1)
+        rows.append(row)
+
+    # csv file must have a header in the first row:
+    found_headers = list(rows[0].keys())
+    # we are checking the found header is correct
+    check_headers(required_headers, optional_headers, found_headers)
+
+    return (rows, found_headers)
+
+
+def write_csv_file(outputfile, fieldnames, rows):
+    with open(outputfile, "w") as csvfile:
+        writer = csv.DictWriter(
+            csvfile,
+            quotechar='"',
+            delimiter=",",
+            fieldnames=fieldnames,
+            quoting=csv.QUOTE_NONNUMERIC,
+            lineterminator="\n",
+        )
+        # The setting quoting=csv.QUOTE_NONNUMERIC causes all data except numbers to be quoted when output to csv file
+        # It determines this automatically from the data in a column.
+        headerrow = dict((n, n) for n in fieldnames)
+        writer.writerow(headerrow)
+        for row in rows:
+            writer.writerow(row)
+
+
+def get_teams_from_rows(rows, groups_category):
+
+    teamname2users = {}
+    for row in rows:
+        user = {}
+        user["name"] = row["First Name"] + " " + row["Last Name"]
+        user["email"] = row["Email"]
+        teamname = row[groups_category]
+        user["teamname"] = teamname
+        if teamname in teamname2users:
+            teamname2users[teamname].append(user)
+        else:
+            teamname2users[teamname] = [user]
+    teams = []
+    for teamname, users in teamname2users.items():
+        team = {"teamname": teamname}
+        names = [user["name"] for user in users]
+        team["names"] = ", ".join(names)
+        emails = [user["email"] for user in users]
+        team["emails"] = ", ".join(emails)
+        teams.append(team)
+    return teams
+
+
+def main():
+    (brightspace_csv_file, groups_category, teams_csv_file) = parseargs()
+    # defined required and optional headers
+    # required_headers = ["teamname", "names", "emails"]
+    required_headers = [
+        "Username",
+        "Last Name",
+        "First Name",
+        "Email",
+        groups_category,
+    ]
+    (rows, found_headers) = read_csv_file(brightspace_csv_file, required_headers)
+    teams = get_teams_from_rows(rows, groups_category)
+    rows = []
+    fieldnames = ["teamname", "names", "emails"]
+    write_csv_file(teams_csv_file, fieldnames, teams)
+    # get_users_teams_from_rows(rows, coursepart, found_headers)
+    # (users, teams) = get_users_teams_from_rows(rows, coursepart, found_headers)
+    # write_domdjudge_import_files(users, teams)
+
+
+if __name__ == "__main__":
+    main()
