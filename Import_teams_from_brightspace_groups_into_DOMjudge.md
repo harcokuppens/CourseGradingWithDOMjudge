@@ -39,7 +39,7 @@ The exported file is a CSV file with at least the following fields:
 - Last Name
 - First Name
 - Email
-- name of groups category; in example above we had 'Practical 1' as groups category
+- name of the groups category; in example above we had 'Practical 1' as groups category
 
 The groups category column in the exported CSV file contains the group to which the student belongs:
 'Group X' where X is the number of the group.
@@ -67,5 +67,5 @@ An example how to use this script:
 
 where 'Practical 1' is the groups category in Brightspace which teams we exported.
 
-The `teams.csv` can the be used with our other DOMjudge scripts to generate DOMjudge import files
+The `teams.csv` can then be used with our other DOMjudge scripts to generate DOMjudge import files
 for users and teams, and to generate emails to send the students their user credentials in DOMjugde.
