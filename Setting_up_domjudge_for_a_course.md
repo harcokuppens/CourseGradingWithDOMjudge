@@ -92,13 +92,21 @@ demo contest:
     click on 'Edit' button at bottom of window
     then change config of 'Demo' contest:
         'Enable public scoreboard' set from 'Yes' to 'No'
+        copy 'Start Time' to 'Scoreboard freeze time' and 'End time' fields
+        then increase the year with one year in the 'Scoreboard freeze time' and 'End time' fields
+        which makes the demo contest open for submissions for one year
     click on 'Save' button at bottom of window
 
-For security reasons we also remove the `demo` user by:
+For security reasons we also remove the `demo` user and `exteam` by:
 
     click on 'DOMjudge' in top right corner, to get 'DOMjudge Jury interface'
     click on 'Users'
     on the row for the 'demo' user click at the end of line on the 'trashcan' icon
+    and confirm by pressing the 'Delete' button in the popup window
+
+    click on 'DOMjudge' in top right corner, to get 'DOMjudge Jury interface'
+    click on 'Teams'
+    on the row for the 'exteam' team click at the end of line on the 'trashcan' icon
     and confirm by pressing the 'Delete' button in the popup window
 
 Now, when not logged in, you see nothing. When logged in, you can play with demo contest.
@@ -352,10 +360,10 @@ directly send the emails, because we want to be able to inspect the emails befor
 With the following script, we use the Linux `sendmail` command to send out the emails:
 
     send-emails "thesender@gmail.com" "mail/"
-    
-Make sure you use a Linux machine for which `sendmail` is configured.
-If somehow this method does not work for you, you can use one of the alternative methods described
-in the page [Sending batch of personalized emails](Sending_batch_of_personalized_emails.md).
+
+Make sure you use a Linux machine for which `sendmail` is configured. If somehow this method does
+not work for you, you can use one of the alternative methods described in the page
+[Sending batch of personalized emails](Sending_batch_of_personalized_emails.md).
 
 #### Create contest
 
