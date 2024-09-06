@@ -19,23 +19,23 @@ The first method gives you more flexibility. This method is used in setting up D
 * first generate `.eml` files from a data file using a script. Your script can support any possible format of a data file. Popular formats are `.csv`, `.yaml` or `.json` file.
 
 * then send `.eml` files
-    * send using mail script, or  
+    * send using a mail script which uses a cmd line tool like `sendmail`, or  
         
     * use Thunderbird 
         * first install [the **ImportExportTools NG** extension](https://addons.thunderbird.net/en-GB/thunderbird/addon/importexporttools-ng/)
         * then right click on `Outbox` folder in `Local Folders`
-        * in upcoming popup menu select
+        * in the upcoming popup menu select
 
                 "ImportExportTools NG" -> Import EML Messages -> Individual EML Messages
         
-        * in upcoming file browser select all `.eml` files you want to send
+        * in the upcoming file browser select all `.eml` files you want to send
             and confirm
         * the selected elm files should now be listed in the `Outbox` folder 
-        * then in thunderbird select the menu entry   
+        * then in Thunderbird select the menu entry   
 
                 File -> Send Unsent Messages
           
-          which causes all files in the  `Outbox` folder  to be send
+          which causes all files in the  `Outbox` folder  to be sent
      
 
 ## Use a "mail merge" tool with a data  file directly:
