@@ -349,10 +349,11 @@ in the previous section:
 This will generate in the `mail/` subfolder the mails which we will send to the students. We do not
 directly send the emails, because we want to be able to inspect the emails before sending.
 
-With the following script we use the linux `sendmail` command to send out the emails:
+With the following script, we use the Linux `sendmail` command to send out the emails:
 
     send-emails "thesender@gmail.com" "mail/"
-
+    
+Make sure you use a Linux machine for which `sendmail` is configured.
 If somehow this method does not work for you, you can use one of the alternative methods described
 in the page [Sending batch of personalized emails](Sending_batch_of_personalized_emails.md).
 
