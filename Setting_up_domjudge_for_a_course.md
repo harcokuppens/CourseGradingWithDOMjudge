@@ -7,42 +7,42 @@ update toc by running command:
    markdown_insert_github_toc Setting_up_domjudge_for_a_course.md
 -->
 <!--ts-->
-
-- [Setting up DOMjudge for a course](#setting-up-domjudge-for-a-course)
-  - [A. Create a fresh and up to date DOMjudge installation](#a-create-a-fresh-and-up-to-date-domjudge-installation)
-    - [New installation](#new-installation)
-    - [Reset and update existing installation](#reset-and-update-existing-installation)
-  - [B. Basic configuration](#b-basic-configuration)
-    - [1. Make demo contest private, and delete demo user](#1-make-demo-contest-private-and-delete-demo-user)
-    - [2. Make DOMjudge use external id's for configuration data](#2-make-domjudge-use-external-ids-for-configuration-data)
-    - [3. Setting language timefactors](#3-setting-language-timefactors)
-    - [4. Give teams more information about their submissions](#4-give-teams-more-information-about-their-submissions)
-  - [C. Install helper scripts of CourseGradingWithDOMjudge repo](#c-install-helper-scripts-of-coursegradingwithdomjudge-repo)
-  - [D. Initial setup DOMjudge for the course](#d-initial-setup-domjudge-for-the-course)
-    - [Setup Test contest](#setup-test-contest)
-    - [Setup Administrators](#setup-administrators)
-      - [Step 1: generate the admin-accounts.yaml and emails](#step-1-generate-the-admin-accountsyaml-and-emails)
-      - [Step 2: Import admin-accounts.yaml file into DOMjudge.](#step-2-import-admin-accountsyaml-file-into-domjudge)
-      - [Step 3: Inform the new administrators by mail.](#step-3-inform-the-new-administrators-by-mail)
-  - [E. Per course part setup and usage DOMjudge](#e-per-course-part-setup-and-usage-domjudge) _
-    [1. Setup part of a course for a specific teams configuration](#1-setup-part-of-a-course-for-a-specific-teams-configuration)
-    _ [Create user and teams in DOMjudge](#create-user-and-teams-in-domjudge) _
-    [Mailing credentials to students](#mailing-credentials-to-students) _
-    [Create contest](#create-contest) _
-    [2. Creating, testing and importing a problem](#2-creating-testing-and-importing-a-problem) _
-    [Create problem for the course](#create-problem-for-the-course) _
-    [Use BACPtools to create a problem](#use-bacptools-to-create-a-problem) _
-    [Edit your problem](#edit-your-problem) _
-    [Generate samples for your problem](#generate-samples-for-your-problem) _
-    [Test your problem](#test-your-problem) _ [Create a zip file](#create-a-zip-file) _
-    [Add problem to the course](#add-problem-to-the-course) _
-    [Create practicing problem from grading problem](#create-practicing-problem-from-grading-problem)
-    _ [Import problem](#import-problem) _ [Set laziness of problem](#set-laziness-of-problem) _
-    [Test problem in DOMjudge](#test-problem-in-domjudge) _
-    [3. Students can submit code to the problem](#3-students-can-submit-code-to-the-problem) _
-    [4. At problem's deadline fetch and process student results.](#4-at-problems-deadline-fetch-and-process-student-results) \*
-    [5. Ending contest and course](#5-ending-contest-and-course)
-
+* [Setting up DOMjudge for a course](#setting-up-domjudge-for-a-course)
+   * [A. Create a fresh and up to date DOMjudge installation](#a-create-a-fresh-and-up-to-date-domjudge-installation)
+      * [New installation](#new-installation)
+      * [Reset and update existing installation](#reset-and-update-existing-installation)
+   * [B. Basic configuration](#b-basic-configuration)
+      * [1. Make demo contest private, and delete demo user](#1-make-demo-contest-private-and-delete-demo-user)
+      * [2. Make DOMjudge use external id's for configuration data](#2-make-domjudge-use-external-ids-for-configuration-data)
+      * [3. Setting language timefactors](#3-setting-language-timefactors)
+      * [4. Give teams more information about their submissions](#4-give-teams-more-information-about-their-submissions)
+   * [C. Install helper scripts of CourseGradingWithDOMjudge repo](#c-install-helper-scripts-of-coursegradingwithdomjudge-repo)
+   * [D. Initial setup DOMjudge for the course](#d-initial-setup-domjudge-for-the-course)
+      * [Setup Test contest](#setup-test-contest)
+      * [Setup Administrators](#setup-administrators)
+         * [Step 1: generate the admin-accounts.yaml and emails](#step-1-generate-the-admin-accountsyaml-and-emails)
+         * [Step 2: Import admin-accounts.yaml file into DOMjudge.](#step-2-import-admin-accountsyaml-file-into-domjudge)
+         * [Step 3: Inform the new administrators by mail.](#step-3-inform-the-new-administrators-by-mail)
+   * [E. Per course part setup and usage DOMjudge](#e-per-course-part-setup-and-usage-domjudge)
+      * [1. Setup part of a course for a specific teams configuration](#1-setup-part-of-a-course-for-a-specific-teams-configuration)
+         * [Create user and teams in DOMjudge](#create-user-and-teams-in-domjudge)
+         * [Mailing credentials to students](#mailing-credentials-to-students)
+         * [Create contest](#create-contest)
+      * [2. Creating, testing and importing a problem](#2-creating-testing-and-importing-a-problem)
+         * [Create problem for the course](#create-problem-for-the-course)
+            * [Use BACPtools to create a problem](#use-bacptools-to-create-a-problem)
+            * [Edit your problem](#edit-your-problem)
+            * [Generate samples for your problem](#generate-samples-for-your-problem)
+            * [Test your problem](#test-your-problem)
+            * [Create a zip file](#create-a-zip-file)
+         * [Add problem to the course](#add-problem-to-the-course)
+            * [Create practicing problem from grading problem](#create-practicing-problem-from-grading-problem)
+            * [Import problem](#import-problem)
+            * [Set laziness of problem](#set-laziness-of-problem)
+            * [Test problem in DOMjudge](#test-problem-in-domjudge)
+      * [3. Students can submit code to the problem](#3-students-can-submit-code-to-the-problem)
+      * [4. At problem's deadline fetch and process student results.](#4-at-problems-deadline-fetch-and-process-student-results)
+      * [5. Ending contest and course](#5-ending-contest-and-course)
 <!--te-->
 
 ## A. Create a fresh and up to date DOMjudge installation
