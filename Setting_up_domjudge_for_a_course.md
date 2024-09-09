@@ -25,24 +25,25 @@ update toc by running command:
       - [Step 2: Import admin-accounts.yaml file into DOMjudge.](#step-2-import-admin-accountsyaml-file-into-domjudge)
       - [Step 3: Inform the new administrators by mail.](#step-3-inform-the-new-administrators-by-mail)
   - [E. Per course part setup and usage DOMjudge](#e-per-course-part-setup-and-usage-domjudge) _
-  [1. Setup part of a course for a specific teams configuration](#1-setup-part-of-a-course-for-a-specific-teams-configuration)
-  _ [Create user and teams in DOMjudge](#create-user-and-teams-in-domjudge) _
-  [Mailing credentials to students](#mailing-credentials-to-students) _
-  [Create contest](#create-contest) _
-  [2. Creating, testing and importing a problem](#2-creating-testing-and-importing-a-problem) _
-  [Create problem for the course](#create-problem-for-the-course) _
-  [Use BACPtools to create a problem](#use-bacptools-to-create-a-problem) _
-  [Edit your problem](#edit-your-problem) _
-  [Generate samples for your problem](#generate-samples-for-your-problem) _
-  [Test your problem](#test-your-problem) _ [Create a zip file](#create-a-zip-file) _
-  [Add problem to the course](#add-problem-to-the-course) _
-  [Create practicing problem from grading problem](#create-practicing-problem-from-grading-problem)
-  _ [Import problem](#import-problem) _ [Set laziness of problem](#set-laziness-of-problem) _
-  [Test problem in DOMjudge](#test-problem-in-domjudge) _
-  [3. Students can submit code to the problem](#3-students-can-submit-code-to-the-problem) _
-  [4. At problem's deadline fetch and process student results.](#4-at-problems-deadline-fetch-and-process-student-results) \*
-  [5. Ending contest and course](#5-ending-contest-and-course)
-  <!--te-->
+    [1. Setup part of a course for a specific teams configuration](#1-setup-part-of-a-course-for-a-specific-teams-configuration)
+    _ [Create user and teams in DOMjudge](#create-user-and-teams-in-domjudge) _
+    [Mailing credentials to students](#mailing-credentials-to-students) _
+    [Create contest](#create-contest) _
+    [2. Creating, testing and importing a problem](#2-creating-testing-and-importing-a-problem) _
+    [Create problem for the course](#create-problem-for-the-course) _
+    [Use BACPtools to create a problem](#use-bacptools-to-create-a-problem) _
+    [Edit your problem](#edit-your-problem) _
+    [Generate samples for your problem](#generate-samples-for-your-problem) _
+    [Test your problem](#test-your-problem) _ [Create a zip file](#create-a-zip-file) _
+    [Add problem to the course](#add-problem-to-the-course) _
+    [Create practicing problem from grading problem](#create-practicing-problem-from-grading-problem)
+    _ [Import problem](#import-problem) _ [Set laziness of problem](#set-laziness-of-problem) _
+    [Test problem in DOMjudge](#test-problem-in-domjudge) _
+    [3. Students can submit code to the problem](#3-students-can-submit-code-to-the-problem) _
+    [4. At problem's deadline fetch and process student results.](#4-at-problems-deadline-fetch-and-process-student-results) \*
+    [5. Ending contest and course](#5-ending-contest-and-course)
+
+<!--te-->
 
 ## A. Create a fresh and up to date DOMjudge installation
 
