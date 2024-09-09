@@ -12,10 +12,6 @@
       * [Method 1: create a contest per problem to have the end time of the contest apply for the problem](#method-1-create-a-contest-per-problem-to-have-the-end-time-of-the-contest-apply-for-the-problem)
       * [Method 2: manually enforce end time per problem](#method-2-manually-enforce-end-time-per-problem)
    * [Conclusion](#conclusion)
-
-<!-- Created by https://github.com/ekalinin/github-markdown-toc -->
-<!-- Added by: harcok, at: za aug 24 09:47:13 CEST 2024 -->
-
 <!--te-->
 
 

@@ -12,10 +12,6 @@
       * [Kattis](#kattis)
       * [DOMjudge](#domjudge)
    * [Tools to make problem/contest data](#tools-to-make-problemcontest-data)
-
-<!-- Created by https://github.com/ekalinin/github-markdown-toc -->
-<!-- Added by: harcok, at: za aug 24 09:47:13 CEST 2024 -->
-
 <!--te-->
 
 <br>

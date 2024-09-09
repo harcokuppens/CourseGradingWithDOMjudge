@@ -10,10 +10,6 @@
       * [Inspect required information](#inspect-required-information)
       * [The teams.csv input file](#the-teamscsv-input-file)
    * [Conclusion](#conclusion)
-
-<!-- Created by https://github.com/ekalinin/github-markdown-toc -->
-<!-- Added by: harcok, at: za aug 24 09:47:12 CEST 2024 -->
-
 <!--te-->
 
 In this document we describe our choosen design of how to setup teams and users in DOMjudge, and how an admin user of DOMjudge, by providing minimal information in a CSV file, can setup and mail around these credentials using automated scripts. The admin's work is made easy.

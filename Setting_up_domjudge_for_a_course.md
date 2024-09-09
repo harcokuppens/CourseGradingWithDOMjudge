@@ -7,41 +7,42 @@ update toc by running command:
    markdown_insert_github_toc Setting_up_domjudge_for_a_course.md
 -->
 <!--ts-->
-
-- [Setting up DOMjudge for a course](#setting-up-domjudge-for-a-course)
-  - [A. Create a fresh and up to date DOMjudge installation](#a-create-a-fresh-and-up-to-date-domjudge-installation)
-    - [New installation](#new-installation)
-    - [Reset and update existing installation](#reset-and-update-existing-installation)
-  - [B. Basic configuration](#b-basic-configuration)
-    - [1. Make demo contest private, and delete demo user](#1-make-demo-contest-private-and-delete-demo-user)
-    - [2. Make DOMjudge use external id's for configuration data](#2-make-domjudge-use-external-ids-for-configuration-data)
-    - [3. Setting language timefactors](#3-setting-language-timefactors)
-    - [4. Give teams more information about their submissions](#4-give-teams-more-information-about-their-submissions)
-  - [C. Install helper scripts of CourseGradingWithDOMjudge repo](#c-install-helper-scripts-of-coursegradingwithdomjudge-repo)
-  - [D. Setup and usage DOMjudge for the course](#d-setup-and-usage-domjudge-for-the-course)
-    - [1. Setup part of a course for a specific teams configuration](#1-setup-part-of-a-course-for-a-specific-teams-configuration)
-      - [Create user and teams in DOMjudge](#create-user-and-teams-in-domjudge)
-      - [Mailing credentials to students](#mailing-credentials-to-students)
-      - [Create contest](#create-contest)
-    - [2. Creating, testing and importing a problem](#2-creating-testing-and-importing-a-problem)
-      - [Create problem for the course](#create-problem-for-the-course)
-        - [Use BACPtools to create a problem](#use-bacptools-to-create-a-problem)
-        - [Edit your problem](#edit-your-problem)
-        - [Generate samples for your problem](#generate-samples-for-your-problem)
-        - [Test your problem](#test-your-problem)
-        - [Create a zip file](#create-a-zip-file)
-      - [Add problem to the course](#add-problem-to-the-course)
-        - [Create practicing problem from grading problem](#create-practicing-problem-from-grading-problem)
-        - [Import problem](#import-problem)
-        - [Set laziness of problem](#set-laziness-of-problem)
-        - [Test problem in DOMjudge](#test-problem-in-domjudge)
-    - [3. Students can submit code to the problem](#3-students-can-submit-code-to-the-problem)
-    - [4. At problem's deadline fetch and process student results.](#4-at-problems-deadline-fetch-and-process-student-results)
-    - [5. Ending contest and course](#5-ending-contest-and-course)
-
-<!-- Created by https://github.com/ekalinin/github-markdown-toc -->
-<!-- Added by: harcok, at: za aug 24 09:47:14 CEST 2024 -->
-
+* [Setting up DOMjudge for a course](#setting-up-domjudge-for-a-course)
+   * [A. Create a fresh and up to date DOMjudge installation](#a-create-a-fresh-and-up-to-date-domjudge-installation)
+      * [New installation](#new-installation)
+      * [Reset and update existing installation](#reset-and-update-existing-installation)
+   * [B. Basic configuration](#b-basic-configuration)
+      * [1. Make demo contest private, and delete demo user](#1-make-demo-contest-private-and-delete-demo-user)
+      * [2. Make DOMjudge use external id's for configuration data](#2-make-domjudge-use-external-ids-for-configuration-data)
+      * [3. Setting language timefactors](#3-setting-language-timefactors)
+      * [4. Give teams more information about their submissions](#4-give-teams-more-information-about-their-submissions)
+   * [C. Install helper scripts of CourseGradingWithDOMjudge repo](#c-install-helper-scripts-of-coursegradingwithdomjudge-repo)
+   * [D. Initial setup DOMjudge for the course](#d-initial-setup-domjudge-for-the-course)
+      * [Setup Test contest](#setup-test-contest)
+      * [Setup Administrators](#setup-administrators)
+         * [Step 1: generate the admin-accounts.yaml and emails](#step-1-generate-the-admin-accountsyaml-and-emails)
+         * [Step 2: Import admin-accounts.yaml file into DOMjudge.](#step-2-import-admin-accountsyaml-file-into-domjudge)
+         * [Step 3: Inform the new administrators by mail.](#step-3-inform-the-new-administrators-by-mail)
+   * [E. Per course part setup and usage DOMjudge](#e-per-course-part-setup-and-usage-domjudge)
+      * [1. Setup part of a course for a specific teams configuration](#1-setup-part-of-a-course-for-a-specific-teams-configuration)
+         * [Create user and teams in DOMjudge](#create-user-and-teams-in-domjudge)
+         * [Mailing credentials to students](#mailing-credentials-to-students)
+         * [Create contest](#create-contest)
+      * [2. Creating, testing and importing a problem](#2-creating-testing-and-importing-a-problem)
+         * [Create problem for the course](#create-problem-for-the-course)
+            * [Use BACPtools to create a problem](#use-bacptools-to-create-a-problem)
+            * [Edit your problem](#edit-your-problem)
+            * [Generate samples for your problem](#generate-samples-for-your-problem)
+            * [Test your problem](#test-your-problem)
+            * [Create a zip file](#create-a-zip-file)
+         * [Add problem to the course](#add-problem-to-the-course)
+            * [Create practicing problem from grading problem](#create-practicing-problem-from-grading-problem)
+            * [Import problem](#import-problem)
+            * [Set laziness of problem](#set-laziness-of-problem)
+            * [Test problem in DOMjudge](#test-problem-in-domjudge)
+      * [3. Students can submit code to the problem](#3-students-can-submit-code-to-the-problem)
+      * [4. At problem's deadline fetch and process student results.](#4-at-problems-deadline-fetch-and-process-student-results)
+      * [5. Ending contest and course](#5-ending-contest-and-course)
 <!--te-->
 
 ## A. Create a fresh and up to date DOMjudge installation
@@ -184,7 +185,98 @@ Then add its scripts folder to your PATH by adding to your `.bashrc`:
     # add scripts to PATH
     export PATH="$REPO_PATH/bin/:$PATH"
 
-## D. Setup and usage DOMjudge for the course
+## D. Initial setup DOMjudge for the course
+
+Initially when DOMjudge is installed we get an 'admin' account. However we rather give the people
+giving the course each their own administrator account, so that we later always can change the set
+of administrators.
+
+The administrators should also be able to test a new contest problem on the DOMjudge server before
+using it in the course. The best practice is to have a separate Test contest to which problems can
+be added and be tested. We only give administrators access the Test contest.
+
+### Setup Test contest
+
+To create the Test contest do:
+
+    click on 'DOMjudge' in top right corner, to get 'DOMjudge Jury interface'
+    click on 'Contests'
+    click on 'Add new contest' button
+       in 'External ID', 'Shortname' and 'Name' boxes enter 'Test'
+       select value in "Activate time" and
+       paste it into "Start time" and "End time" fields.
+       In the "End time" field increase the date by 1 year.
+       "Record balloons" set to "No"
+       "Enable public scoreboard" set to "No"
+       "Open contest to all teams" set to "No"
+       select in "Team categories" the value 'Jury'
+
+By only allowing the Jury team category we give access to only administrators.
+
+### Setup Administrators
+
+When in DOMjudge importing with an "accounts.yaml" with user accounts of type 'admin' DOMjudge
+behaves different then when importing normal team users (type 'team'). It then not only creates the
+user with the administrator role, but also gives it the 'team' role. DOMjudge also automatically
+creates a team only for this user, where the team is in the 'Jury' team category. Having both roles
+allows the adminstrator user switch role between 'Jury' and 'Team' interface in DOMjudge, allowing
+is also submit solutions as team member to the Test contest we made in the previous section.
+
+Because the teams are automatically created in DOMjudge we only need to import an `accounts.yaml`
+file into DOMjudge describing the administrators.
+
+To make it convenient to create administrators I defined a simple CSV file format in which you can
+only need to define the names and emails of the administrators. For example:
+
+     $ cat admins.csv
+     name, email
+     Henk Groot, henk.groot@gmail.com
+     Piet Klein, piet.klein@gmail.com
+
+then using the `create-domjudge-admins` script we can easily generate the `admin-accounts.yaml`
+file. By importing this file in DOMjudge the admin accounts are created. The
+`create-domjudge-admins` script also generates emails to inform the new administrators of their
+credentials in a folder.
+
+Now let setup the new admins in 3 steps.
+
+#### Step 1: generate the `admin-accounts.yaml` and emails
+
+Create an `admins.csv` file, and then run the following script:
+
+     create-domjudge-admins "admins.csv" "mail/" "thesender@gmail.com" "The Sender Name"
+
+Which will create an `admin-accounts.yaml` import file for DOMjudge, and the mails in the `mail/`
+folder, where each mail is from the sender "The Sender Name" with email address
+"thesender@gmail.com".
+
+#### Step 2: Import `admin-accounts.yaml` file into DOMjudge.
+
+We can do the import manually via the "Import / export" page linked on the "DOMjudge Jury
+interface". But we can also do it using the REST API using the httpie tool:
+
+    DOMJUDGE_SERVER="http://localhost:12345"
+    ADMINUSER="admin"
+    PASSWORD="secret"
+    # admin password can be read from ./data/passwords/admin.pw
+    # see https://github.com/harcokuppens/DOMjudgeDockerCompose/
+
+    # import accounts
+    https -a "$ADMINUSER:$PASSWORD" --check-status -b -f POST "$DOMJUDGE_SERVER/api/v4/users/accounts" yaml@admin-accounts.yaml
+
+#### Step 3: Inform the new administrators by mail.
+
+Finall with the following script, we use the Linux sendmail command to send out the emails:
+
+    send-emails "thesender@gmail.com" "mail/"
+
+Make sure you use a Linux machine for which sendmail is configured. If somehow this method does not
+work for you, you can use one of the alternative methods described in the page
+[Sending batch of personalized emails](Sending_batch_of_personalized_emails.md).
+
+All steps from now on in this page, can be done by one of the new administrators.
+
+## E. Per course part setup and usage DOMjudge
 
 The course will be given in different parts, where each part arranges the students differently over
 the teams. Each part has a different teams configuration.
@@ -373,7 +465,7 @@ use any coursename here.
     click on 'DOMjudge' in top right corner, to get 'DOMjudge Jury interface'
     click on 'Contests'
     click on 'Add new contest' button
-       in 'Shortname' and 'Name' boxes enter 'mycourse-part-1'
+       in 'External ID', 'Shortname' and 'Name' boxes enter 'mycourse-part-1'
        select value in "Activate time" and
        paste it into "Start time" and "End time" fields.
        In the "End time" field increase the date by 1 year.

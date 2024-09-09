@@ -3,20 +3,15 @@
 **Table of Contents**
 
 <!--ts-->
-
-- [How to automate the grading of solutions from external source](#how-to-automate-the-grading-of-solutions-from-external-source)
-  - [setup domjudge for grading which is invisible for students](#setup-domjudge-for-grading-which-is-invisible-for-students)
-    - [Create a special grading contest with team category "grading"](#create-a-special-grading-contest-with-team-category-grading)
-    - [create grading teams and users](#create-grading-teams-and-users)
-  - [Add a problem for grading in the grading contest](#add-a-problem-for-grading-in-the-grading-contest)
-  - [Collect grading solutions for a problem](#collect-grading-solutions-for-a-problem)
-    - [cleanup tricks](#cleanup-tricks)
-  - [How to RUN the grading of solutions in DOMjudge](#how-to-run-the-grading-of-solutions-in-domjudge)
-  - [Fetch grading results](#fetch-grading-results)
-
-<!-- Created by https://github.com/ekalinin/github-markdown-toc -->
-<!-- Added by: harcok, at: za aug 24 09:47:12 CEST 2024 -->
-
+* [How to automate the grading of solutions from external source](#how-to-automate-the-grading-of-solutions-from-external-source)
+   * [setup domjudge for grading which is invisible for students](#setup-domjudge-for-grading-which-is-invisible-for-students)
+      * [Create a special grading contest with team category "grading"](#create-a-special-grading-contest-with-team-category-grading)
+      * [create grading teams and users](#create-grading-teams-and-users)
+   * [Add a problem for grading in the grading contest](#add-a-problem-for-grading-in-the-grading-contest)
+   * [Collect grading solutions for a problem](#collect-grading-solutions-for-a-problem)
+      * [cleanup tricks](#cleanup-tricks)
+   * [How to RUN the grading of solutions in DOMjudge](#how-to-run-the-grading-of-solutions-in-domjudge)
+   * [Fetch grading results](#fetch-grading-results)
 <!--te-->
 
 ## setup domjudge for grading which is invisible for students

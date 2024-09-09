@@ -12,10 +12,6 @@
       * [Point 5:  stop submissions to a problem when the deadline expires](#point-5--stop-submissions-to-a-problem-when-the-deadline-expires)
       * [Point 6: the DOMjudge system should be easy installable and upgradable](#point-6-the-domjudge-system-should-be-easy-installable-and-upgradable)
       * [Point 7: data should be easily being backed up for long term storage](#point-7-data-should-be-easily-being-backed-up-for-long-term-storage)
-
-<!-- Created by https://github.com/ekalinin/github-markdown-toc -->
-<!-- Added by: harcok, at: za aug 24 09:47:12 CEST 2024 -->
-
 <!--te-->
 
 
