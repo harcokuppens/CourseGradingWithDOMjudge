@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 readonly USAGE="
 
 USAGE:
@@ -12,29 +11,26 @@ PARAMS:
     
 "
 
-if [[  "$#" -ne "2" ]]
-then
+if [[ "$#" -ne "2" ]]; then
     echo "$USAGE"
     exit 0
-fi    
+fi
 
 from_email="$1"
 from_directory="$2"
 
-if [[ ! -d "$from_directory" ]]
-then
+if [[ ! -d "$from_directory" ]]; then
     echo "ERROR: directory '$from_directory' does not exist"
     exit 1
 fi
 
-for mailfile in $from_directory/*.eml
-do 
+for mailfile in $from_directory/*.eml; do
     printf "\n\n"
-    to_email=$(basename ${mailfile%.eml} )
+    to_email=$(basename ${mailfile%.eml})
     printf "sending $mailfile to $to_email\n"
     printf -- "--------------------------\n"
     #cat $mailfile | mutt -s "subject" -- $email
     # prefer sendmail, because then also subject and recipient in mailfile
-    sendmail -t -i   -f $from_email  < $mailfile
+    sendmail -t -i -f $from_email <$mailfile
     sleep 1 # not to overflow mail server
 done
