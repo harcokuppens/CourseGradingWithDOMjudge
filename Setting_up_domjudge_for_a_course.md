@@ -681,7 +681,7 @@ All other data in the zipfile is not imported into the DOMjudge problem.
   has **admin role** , **belongs to a team** and **imports the problem to a contest directly**. Then
   the `submissions/` folder will be submitted to the newly
   created problem to be judged. This can be convenient to directly evaluate that everything also
-  works the same on the DOMjudge server as on your local machine. However as describe below in the
+  works the same on the DOMjudge server as on your local machine. However as we describe below in the
   'Test problem in DOMjudge' section I prefer to do the testing separately in a separate test
   contest, because then testing submissions are then not included in the student contests, so we
   then later do not have to filter out test submissions when processing the student results.
