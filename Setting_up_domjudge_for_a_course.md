@@ -675,9 +675,11 @@ All other data in the zipfile is not imported into the DOMjudge problem.
   [setting the problem's shortname], as for the name field in the `problem.yaml` config file
   [setting the problem's (long)name].
 
-- The `submissions/` folder in the zipfile is handled specially if the user account doing the import
+- It is advised to not import the problem to a contest directly. The `submissions/` folder is never
+  imported to the problem. But, the `submissions/` folder in the zipfile is handled specially if
+  the user account doing the import
   has **admin role** , **belongs to a team** and **imports the problem to a contest directly**. Then
-  `submissions/` folder will not be imported into the problem, but instead submitted to the newly
+  the `submissions/` folder will be submitted to the newly
   created problem to be judged. This can be convenient to directly evaluate that everything also
   works the same on the DOMjudge server as on your local machine. However as describe below in the
   'Test problem in DOMjudge' section I prefer to do the testing separately in a separate test
