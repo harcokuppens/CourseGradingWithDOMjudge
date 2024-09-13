@@ -766,8 +766,8 @@ When setting up administrator accounts earlier in this page we already
 [setup a **Test** contest](#setup-test-contest), which only the administrators can use. So I suggest
 use this contest to test your new problem. Use the following steps:
 
-- open the Test contest, and select Edit, the at the bottom of the edit form it allows you to add problems
-  to the contest. So add the grading version of the problem to the Test contest.
+- open the Test contest, and select Edit. Then at the bottom of the edit form it allows you to add problems
+  to the contest. So, add the grading version of the problem to the Test contest.
 - the administrator accounts all have both the team as admin role permissions.  When logging in as administrator
   then by default you are logged in with the admin role. In our test we want to test submissions which can
   only be done in the team role. So to switch to the team role we click at the top bar on '-> team' to open the team interface.
@@ -775,7 +775,7 @@ use this contest to test your new problem. Use the following steps:
   on '-> Jury' we can switch back to the admin interface.
 - when in the team role we select the 'Test' contest in the select box to the right of the logout button. Then we press the
   Submit button and submit a solution to the test problem.
-- in team interface we see the judging of the solution as seen by a team member, that is you only see the evaluation of
+- in the team interface we see the judging of the solution as seen by a team member. You only see the evaluation of
   the public answers, but not for the secret answers.  To also see the latter, we can switch back to the admin interface
   by pressing on  '-> Jury' in the top bar. In the admin interface we click on "submissions" in the top bar. Then a list
   of submissions is shown, and you can click on the submission of interest to see the judgement for both the public as
