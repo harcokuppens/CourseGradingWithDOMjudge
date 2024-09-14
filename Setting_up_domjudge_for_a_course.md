@@ -809,7 +809,11 @@ on their solution without using DOMjudge.
 
 If the team has a final solution they can submit it to the **grading problem** for grading. The
 grading problem is **judged none-lazy**, because all secret samples must be evaluated for the
-grading.
+grading. The student only sees the results for the public input and answers, and not for the secret
+input and answers. However the student does see the overall result of all public and secret input
+and answers together. This means if a student has all the public input/answer sets good, but
+he has one of the secret ones wrong, is overall result is wrong. He cannot see which secret
+input/output set he has wrong. Maybe he can ask the teacher for an hint.
 
 A team should only submit once per grading problem, however if something went wrong, they are
 allowed to submit again. For grading the latest submission is used.
