@@ -15,6 +15,7 @@ import requests.utils
 import stat
 import sys
 import time
+
 try:
     import magic
 except ModuleNotFoundError:
@@ -23,11 +24,11 @@ except ModuleNotFoundError:
 
 # Set the default base URL to submit to (optional). It can be overridden
 # by the SUBMITBASEURL environment variable or the -u/--url argument.
-baseurl = ''
+baseurl = ""
 
 # Use a specific API version, set to empty string for default
 # or set to the version followed by a slash to use that version
-api_version = ''
+api_version = ""
 
 # Last modified time in minutes after which to warn for submitting
 # an old file.
@@ -36,168 +37,187 @@ warn_mtime_minutes = 5
 # End of configurable settings
 num_warnings = 0
 
-headers = {'user-agent': f'domjudge-submit-client ({requests.utils.default_user_agent()})'}
+headers = {
+    "user-agent": f"domjudge-submit-client ({requests.utils.default_user_agent()})"
+}
+
 
 def confirm(message: str) -> bool:
-    answer = ''
-    while answer not in ['y', 'n']:
-        answer = input(f'{message} (y/n) ').lower()
-    return answer == 'y'
+    answer = ""
+    while answer not in ["y", "n"]:
+        answer = input(f"{message} (y/n) ").lower()
+    return answer == "y"
+
 
 def warn_user(msg: str):
     global num_warnings
     num_warnings += 1
     if args.quiet:
-        logging.debug(f'user warning #{num_warnings}: {msg}')
+        logging.debug(f"user warning #{num_warnings}: {msg}")
     else:
-        print(f'WARNING: {msg}!')
+        print(f"WARNING: {msg}!")
+
 
 def usage(msg: str):
-    logging.error(f'error: {msg}')
+    logging.error(f"error: {msg}")
     print(f"Type '{sys.argv[0]} --help' to get help.")
     exit(1)
+
 
 def error(msg: str):
     logging.error(msg)
     exit(-1)
 
+
 def read_contests() -> list:
-    '''Read all contests from the API.
-    
+    """Read all contests from the API.
+
     Returns:
         The contests or None if an error occurred.
-    '''
+    """
 
     try:
-        data = do_api_request('contests')
+        data = do_api_request("contests")
     except RuntimeError as e:
         error(e)
-        
+
     if not isinstance(data, list):
-        logging.warning("DOMjudge's API returned unexpected JSON data for endpoint 'contests'.")
+        logging.warning(
+            "DOMjudge's API returned unexpected JSON data for endpoint 'contests'."
+        )
         return None
 
     contests = []
     for contest in data:
-        if not verify_fields('contest',contest,['id','shortname']):
+        if not verify_fields("contest", contest, ["id", "shortname"]):
             continue
         contests.append(contest)
 
-    logging.info(f'Read {len(contests)} contest(s) from the API.')
+    logging.info(f"Read {len(contests)} contest(s) from the API.")
     return contests
 
+
 def read_languages() -> list:
-    '''Read all languages for the current contest from the API.
-    
+    """Read all languages for the current contest from the API.
+
     Returns:
         The languages or None if an error occurred.
-    '''
+    """
 
     try:
-        endpoint = 'contests/' + my_contest['id'] + '/languages'
+        endpoint = "contests/" + my_contest["id"] + "/languages"
         data = do_api_request(endpoint)
     except RuntimeError as e:
         logging.warning(e)
         return None
 
     if not isinstance(data, list):
-        logging.warning("DOMjudge's API returned unexpected JSON data for endpoint 'languages'.")
+        logging.warning(
+            "DOMjudge's API returned unexpected JSON data for endpoint 'languages'."
+        )
         return None
 
     languages = []
 
     for item in data:
-        if not verify_fields('language',item,['id','extensions']):
-            continue        
-        if (not isinstance(item['extensions'], list)
-            or len(item['extensions']) == 0):
+        if not verify_fields("language", item, ["id", "extensions"]):
+            continue
+        if not isinstance(item["extensions"], list) or len(item["extensions"]) == 0:
             logging.warning("SKIP language because has no extensions")
             continue
         language = {
-            'id': item['id'],
-            'name': item['name'],
-            'entry_point_required': item['entry_point_required'] or False,
-            'extensions': {item['id']}
+            "id": item["id"],
+            "name": item["name"],
+            "entry_point_required": item["entry_point_required"] or False,
+            "extensions": {item["id"]},
         }
-        language['extensions'] |= set([ext for ext in item['extensions']])
+        language["extensions"] |= set([ext for ext in item["extensions"]])
         languages.append(language)
 
-    logging.info(f'Read {len(languages)} language(s) from the API.')
+    logging.info(f"Read {len(languages)} language(s) from the API.")
 
     return languages
 
+
 def read_problems() -> list:
-    '''Read all problems for the current contest from the API.
-    
+    """Read all problems for the current contest from the API.
+
     Returns:
         The problems or None if an error occurred.
-    '''
+    """
 
     try:
-        endpoint = 'contests/' + my_contest['id'] + '/problems'
+        endpoint = "contests/" + my_contest["id"] + "/problems"
         data = do_api_request(endpoint)
     except RuntimeError as e:
         logging.warning(e)
         return None
 
     if not isinstance(data, list):
-        logging.warning("DOMjudge's API returned unexpected JSON data for endpoint 'problems'.")
+        logging.warning(
+            "DOMjudge's API returned unexpected JSON data for endpoint 'problems'."
+        )
         return None
 
     problems = []
 
     for problem in data:
-        if not verify_fields('problem',problem,['id','label']):
+        if not verify_fields("problem", problem, ["id", "label"]):
             continue
         problems.append(problem)
 
-    logging.info(f'Read {len(problems)} problem(s) from the API.')
+    logging.info(f"Read {len(problems)} problem(s) from the API.")
 
     return problems
 
-def read_submission_sources_as_json(id,team) -> list:
-    '''Read all submissions for the current problem in the current contest from the API.
-    
+
+def read_submission_sources_as_json(id, team) -> list:
+    """Read all submissions for the current problem in the current contest from the API.
+
     Returns:
         The submissions or None if an error occurred.
-    '''
+    """
 
     try:
-        endpoint = 'contests/' + my_contest['id'] + '/submissions/' + id + '/source-code'
+        endpoint = (
+            "contests/" + my_contest["id"] + "/submissions/" + id + "/source-code"
+        )
         data = do_api_request(endpoint)
     except RuntimeError as e:
         logging.warning(e)
         return None
 
     if not isinstance(data, list):
-        logging.warning("DOMjudge's API returned unexpected JSON data for endpoint 'submissions/ID/source-code'.")
+        logging.warning(
+            "DOMjudge's API returned unexpected JSON data for endpoint 'submissions/ID/source-code'."
+        )
         return None
-    
+
     sources = []
 
     for source in data:
-        if not verify_fields('source',source,['id','source']):
+        if not verify_fields("source", source, ["id", "source"]):
             continue
-        source['team_id']=team['id']
-        source['team_name']=team['name']
-        source['team_display_name']=team['display_name']
+        source["team_id"] = team["id"]
+        source["team_name"] = team["name"]
+        source["team_display_name"] = team["display_name"]
         sources.append(source)
 
-    logging.info(f'Read {len(problems)} problem(s) from the API.')
+    logging.info(f"Read {len(problems)} problem(s) from the API.")
 
     return sources
 
 
-def read_submission_files_as_zip(id,zipfile) -> list:
-    '''Read all submissions for the current problem in the current contest from the API.
-    
+def read_submission_files_as_zip(id, zipfile) -> list:
+    """Read all submissions for the current problem in the current contest from the API.
+
     Returns:
         The submissions or None if an error occurred.
-    '''
+    """
 
     try:
-        endpoint = 'contests/' + my_contest['id'] + '/submissions/' + id + '/files'
-        data = do_api_request(endpoint,binary=True)
+        endpoint = "contests/" + my_contest["id"] + "/submissions/" + id + "/files"
+        data = do_api_request(endpoint, binary=True)
     except RuntimeError as e:
         logging.warning(e)
         return None
@@ -206,27 +226,29 @@ def read_submission_files_as_zip(id,zipfile) -> list:
     f.write(data)
     f.close()
 
-    logging.info(f'Read {zipfile} from the API.')
+    logging.info(f"Read {zipfile} from the API.")
 
-    return 
+    return
 
 
 def read_submissions() -> list:
-    '''Read all submissions for the current problem in the current contest from the API.
-    
+    """Read all submissions for the current problem in the current contest from the API.
+
     Returns:
         The submissions or None if an error occurred.
-    '''
+    """
 
     try:
-        endpoint = 'contests/' + my_contest['id'] + '/submissions'
+        endpoint = "contests/" + my_contest["id"] + "/submissions"
         data = do_api_request(endpoint)
     except RuntimeError as e:
         logging.warning(e)
         return None
 
     if not isinstance(data, list):
-        logging.warning("DOMjudge's API returned unexpected JSON data for endpoint 'submissions'.")
+        logging.warning(
+            "DOMjudge's API returned unexpected JSON data for endpoint 'submissions'."
+        )
         return None
 
     submissions = []
@@ -242,38 +264,40 @@ def read_submissions() -> list:
     #   'language_id': 'java',
     #   'problem_id': '4',
     #   'team_id': '54',
-    #   'time': '2023-12-11T01:17:57.865+01:00'}     
+    #   'time': '2023-12-11T01:17:57.865+01:00'}
 
     for submission in data:
-        if not verify_fields('submission',submission,['id','problem_id']):
-            continue        
-        if submission['problem_id'] == my_problem['id'] :
-           submissions.append(submission)
+        if not verify_fields("submission", submission, ["id", "problem_id"]):
+            continue
+        if submission["problem_id"] == my_problem["id"]:
+            submissions.append(submission)
 
+    logging.info(f"Read {len(submissions)} submission(s) from the API.")
 
-    logging.info(f'Read {len(submissions)} submission(s) from the API.')
-    
-    
-    submissions=sorted(submissions, key=lambda submission: submission['time'], reverse=True) 
+    submissions = sorted(
+        submissions, key=lambda submission: submission["time"], reverse=True
+    )
     return submissions
 
 
 def read_judgements(submission_ids) -> list:
-    '''Read all judgements for the current problem in the current contest from the API.
-    
+    """Read all judgements for the current problem in the current contest from the API.
+
     Returns:
         The judgements or None if an error occurred.
-    '''
+    """
 
     try:
-        endpoint = 'contests/' + my_contest['id'] + '/judgements'
+        endpoint = "contests/" + my_contest["id"] + "/judgements"
         data = do_api_request(endpoint)
     except RuntimeError as e:
         logging.warning(e)
         return None
 
     if not isinstance(data, list):
-        logging.warning("DOMjudge's API returned unexpected JSON data for endpoint 'judgements'.")
+        logging.warning(
+            "DOMjudge's API returned unexpected JSON data for endpoint 'judgements'."
+        )
         return None
 
     ## judgement looks like:
@@ -287,40 +311,45 @@ def read_judgements(submission_ids) -> list:
     #   'submission_id': '134',
     #   'valid': True }
 
-    #pprint(data)
+    # pprint(data)
 
     judgements = []
     for judgement in data:
-        if not verify_fields('judgement',judgement,['id','judgement_type_id']):
-            continue          
+        if not verify_fields("judgement", judgement, ["id", "judgement_type_id"]):
+            continue
         judgements.append(judgement)
 
-
-    # now still all judgements in contest are returned, but 
+    # now still all judgements in contest are returned, but
     # should be only them belonging to a specific problem.
     # Filter by submission_id for submissions belonging to a problem:
-    judgements=[judgement for judgement in judgements if judgement['submission_id'] in submission_ids ]
-    logging.info(f'Read {len(judgements)} judgement(s) from the API.')
+    judgements = [
+        judgement
+        for judgement in judgements
+        if judgement["submission_id"] in submission_ids
+    ]
+    logging.info(f"Read {len(judgements)} judgement(s) from the API.")
 
     return judgements
 
 
 def read_runs(judgement_ids) -> list:
-    '''Read all runs for the current problem in the current contest from the API.
-    
+    """Read all runs for the current problem in the current contest from the API.
+
     Returns:
         The runs or None if an error occurred.
-    '''
+    """
 
     try:
-        endpoint = 'contests/' + my_contest['id'] + '/runs'
+        endpoint = "contests/" + my_contest["id"] + "/runs"
         data = do_api_request(endpoint)
     except RuntimeError as e:
         logging.warning(e)
         return None
 
     if not isinstance(data, list):
-        logging.warning("DOMjudge's API returned unexpected JSON data for endpoint 'runs'.")
+        logging.warning(
+            "DOMjudge's API returned unexpected JSON data for endpoint 'runs'."
+        )
         return None
 
     ## run looks like
@@ -334,40 +363,38 @@ def read_runs(judgement_ids) -> list:
 
     runs = []
     for run in data:
-        if not verify_fields('run',run,['id','judgement_type_id']):
-            continue        
+        if not verify_fields("run", run, ["id", "judgement_type_id"]):
+            continue
         runs.append(run)
 
-
-    # now still all runs in contest are returned, but 
+    # now still all runs in contest are returned, but
     # should be only them belonging to a specific problem.
     # Filter by judgement_id for judgements belonging to a problem:
-    runs=[run for run in runs if run['judgement_id'] in judgement_ids ]
+    runs = [run for run in runs if run["judgement_id"] in judgement_ids]
 
-    logging.info(f'Read {len(runs)} run(s) from the API.')
+    logging.info(f"Read {len(runs)} run(s) from the API.")
 
     return runs
 
 
-
-
-
 def read_accounts() -> list:
-    '''Read all accounts in the current contest from the API.
-    
+    """Read all accounts in the current contest from the API.
+
     Returns:
         The accounts or None if an error occurred.
-    '''
+    """
 
     try:
-        endpoint = 'contests/' + my_contest['id'] + '/teams'
+        endpoint = "contests/" + my_contest["id"] + "/teams"
         data = do_api_request(endpoint)
     except RuntimeError as e:
         logging.warning(e)
         return None
 
     if not isinstance(data, list):
-        logging.warning("DOMjudge's API returned unexpected JSON data for endpoint 'teams'.")
+        logging.warning(
+            "DOMjudge's API returned unexpected JSON data for endpoint 'teams'."
+        )
         return None
 
     # {
@@ -391,34 +418,36 @@ def read_accounts() -> list:
 
     accounts = []
     for account in accounts:
-        if not verify_fields('account',account,['id','name']):
+        if not verify_fields("account", account, ["id", "name"]):
             continue
         accounts.append(account)
 
-    logging.info(f'Read {len(accounts)} account(s) from the API.')
+    logging.info(f"Read {len(accounts)} account(s) from the API.")
 
     return teams
 
 
 def read_teams() -> list:
-    '''Read all teams for the current problem in the current contest from the API.
-    
+    """Read all teams for the current problem in the current contest from the API.
+
     Returns:
         The teams or None if an error occurred.
-    '''
+    """
 
     try:
-        endpoint = 'contests/' + my_contest['id'] + '/teams'
+        endpoint = "contests/" + my_contest["id"] + "/teams"
         data = do_api_request(endpoint)
     except RuntimeError as e:
         logging.warning(e)
         return None
 
     if not isinstance(data, list):
-        logging.warning("DOMjudge's API returned unexpected JSON data for endpoint 'teams'.")
+        logging.warning(
+            "DOMjudge's API returned unexpected JSON data for endpoint 'teams'."
+        )
         return None
 
-    ## team entry looks like: 
+    ## team entry looks like:
     # {'affiliation': None,
     # 'display_name': None,
     # 'group_ids': ['1'],
@@ -429,36 +458,58 @@ def read_teams() -> list:
     # 'nationality': None,
     # 'organization_id': None,
     # 'public_description': None}
-    #pprint(data)
+    # pprint(data)
 
     teams = []
     for team in data:
-        if not verify_fields('team',team,['id','name']):
+        if not verify_fields("team", team, ["id", "name"]):
             continue
         teams.append(team)
 
-    logging.info(f'Read {len(teams)} team(s) from the API.')
+    logging.info(f"Read {len(teams)} team(s) from the API.")
 
     return teams
 
-def verify_fields(label,obj,fields):
+
+def verify_fields(label, obj, fields):
     for field in fields:
         if field not in obj:
-            # something really wrong with json if it doesn't has these fields! 
+            # something really wrong with json if it doesn't has these fields!
             import sys
             from pprint import pformat
-            logging.error("ERROR: DOMjudge's API returned unexpected JSON data:\n    a '" + label + "' object is missing field '" + field  + "': \n    '" + label + "' object: " + pformat(obj,width=1000));
+
+            logging.error(
+                "ERROR: DOMjudge's API returned unexpected JSON data:\n    a '"
+                + label
+                + "' object is missing field '"
+                + field
+                + "': \n    '"
+                + label
+                + "' object: "
+                + pformat(obj, width=1000)
+            )
             sys.exit(1)
         if not obj[field]:
             from pprint import pformat
-            logging.warning("SKIPPING a '" + label + "' object because it has no value for field '" + field  + "':\n    '" + label + "' object: " + pformat(obj,width=1000));
+
+            logging.warning(
+                "SKIPPING a '"
+                + label
+                + "' object because it has no value for field '"
+                + field
+                + "':\n    '"
+                + label
+                + "' object: "
+                + pformat(obj, width=1000)
+            )
             return False
 
-    return True    
+    return True
 
-def do_api_request(name: str,binary=False):
-    '''Perform an API call to the given endpoint and return its data.
-    
+
+def do_api_request(name: str, binary=False):
+    """Perform an API call to the given endpoint and return its data.
+
     Parameters:
         name (str): the endpoint to call
 
@@ -467,70 +518,76 @@ def do_api_request(name: str,binary=False):
 
     Raises:
         RuntimeError when the response is not JSON or the HTTP status code is non 2xx.
-    '''
+    """
 
     if not baseurl:
-        raise RuntimeError('No baseurl set')
+        raise RuntimeError("No baseurl set")
 
-    url = f'{baseurl}api/{api_version}{name}'
-    
-    logging.info(f'Connecting to {url}')
-    
+    url = f"{baseurl}api/{api_version}{name}"
+
+    logging.info(f"Connecting to {url}")
+
     try:
         response = requests.get(url, headers=headers, auth=user_password_tuple)
     except requests.exceptions.RequestException as e:
         raise RuntimeError(e)
-    
-    logging.info(f'status code {response.status_code}')
+
+    logging.info(f"status code {response.status_code}")
     if response.status_code >= 300:
         print(response.text)
         if response.status_code == 401:
-            raise RuntimeError('Authentication failed, please check your DOMjudge credentials in ~/.netrc.')
+            raise RuntimeError(
+                "Authentication failed, please check your DOMjudge credentials in ~/.netrc."
+            )
         else:
-            raise RuntimeError(f'API request {name} failed (code {response.status_code}).')
+            raise RuntimeError(
+                f"API request {name} failed (code {response.status_code})."
+            )
 
     if binary:
         logging.debug(f"API call '{name}' returned: binary data")
         return response.content
-    else: 
+    else:
         logging.debug(f"API call '{name}' returned:\n{response.text}")
         return json.loads(response.text)
 
 
-
-
 def get_epilog():
-    '''Get the epilog for the help text.'''
+    """Get the epilog for the help text."""
 
     contests_part_one = None
     contests_part_two = None
 
     if not contests or len(contests) <= 1:
-        contests_part_one = '''For CONTEST use the ID or short name as shown in the top-right contest
-drop-down box in the web interface.'''
+        contests_part_one = """For CONTEST use the ID or short name as shown in the top-right contest
+drop-down box in the web interface."""
         if contests and len(contests) == 1:
             contests_part_two = f"Currently this defaults to the only active contest '{contests[0]['shortname']}'"
     else:
-        contests_part_one = 'For CONTEST use one of the following:'
-        max_length = max([len(c['shortname']) for c in contests])
+        contests_part_one = "For CONTEST use one of the following:"
+        max_length = max([len(c["shortname"]) for c in contests])
         for contest in contests:
-            contests_part_one += f"\n    {contest['shortname']:<{max_length}} - {contest['name']}"
+            contests_part_one += (
+                f"\n    {contest['shortname']:<{max_length}} - {contest['name']}"
+            )
 
     if not problems:
-        problem_part = 'For PROBLEM use the label as on the scoreboard.'
+        problem_part = "For PROBLEM use the label as on the scoreboard."
     else:
-        problem_part = 'For PROBLEM use one of the following:'
-        max_length = max([len(p['label']) for p in problems])
+        problem_part = "For PROBLEM use one of the following:"
+        max_length = max([len(p["label"]) for p in problems])
         for problem in problems:
-            problem_part += f"\n    {problem['label']:<{max_length}} - {problem['name']}"
+            problem_part += (
+                f"\n    {problem['label']:<{max_length}} - {problem['name']}"
+            )
 
     if not languages:
-        language_part = 'For LANGUAGE use the ID or a common extension.'
+        language_part = "For LANGUAGE use the ID or a common extension."
     else:
-        language_part = 'For LANGUAGE use one of the following IDs or extensions:'
-        max_length = max([len(l['name']) for l in languages])
+        language_part = "For LANGUAGE use one of the following IDs or extensions:"
+        max_length = max([len(l["name"]) for l in languages])
         for language in languages:
-            sorted_exts = ', '.join(sorted(language['extensions']))
+            sorted_exts = ", ".join(sorted(language["extensions"]))
             language_part += f"\n    {language['name']:<{max_length}} - {sorted_exts}"
 
     submit_client = sys.argv[0]
@@ -539,114 +596,171 @@ drop-down box in the web interface.'''
         contests_part_one,
         contests_part_two,
         problem_part,
-        "\nYou must specify a PROBLEM!\nYou must specify a CONTEST except when there is only one active contest."
-        ]
+        "\nYou must specify a PROBLEM!\nYou must specify a CONTEST except when there is only one active contest.",
+    ]
 
-    return "\n\n".join(part for part in epilog_parts if part) 
+    return "\n\n".join(part for part in epilog_parts if part)
 
 
-
-version_text = '''
+version_text = """
 fetch -- fetch data from DOMjudge
 Written by Harco Kuppens
 
 Fetch comes with ABSOLUTELY NO WARRANTY.  This is free software, and you
 are welcome to redistribute it under certain conditions.  See the GNU
 General Public Licence for details.
-'''
+"""
 
 loglevels = {
-    'DEBUG': logging.DEBUG,
-    'INFO': logging.INFO,
-    'WARNING': logging.WARNING,
-    'ERROR': logging.ERROR,
-    'CRITICAL': logging.CRITICAL,
+    "DEBUG": logging.DEBUG,
+    "INFO": logging.INFO,
+    "WARNING": logging.WARNING,
+    "ERROR": logging.ERROR,
+    "CRITICAL": logging.CRITICAL,
 }
 
 # Note: we set add_help to false since we can only print the help text after
 # parsing flags, since the help contains data needed from the API.
 parser = argparse.ArgumentParser(
-        formatter_class=argparse.RawTextHelpFormatter,
-        description='Fetch students final solutions for a problem in a contest into a data file.',
-        add_help=False)
-parser.add_argument('--version', action='version', version=version_text, help='output version information and exit')
-parser.add_argument('-h', '--help', help='display this help and exit', action='store_true')
-parser.add_argument('-c', '--contest', help='''fetch from contest with ID or short name CONTEST.
+    formatter_class=argparse.RawTextHelpFormatter,
+    description="Fetch students final solutions for a problem in a contest into a data file.",
+    add_help=False,
+)
+parser.add_argument(
+    "--version",
+    action="version",
+    version=version_text,
+    help="output version information and exit",
+)
+parser.add_argument(
+    "-h", "--help", help="display this help and exit", action="store_true"
+)
+parser.add_argument(
+    "-c",
+    "--contest",
+    help="""fetch from contest with ID or short name CONTEST.
     Defaults to the value of the
     environment variable 'SUBMITCONTEST'.
-    Mandatory when more than one contest is active.''')
-parser.add_argument('-p', '--problem', help='fetch from problem with ID or label PROBLEM', default='')
-parser.add_argument('-v', '--verbose', help='increase verbosity', choices=loglevels.keys(), nargs='?', const='INFO', default='WARNING')
-parser.add_argument('-q', '--quiet', help='suppress warning/info messages', action='store_true')
-parser.add_argument('-l', '--last-per-team', help='only fetch the last submission per team', action='store_true')
-parser.add_argument('-f', '--files', help='also fetch the files belonging to a team submission as a zipfile', action='store_true')
-parser.add_argument('-u', '--url', help='''submit to server with base address URL
-    (should not be necessary for normal use)''')
-parser.add_argument('-o', '--outputfile', help='''output file where fetched data is stored. Default: contest_problem_data.pod ''', default='contest_problem_data.pod')
-parser.add_argument('-a', '--auth', help='user:password value to authenticate with basic auth', default='')
+    Mandatory when more than one contest is active.""",
+)
+parser.add_argument(
+    "-p", "--problem", help="fetch from problem with ID or label PROBLEM", default=""
+)
+parser.add_argument(
+    "-v",
+    "--verbose",
+    help="increase verbosity",
+    choices=loglevels.keys(),
+    nargs="?",
+    const="INFO",
+    default="WARNING",
+)
+parser.add_argument(
+    "-q", "--quiet", help="suppress warning/info messages", action="store_true"
+)
+parser.add_argument(
+    "-l",
+    "--last-per-team",
+    help="only fetch the last submission per team",
+    action="store_true",
+)
+parser.add_argument(
+    "-f",
+    "--files",
+    help="also fetch the files belonging to a team submission as a zipfile",
+    action="store_true",
+)
+parser.add_argument(
+    "-u",
+    "--url",
+    help="""submit to server with base address URL
+    (should not be necessary for normal use)""",
+)
+parser.add_argument(
+    "-o",
+    "--outputfile",
+    help="""output file where fetched data is stored. Default: contest_problem_data.pod """,
+    default="contest_problem_data.pod",
+)
+parser.add_argument(
+    "-a",
+    "--auth",
+    help="user:password value to authenticate with basic auth",
+    default="",
+)
 
 args = parser.parse_args()
- 
+
 verbosity = args.verbose
 if args.quiet:
-    verbosity = 'ERROR'
+    verbosity = "ERROR"
 
-last_per_team=args.last_per_team
-files=args.files
+last_per_team = args.last_per_team
+files = args.files
 
-logging.basicConfig(format=f'%(message)s', level=loglevels[verbosity])
-logging.info(f'set verbosity to {verbosity}')
+logging.basicConfig(format=f"%(message)s", level=loglevels[verbosity])
+logging.info(f"set verbosity to {verbosity}")
 
 problem_id = args.problem
 
 userpassword = args.auth
 
-user_password_tuple=None # fallback to .netrc file
+user_password_tuple = None  # fallback to .netrc file
 if userpassword:
-   user, password = userpassword.split(':')
-   user_password_tuple=(user,password)
+    user, password = userpassword.split(":")
+    user_password_tuple = (user, password)
 
 
-filename=args.outputfile
+filename = args.outputfile
 
 if args.url:
     baseurl = args.url
-elif 'SUBMITBASEURL' in os.environ:
-    baseurl = os.environ['SUBMITBASEURL']
+elif "SUBMITBASEURL" in os.environ:
+    baseurl = os.environ["SUBMITBASEURL"]
+# Make sure that baseurl terminates starts with http
+if not baseurl.lower().startswith("http"):
+    usage(
+        "No valid contest url specified, it must start with http:// or https:// protocol"
+    )
 # Make sure that baseurl terminates with a '/' for later concatenation.
-if baseurl and baseurl[-1:] != '/':
-    baseurl += '/'
+if baseurl and baseurl[-1:] != "/":
+    baseurl += "/"
 
 if args.contest:
     contest_id = args.contest
-elif 'SUBMITCONTEST' in os.environ:
-    contest_id = os.environ['SUBMITCONTEST']
+elif "SUBMITCONTEST" in os.environ:
+    contest_id = os.environ["SUBMITCONTEST"]
 else:
-    contest_id = ''
+    contest_id = ""
 
 contests = read_contests() if baseurl else None
 
 if not contests and not args.help:
-    logging.warning('Obtained an empty list of active contests. For none public contests you have to provide credentials to fetch them.')
+    logging.warning(
+        "Obtained an empty list of active contests. For none public contests you have to provide credentials to fetch them."
+    )
 
 
 my_contest = None
-#my_language = None
+# my_language = None
 my_problem = None
 
 if not contest_id:
     if not contests:
         if not args.help:
-            warn_user('No active contests found (and no contest specified)')
+            warn_user("No active contests found (and no contest specified)")
     elif len(contests) == 1:
         my_contest = contests[0]
     else:
-        shortnames = ', '.join([c['shortname'] for c in contests])
+        shortnames = ", ".join([c["shortname"] for c in contests])
         warn_user(f"Multiple active contests found, please specify one of {shortnames}")
 elif contests:
     contest_id = contest_id.lower()
     for contest in contests:
-        if contest['id'].lower() == contest_id or contest['shortname'].lower() == contest_id:
+        if (
+            contest["id"].lower() == contest_id
+            or contest["shortname"].lower() == contest_id
+        ):
             my_contest = contest
             break
 
@@ -659,84 +773,84 @@ if my_contest and baseurl:
 parser.epilog = get_epilog()
 
 if args.help:
-    if 'BATS_VERSION' in os.environ:
+    if "BATS_VERSION" in os.environ:
         # print_help adds line breaks depending on the number of available columns.
         # To make it deterministic under test, we set it to 100 here if we are testing.
-        os.environ['COLUMNS'] = '100'
+        os.environ["COLUMNS"] = "100"
     parser.print_help()
     exit(0)
 
 if not baseurl:
-    usage('No contest url specified, pass it as --url or set as SUBMITBASEURL environment variable.')
+    usage(
+        "No contest url specified, pass it as --url or set as SUBMITBASEURL environment variable."
+    )
 
 if not my_contest:
-    shortnames=[]
+    shortnames = []
     for contest in contests:
-        shortnames.append(contest['shortname'].lower())
+        shortnames.append(contest["shortname"].lower())
     print("available contests: " + ", ".join(shortnames))
-    usage('No (valid) contest specified, pass it as --contest or set as SUBMITCONTEST environment variable. Or maybe you need to supply credentials, because for none public contests you must authenticate.')
+    usage(
+        "No (valid) contest specified, pass it as --contest or set as SUBMITCONTEST environment variable. Or maybe you need to supply credentials, because for none public contests you must authenticate."
+    )
 
 if not languages:
-    logging.warning('Could not obtain language data.')
+    logging.warning("Could not obtain language data.")
 
 if not problems:
-    logging.warning('Could not obtain problem data.')
-
+    logging.warning("Could not obtain problem data.")
 
 
 # Check for problem matching ID or label.
 problem_id = problem_id.lower()
 for problem in problems:
-    if problem['id'].lower() == problem_id or problem['label'].lower() == problem_id:
+    if problem["id"].lower() == problem_id or problem["label"].lower() == problem_id:
         my_problem = problem
         break
 
 if not my_problem:
-    names=[]
+    names = []
     for problem in problems:
-        names.append(problem['label'].lower())
+        names.append(problem["label"].lower())
     print("available problems: " + ", ".join(names))
-    usage('No known problem specified or detected.')
+    usage("No known problem specified or detected.")
 
- 
 
 logging.debug(f"contest is `{my_contest['shortname']}'")
 logging.debug(f"problem is `{my_problem['label']}'")
 logging.debug(f"url is `{baseurl}'")
 
 
-
 from pprint import pprint
-teams=read_teams()
-id2team={}
+
+teams = read_teams()
+id2team = {}
 for team in teams:
-    id2team[team['id']]=team
+    id2team[team["id"]] = team
 
 # read all submissions / judgements / runs for  contest and problem
-submissions=read_submissions()
-
-
+submissions = read_submissions()
 
 
 # only get latest submission per team (and one zip per team if files option used)
 # note: per submission there could be multiple judgements; we don't take the latest here.
 #       the 'process' script only looks at latest submission and judgement
 #       We do look at latest submission already here, because we only want to download
-#       files for the latest submissions. We just want one zip per team to evaluate! 
+#       files for the latest submissions. We just want one zip per team to evaluate!
 #
 if last_per_team:
-    result=[]
-    team2submission={}
+    result = []
+    team2submission = {}
     for submission in submissions:
-        teamid = submission['team_id']
+        teamid = submission["team_id"]
         if teamid in team2submission:
-            othertime=submission['time']
-            currenttime=team2submission[teamid]['time']
+            othertime = submission["time"]
+            currenttime = team2submission[teamid]["time"]
             if othertime > currenttime:
-                team2submission[teamid]=submission
+                team2submission[teamid] = submission
         else:
-            team2submission[teamid] = submission   
-    submissions=list(team2submission.values())
+            team2submission[teamid] = submission
+    submissions = list(team2submission.values())
 
 
 if files:
@@ -746,39 +860,41 @@ if files:
     #     sources += read_submission_sources_as_json(submission['id'],id2team[submission['team_id']])
 
     import os
-    directory="files"
+
+    directory = "files"
     if not os.path.exists(directory):
-       os.makedirs(directory)
+        os.makedirs(directory)
 
     for submission in submissions:
-        team=id2team[submission['team_id']]
-        name=team['name'] or "none"  
-        displayname=team['display_name'] or "none"
-        zipfile="files/" + name + "__" + displayname + "__s"+submission['id'] + ".zip"
-        zipfile=zipfile.replace(" ", "_")
-        zipfile=zipfile.replace(",", "_")
-        data = read_submission_files_as_zip(submission['id'],zipfile)
+        team = id2team[submission["team_id"]]
+        name = team["name"] or "none"
+        displayname = team["display_name"] or "none"
+        zipfile = (
+            "files/" + name + "__" + displayname + "__s" + submission["id"] + ".zip"
+        )
+        zipfile = zipfile.replace(" ", "_")
+        zipfile = zipfile.replace(",", "_")
+        data = read_submission_files_as_zip(submission["id"], zipfile)
 
-    print("written zipfiles of submission code in files/ folder")    
+    print("written zipfiles of submission code in files/ folder")
 
-judgements=read_judgements([submission['id'] for submission in submissions])
-runs=read_runs([judgement['id'] for judgement in judgements])
+judgements = read_judgements([submission["id"] for submission in submissions])
+runs = read_runs([judgement["id"] for judgement in judgements])
 
-# store all problem's data within a contest 
+# store all problem's data within a contest
 all_contest_problem_data = {
-    "url"  : baseurl,
-    "contest" : my_contest,
-    "problem" : my_problem,
-    "languages" : languages,
-    "teams" : teams,
-    "submissions" : submissions,
-    "judgements" : judgements,
-    "runs" : runs
+    "url": baseurl,
+    "contest": my_contest,
+    "problem": my_problem,
+    "languages": languages,
+    "teams": teams,
+    "submissions": submissions,
+    "judgements": judgements,
+    "runs": runs,
 }
 
 # write all data in a plain old data file (.pod file)
 with open(filename, "w") as data_file:
     pprint(all_contest_problem_data, data_file)
 
-print("written data in python plain old data file: " + filename)    
-
+print("written data in python plain old data file: " + filename)
