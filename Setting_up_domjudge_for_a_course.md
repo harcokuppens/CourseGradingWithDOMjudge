@@ -675,11 +675,13 @@ All other data in the zipfile is not imported into the DOMjudge problem.
   [setting the problem's shortname], as for the name field in the `problem.yaml` config file
   [setting the problem's (long)name].
 
-- The `submissions/` folder in the zipfile is handled specially if the user account doing the import
+- It is advised to not import the problem to a contest directly. The `submissions/` folder is never
+  imported to the problem. But, the `submissions/` folder in the zipfile is handled specially if
+  the user account doing the import
   has **admin role** , **belongs to a team** and **imports the problem to a contest directly**. Then
-  `submissions/` folder will not be imported into the problem, but instead submitted to the newly
+  the `submissions/` folder will be submitted to the newly
   created problem to be judged. This can be convenient to directly evaluate that everything also
-  works the same on the DOMjudge server as on your local machine. However as describe below in the
+  works the same on the DOMjudge server as on your local machine. However as we describe below in the
   'Test problem in DOMjudge' section I prefer to do the testing separately in a separate test
   contest, because then testing submissions are then not included in the student contests, so we
   then later do not have to filter out test submissions when processing the student results.
@@ -762,7 +764,23 @@ also import the problem directly to test contest if it needs testing.
 
 When setting up administrator accounts earlier in this page we already
 [setup a **Test** contest](#setup-test-contest), which only the administrators can use. So I suggest
-use this contest to test your new problem.
+use this contest to test your new problem. Use the following steps:
+
+- open the Test contest, and select Edit. Then at the bottom of the edit form it allows you to add problems
+  to the contest. So, add the grading version of the problem to the Test contest.
+- the administrator accounts all have both the team as admin role permissions.  When logging in as administrator
+  then by default you are logged in with the admin role. In our test we want to test submissions which can
+  only be done in the team role. So to switch to the team role we click at the top bar on '-> team' to open the team interface.
+  When switching to the team interface we see in the top bar that    '-> team' is change to  '-> Jury'. By clicking
+  on '-> Jury' we can switch back to the admin interface.
+- when in the team role we select the 'Test' contest in the select box to the right of the logout button. Then we press the
+  Submit button and submit a solution to the test problem.
+- in the team interface we see the judging of the solution as seen by a team member. You only see the evaluation of
+  the public answers, but not for the secret answers.  To also see the latter, we can switch back to the admin interface
+  by pressing on  '-> Jury' in the top bar. In the admin interface we click on "submissions" in the top bar. Then a list
+  of submissions is shown, and you can click on the submission of interest to see the judgement for both the public as
+  secret answers.
+- by manually sumbitting solutions this way we can test our problem in DOMjudge  
 
 **REMARK**: when importing a problem **into a contest** as an user with **admin role** which is also
 **belonging to a team**, then on import the solutions in the problem's zipfile are directly judge.
@@ -791,7 +809,11 @@ on their solution without using DOMjudge.
 
 If the team has a final solution they can submit it to the **grading problem** for grading. The
 grading problem is **judged none-lazy**, because all secret samples must be evaluated for the
-grading.
+grading. The student only sees the results for the public input and answers, and not for the secret
+input and answers. However the student does see the overall result of all public and secret input
+and answers together. This means if a student has all the public input/answer sets good, but
+he has one of the secret ones wrong, is overall result is wrong. He cannot see which secret
+input/output set he has wrong. Maybe he can ask the teacher for an hint.
 
 A team should only submit once per grading problem, however if something went wrong, they are
 allowed to submit again. For grading the latest submission is used.
