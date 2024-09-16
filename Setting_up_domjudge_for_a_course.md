@@ -20,11 +20,11 @@ update toc by running command:
     - [4. Give teams more information about their submissions](#4-give-teams-more-information-about-their-submissions)
   - [C. Install helper scripts of CourseGradingWithDOMjudge repo](#c-install-helper-scripts-of-coursegradingwithdomjudge-repo)
   - [D. Initial setup DOMjudge for the course](#d-initial-setup-domjudge-for-the-course)
-    - [Setup Test contest](#setup-test-contest)
     - [Setup Administrators](#setup-administrators)
       - [Step 1: generate the admin-accounts.yaml and emails](#step-1-generate-the-admin-accountsyaml-and-emails)
       - [Step 2: Import admin-accounts.yaml file into DOMjudge.](#step-2-import-admin-accountsyaml-file-into-domjudge)
       - [Step 3: Inform the new administrators by mail.](#step-3-inform-the-new-administrators-by-mail)
+    - [Setup Test contest](#setup-test-contest)
   - [E. Per course part setup and usage DOMjudge](#e-per-course-part-setup-and-usage-domjudge)
     - [1. Setup part of a course for a specific teams configuration](#1-setup-part-of-a-course-for-a-specific-teams-configuration)
       - [Create user and teams in DOMjudge](#create-user-and-teams-in-domjudge)
@@ -193,41 +193,22 @@ Then add its scripts folder to your PATH by adding to your `.bashrc`:
 
 ## D. Initial setup DOMjudge for the course
 
-Initially when DOMjudge is installed we get an 'admin' account. However we rather give the people
+Initially, when DOMjudge is installed we get an 'admin' account. However, we rather give the people
 giving the course each their own administrator account, so that we later always can change the set
 of administrators.
 
 The administrators should also be able to test a new contest problem on the DOMjudge server before
 using it in the course. The best practice is to have a separate Test contest to which problems can
-be added and be tested. We only give administrators access the Test contest.
-
-### Setup Test contest
-
-To create the Test contest do:
-
-    click on 'DOMjudge' in top right corner, to get 'DOMjudge Jury interface'
-    click on 'Contests'
-    click on 'Add new contest' button
-       in 'External ID', 'Shortname' and 'Name' boxes enter 'Test'
-       select value in "Activate time" and
-       paste it into "Start time" and "End time" fields.
-       In the "End time" field increase the date by 1 year.
-       "Record balloons" set to "No"
-       "Medals enabled" set to "No"
-       "Enable public scoreboard" set to "No"
-       "Open contest to all teams" set to "No"
-       select in "Team categories" the value 'Jury'
-
-By only allowing the Jury team category we give access to only administrators.
+be added and be tested. We only give administrators access to the Test contest.
 
 ### Setup Administrators
 
-When in DOMjudge importing with an "accounts.yaml" with user accounts of type 'admin' DOMjudge
-behaves different then when importing normal team users (type 'team'). It then not only creates the
-user with the administrator role, but also gives it the 'team' role. DOMjudge also automatically
+When DOMjudge imports with an "accounts.yaml" with user accounts of type 'admin' DOMjudge
+behaves differently than when importing normal team users (type 'team'). It then not only creates the
+user with the administrator role but also gives it the 'team' role. DOMjudge also automatically
 creates a team only for this user, where the team is in the 'Jury' team category. Having both roles
-allows the adminstrator user switch role between 'Jury' and 'Team' interface in DOMjudge, allowing
-is also submit solutions as team member to the Test contest we made in the previous section.
+allows the administrator user to switch roles between 'Jury' and 'Team' interface in DOMjudge, allowing
+us to also submit solutions as a team member to the Test contest we made in the previous section.
 
 Because the teams are automatically created in DOMjudge we only need to import an `accounts.yaml`
 file into DOMjudge describing the administrators.
@@ -255,12 +236,12 @@ Create an `admins.csv` file, and then run the following script:
 
 Which will create an `admin-accounts.yaml` import file for DOMjudge, and the mails in the `mail/`
 folder, where each mail is from the sender "The Sender Name" with email address
-"thesender@gmail.com".
+"thesender@gmail.com".  
 
 #### Step 2: Import `admin-accounts.yaml` file into DOMjudge.
 
 We can do the import manually via the "Import / export" page linked on the "DOMjudge Jury
-interface". But we can also do it using the REST API using the httpie tool:
+interface". But we can also do it using the REST API using the `httpie` tool:
 
     DOMJUDGE_SERVER="http://localhost:12345"
     ADMINUSER="admin"
@@ -271,17 +252,39 @@ interface". But we can also do it using the REST API using the httpie tool:
     # import accounts
     https -a "$ADMINUSER:$PASSWORD" --check-status -b -f POST "$DOMJUDGE_SERVER/api/v4/users/accounts" yaml@admin-accounts.yaml
 
+On a fresh install of DOMjudge, there is no `Jury` team category. When above import is done, next to the users and their teams, also
+a `Jury` team category is created.
+
 #### Step 3: Inform the new administrators by mail.
 
-Finall with the following script, we use the Linux sendmail command to send out the emails:
+Finally, with the following script, we use the Linux sendmail command to send out the emails:
 
     send-emails "thesender@gmail.com" "mail/"
 
 Make sure you use a Linux machine for which sendmail is configured. If somehow this method does not
-work for you, you can use one of the alternative methods described in the page
+work for you, you can use one of the alternative methods described on the page
 [Sending batch of personalized emails](Sending_batch_of_personalized_emails.md).
 
-All steps from now on in this page, can be done by one of the new administrators.
+All steps from now on in this page can be done by one of the new administrators.
+
+### Setup Test contest
+
+To create the Test contest do:
+
+    click on 'DOMjudge' in top right corner, to get 'DOMjudge Jury interface'
+    click on 'Contests'
+    click on 'Add new contest' button
+       in 'External ID', 'Shortname' and 'Name' boxes enter 'Test'
+       select value in "Activate time" and
+       paste it into "Start time" and "End time" fields.
+       In the "End time" field increase the date by 1 year.
+       "Record balloons" set to "No"
+       "Medals enabled" set to "No"
+       "Enable public scoreboard" set to "No"
+       "Open contest to all teams" set to "No"
+       select in "Team categories" the value 'Jury'
+
+By only allowing the Jury team category we give access to only administrators.
 
 ## E. Per course part setup and usage DOMjudge
 
