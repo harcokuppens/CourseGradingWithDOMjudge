@@ -100,6 +100,7 @@ demo contest:
         then increase the year with one year in the 'Scoreboard freeze time' and 'End time' fields
         which makes the demo contest open for submissions for one year
         "Record balloons" set to "No"
+        "Medals enabled" set to "No"
         "Enable public scoreboard" set to "No"
     click on 'Save' button at bottom of window
 
@@ -212,6 +213,7 @@ To create the Test contest do:
        paste it into "Start time" and "End time" fields.
        In the "End time" field increase the date by 1 year.
        "Record balloons" set to "No"
+       "Medals enabled" set to "No"
        "Enable public scoreboard" set to "No"
        "Open contest to all teams" set to "No"
        select in "Team categories" the value 'Jury'
@@ -475,6 +477,7 @@ use any coursename here.
        paste it into "Start time" and "End time" fields.
        In the "End time" field increase the date by 1 year.
        "Record balloons" set to "No"
+       "Medals enabled" set to "No"
        "Enable public scoreboard" set to "No"
        "Open contest to all teams" set to "No"
        select in "Team categories" the value 'part1-teams-config'
