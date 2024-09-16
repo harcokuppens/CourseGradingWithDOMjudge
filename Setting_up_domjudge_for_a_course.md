@@ -99,6 +99,8 @@ demo contest:
         copy 'Start Time' to 'Scoreboard freeze time' and 'End time' fields
         then increase the year with one year in the 'Scoreboard freeze time' and 'End time' fields
         which makes the demo contest open for submissions for one year
+        "Record balloons" set to "No"
+        "Enable public scoreboard" set to "No"
     click on 'Save' button at bottom of window
 
 For security reasons we also remove the `demo` user and `exteam` by:
