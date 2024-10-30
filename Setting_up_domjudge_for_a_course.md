@@ -50,15 +50,15 @@ update toc by running command:
 
 ## A. Create a fresh and up to date DOMjudge installation
 
-You do not want to load of one course to effect another course. So we advice to use per course a
+You do not want the load of one course to affect another course. So we advise to use per course a
 separate DOMjudge installation.
 
-We have two options, either do a new installation from scratch, or reset and update an existing
+We have two options, either do a new installation from scratch or reset and update an existing
 installation of DOMjudge.
 
 ### New installation
 
-A new installation can be easily be done using by unning DOMjudge in docker by following this
+A new installation can be easily done by running DOMjudge in docker by following this
 quickstart. https://github.com/harcokuppens/DOMjudgeDockerCompose/blob/main/README.md#quick-start
 
 ### Reset and update existing installation
@@ -131,7 +131,15 @@ To make DOMjudge use external id's for configuration data instead of internal id
 
 Using external id's simplifies setting up teams.
 
-### 3. Setting language timefactors
+### 3. Adding extra languages to DOMjudge
+
+By default DOMjudge only supports C,C++,Java and Python. However sometimes you want to add extra languages. 
+The setup of using DOMjudge in docker allows us to easily add extra languages which is described [here](https://github.com/harcokuppens/DOMjudgeDockerCompose/blob/main/README.md#adding-extra-languages-in-domjudge).
+
+The `DOMjudgeDockerCompose` setup by default already installs rustc in the judgehosts. We advise you to follow
+the simple instructions to also [enable the Rust language](https://github.com/harcokuppens/DOMjudgeDockerCompose/blob/main/README.md#adding-rust-language) in DOMjudge. 
+
+### 4. Setting language timefactors
 
 The python and java languages are higher level languages then C and C++ and thereby having more
 overhead in executing their code, causing them to have higher execution times for similar code in
@@ -144,9 +152,11 @@ execution times in higher level languages with a timefactor. We use the followin
 | C++      | 1          |
 | java     | 3          |
 | python   | 4          |
+| Rust     | 1          |  
 
 This means that for a problem with a timelimit of 1 second, a C or C++ program must solve the
 problem within 1 second, but a java program in 3 seconds, and a python program in 4 seconds.
+The Rust language needs to be added as described in the previous section.
 
 To set a timefactor for a language in DOMjudge we do:
 
@@ -156,7 +166,7 @@ To set a timefactor for a language in DOMjudge we do:
     in the edit form for the language set the timefactor field to the desired value
     click on 'Save' button at bottom of window
 
-### 4. Give teams more information about their submissions
+### 5. Give teams more information about their submissions
 
 DOMjudge by default does not allow teams to see the output of the output validator of a submission
 to the test samples. In below instructions we enable showing them, so that students can see what is
