@@ -38,7 +38,8 @@ warn_mtime_minutes = 5
 num_warnings = 0
 
 headers = {
-    "user-agent": f"domjudge-submit-client ({requests.utils.default_user_agent()})"
+    "user-agent": f"domjudge-submit-client ({requests.utils.default_user_agent()})",
+    "accept": "application/json",
 }
 
 
@@ -262,13 +263,19 @@ def read_submissions() -> list:
     #   'team_id': '54',
     #   'time': '2023-12-11T01:17:57.865+01:00'}
 
+    # REST API does NOT let us filter submissions of a problem!
+    logging.info(
+        f"Read {len(data)} submission(s) for all problems in the contest from the API."
+    )
+
+    # filter for problem id afterwards
     for submission in data:
         if not verify_fields("submission", submission, ["id", "problem_id"]):
             continue
         if submission["problem_id"] == my_problem["id"]:
             submissions.append(submission)
 
-    logging.info(f"Read {len(submissions)} submission(s) from the API.")
+    logging.info(f"Got only {len(submissions)} submission(s) for our problem.")
 
     submissions = sorted(
         submissions, key=lambda submission: submission["time"], reverse=True
@@ -282,55 +289,116 @@ def read_judgements(submission_ids) -> list:
     Returns:
         The judgements or None if an error occurred.
     """
-    import pprint
-
-    id_set = "{" + ",".join([str(id) for id in submission_ids]) + "}"
-    try:
-        endpoint = "contests/" + my_contest["id"] + "/judgements"
-        params = "?submission_id=" + id_set
-        data = do_api_request(endpoint, params=params)
-    except RuntimeError as e:
-        error(e)
-
-    if not isinstance(data, list):
-        logging.warning(
-            "DOMjudge's API returned unexpected JSON data for endpoint 'judgements'."
-        )
-        return None
-
-    ## judgement looks like:
-    #   {'end_contest_time': '49:01:30.401',
-    #   'end_time': '2023-12-11T01:27:30.401+01:00',
-    #   'id': '134',
-    #   'judgement_type_id': 'TLE',
-    #   'max_run_time': 33.053,
-    #   'start_contest_time': '48:53:37.586',
-    #   'start_time': '2023-12-11T01:19:37.586+01:00',
-    #   'submission_id': '134',
-    #   'valid': True }
 
     judgements = []
-    # to be safe we verify entries
-    for judgement in data:
-        if not verify_fields("judgement", judgement, ["id", "judgement_type_id"]):
-            continue
-        judgements.append(judgement)
+    for submission_id in submission_ids:
+        try:
+            endpoint = (
+                "contests/"
+                + my_contest["id"]
+                + "/judgements?submission_id="
+                + submission_id
+            )
+            data = do_api_request(endpoint)
+            logging.info(
+                f"Read {len(data)}  judgement(s) from submission {submission_id} from the API."
+            )
+        except RuntimeError as e:
+            error(e)
 
-    logging.info(f"Read {len(judgements)} unprocessed judgement(s) from the API.")
+        if not isinstance(data, list):
+            logging.warning(
+                "DOMjudge's API returned unexpected JSON data for endpoint 'judgements'."
+            )
+            return None
 
-    # now still all judgements in contest are returned, but
-    # should be only them belonging to a specific problem.
-    # Filter by submission_id for submissions belonging to a problem:
-    judgements = [
-        judgement
-        for judgement in judgements
-        if judgement["submission_id"] in submission_ids
-    ]
-    logging.info(f"Read {len(judgements)} judgement(s) from the API.")
+        ## judgement looks like:
+        #   {'end_contest_time': '49:01:30.401',
+        #   'end_time': '2023-12-11T01:27:30.401+01:00',
+        #   'id': '134',
+        #   'judgement_type_id': 'TLE',
+        #   'max_run_time': 33.053,
+        #   'start_contest_time': '48:53:37.586',
+        #   'start_time': '2023-12-11T01:19:37.586+01:00',
+        #   'submission_id': '134',
+        #   'valid': True }
+
+        # to be safe we verify entries
+        for judgement in data:
+            if not verify_fields("judgement", judgement, ["id", "judgement_type_id"]):
+                logging.info("skip judgement")
+                continue
+            judgements.append(judgement)
+
+    logging.info(f"Read {len(judgements)}  judgement(s) from the API.")
 
     return judgements
 
 
+# => {} syntax only works with curl  => curl does globbing , and this doesn't work with request library
+# def read_judgements_set(submission_ids) -> list:
+#     """Read all judgements for the current problem in the current contest from the API.
+
+#     Returns:
+#         The judgements or None if an error occurred.
+#     """
+#     import pprint
+
+#     id_set = "{" + ",".join([str(id) for id in submission_ids]) + "}"
+
+#     try:
+#         endpoint = "contests/" + my_contest["id"] + "/judgements"
+#         # params = "?submission_id=" + id_set
+#         params = "submission_id={61,62}"
+#         # params = "submission_id=61"
+
+#         # params = None
+#         data = do_api_request(endpoint, params=params)
+#     except RuntimeError as e:
+#         error(e)
+
+#     if not isinstance(data, list):
+#         logging.warning(
+#             "DOMjudge's API returned unexpected JSON data for endpoint 'judgements'."
+#         )
+#         return None
+
+#     ## judgement looks like:
+#     #   {'end_contest_time': '49:01:30.401',
+#     #   'end_time': '2023-12-11T01:27:30.401+01:00',
+#     #   'id': '134',
+#     #   'judgement_type_id': 'TLE',
+#     #   'max_run_time': 33.053,
+#     #   'start_contest_time': '48:53:37.586',
+#     #   'start_time': '2023-12-11T01:19:37.586+01:00',
+#     #   'submission_id': '134',
+#     #   'valid': True }
+
+#     logging.info(f"Read {len(data)} unprocessed judgement(s) from the API.")
+
+#     judgements = []
+#     # to be safe we verify entries
+#     for judgement in data:
+#         if not verify_fields("judgement", judgement, ["id", "judgement_type_id"]):
+#             continue
+#         judgements.append(judgement)
+
+#     logging.info(f"Read {len(judgements)} unprocessed judgement(s) from the API.")
+
+#     # now still all judgements in contest are returned, but
+#     # should be only them belonging to a specific problem.
+#     # Filter by submission_id for submissions belonging to a problem:
+#     judgements = [
+#         judgement
+#         for judgement in judgements
+#         if judgement["submission_id"] in submission_ids
+#     ]
+#     logging.info(f"Read {len(judgements)} judgement(s) from the API.")
+
+#     return judgements
+
+
+# read_runs_per_judgment
 def read_runs(judgement_ids) -> list:
     """Read all runs for the current problem in the current contest from the API.
 
@@ -523,21 +591,12 @@ def do_api_request(name: str, binary=False, params=None):
 
     url = f"{baseurl}api/{api_version}{name}"
 
-    # params in url get base64 encoded,
-    # but sometimes you do not want '{' and '}' base64 encode eg. if you want to pass a id={2,3}
-    # see:
-    #   https://stackoverflow.com/questions/23496750/how-to-prevent-python-requests-from-percent-encoding-my-urls
-    #     https://requests.readthedocs.io/en/latest/api/#requests.get
-    #     https://docs.python.org/3/library/urllib.parse.html#urllib.parse.urlencode
-
     logging.info(f"Connecting to {url}")
 
     try:
-
         response = requests.get(
             url, headers=headers, auth=user_password_tuple, params=params
         )
-
     except requests.exceptions.RequestException as e:
         raise RuntimeError(e)
 
@@ -858,7 +917,9 @@ if last_per_team:
         else:
             team2submission[teamid] = submission
     submissions = list(team2submission.values())
-
+    logging.info(
+        f"Take only the latest submission per team, leaving us with {len(submissions)} submission(s)."
+    )
 
 if files:
     ## read sources and add as data to output file;  => we decided as separate zipfiles was more convenient
@@ -886,6 +947,7 @@ if files:
     print("written zipfiles of submission code in files/ folder")
 
 judgements = read_judgements([submission["id"] for submission in submissions])
+exit(0)
 runs = read_runs([judgement["id"] for judgement in judgements])
 
 # store all problem's data within a contest
