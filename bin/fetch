@@ -59,13 +59,14 @@ def warn_user(msg: str):
 
 
 def usage(msg: str):
-    logging.error(f"error: {msg}")
+    logging.error(f"ERROR: {msg}")
     print(f"Type '{sys.argv[0]} --help' to get help.")
     exit(1)
 
 
 def error(msg: str):
-    logging.error(msg)
+    logging.error(f"\n\nERROR: {msg}\n       Unsuccesfull fetch. Contant support. ")
+
     exit(-1)
 
 
@@ -108,8 +109,7 @@ def read_languages() -> list:
         endpoint = "contests/" + my_contest["id"] + "/languages"
         data = do_api_request(endpoint)
     except RuntimeError as e:
-        logging.warning(e)
-        return None
+        error(e)
 
     if not isinstance(data, list):
         logging.warning(
@@ -150,8 +150,7 @@ def read_problems() -> list:
         endpoint = "contests/" + my_contest["id"] + "/problems"
         data = do_api_request(endpoint)
     except RuntimeError as e:
-        logging.warning(e)
-        return None
+        error(e)
 
     if not isinstance(data, list):
         logging.warning(
@@ -184,8 +183,7 @@ def read_submission_sources_as_json(id, team) -> list:
         )
         data = do_api_request(endpoint)
     except RuntimeError as e:
-        logging.warning(e)
-        return None
+        error(e)
 
     if not isinstance(data, list):
         logging.warning(
@@ -219,8 +217,7 @@ def read_submission_files_as_zip(id, zipfile) -> list:
         endpoint = "contests/" + my_contest["id"] + "/submissions/" + id + "/files"
         data = do_api_request(endpoint, binary=True)
     except RuntimeError as e:
-        logging.warning(e)
-        return None
+        error(e)
 
     f = open(zipfile, "wb")
     f.write(data)
@@ -242,8 +239,7 @@ def read_submissions() -> list:
         endpoint = "contests/" + my_contest["id"] + "/submissions"
         data = do_api_request(endpoint)
     except RuntimeError as e:
-        logging.warning(e)
-        return None
+        error(e)
 
     if not isinstance(data, list):
         logging.warning(
@@ -291,8 +287,7 @@ def read_judgements(submission_ids) -> list:
         endpoint = "contests/" + my_contest["id"] + "/judgements"
         data = do_api_request(endpoint)
     except RuntimeError as e:
-        logging.warning(e)
-        return None
+        error(e)
 
     if not isinstance(data, list):
         logging.warning(
@@ -339,38 +334,35 @@ def read_runs(judgement_ids) -> list:
         The runs or None if an error occurred.
     """
 
-    try:
-        endpoint = "contests/" + my_contest["id"] + "/runs"
-        data = do_api_request(endpoint)
-    except RuntimeError as e:
-        logging.warning(e)
-        return None
-
-    if not isinstance(data, list):
-        logging.warning(
-            "DOMjudge's API returned unexpected JSON data for endpoint 'runs'."
-        )
-        return None
-
-    ## run looks like
-    # {'contest_time': '49:01:30.386',
-    # 'id': '6700',
-    # 'judgement_id': '134',
-    # 'judgement_type_id': 'TLE',
-    # 'ordinal': 50,
-    # 'run_time': 33.053,
-    # 'time': '2023-12-11T01:27:30.386+01:00'}
-
     runs = []
-    for run in data:
-        if not verify_fields("run", run, ["id", "judgement_type_id"]):
-            continue
-        runs.append(run)
+    for judgement_id in judgement_ids:
+        try:
+            endpoint = (
+                "contests/" + my_contest["id"] + "/runs?judging_id=" + judgement_id
+            )
+            data = do_api_request(endpoint)
 
-    # now still all runs in contest are returned, but
-    # should be only them belonging to a specific problem.
-    # Filter by judgement_id for judgements belonging to a problem:
-    runs = [run for run in runs if run["judgement_id"] in judgement_ids]
+        except RuntimeError as e:
+            error(e)
+        if not isinstance(data, list):
+            logging.warning(
+                "DOMjudge's API returned unexpected JSON data for endpoint 'runs'."
+            )
+            return None
+
+        ## run looks like
+        # {'contest_time': '49:01:30.386',
+        # 'id': '6700',
+        # 'judgement_id': '134',
+        # 'judgement_type_id': 'TLE',
+        # 'ordinal': 50,
+        # 'run_time': 33.053,
+        # 'time': '2023-12-11T01:27:30.386+01:00'}
+
+        for run in data:
+            if not verify_fields("run", run, ["id", "judgement_type_id"]):
+                continue
+            runs.append(run)
 
     logging.info(f"Read {len(runs)} run(s) from the API.")
 
@@ -388,8 +380,7 @@ def read_accounts() -> list:
         endpoint = "contests/" + my_contest["id"] + "/teams"
         data = do_api_request(endpoint)
     except RuntimeError as e:
-        logging.warning(e)
-        return None
+        error(e)
 
     if not isinstance(data, list):
         logging.warning(
@@ -438,8 +429,7 @@ def read_teams() -> list:
         endpoint = "contests/" + my_contest["id"] + "/teams"
         data = do_api_request(endpoint)
     except RuntimeError as e:
-        logging.warning(e)
-        return None
+        error(e)
 
     if not isinstance(data, list):
         logging.warning(
@@ -534,7 +524,6 @@ def do_api_request(name: str, binary=False):
 
     logging.info(f"status code {response.status_code}")
     if response.status_code >= 300:
-        print(response.text)
         if response.status_code == 401:
             raise RuntimeError(
                 "Authentication failed, please check your DOMjudge credentials in ~/.netrc."
@@ -691,6 +680,14 @@ parser.add_argument(
 
 args = parser.parse_args()
 
+if args.help:
+    if "BATS_VERSION" in os.environ:
+        # print_help adds line breaks depending on the number of available columns.
+        # To make it deterministic under test, we set it to 100 here if we are testing.
+        os.environ["COLUMNS"] = "100"
+    parser.print_help()
+    exit(0)
+
 verbosity = args.verbose
 if args.quiet:
     verbosity = "ERROR"
@@ -742,7 +739,6 @@ if not contests and not args.help:
 
 
 my_contest = None
-# my_language = None
 my_problem = None
 
 if not contest_id:
@@ -771,14 +767,6 @@ if my_contest and baseurl:
     problems = read_problems()
 
 parser.epilog = get_epilog()
-
-if args.help:
-    if "BATS_VERSION" in os.environ:
-        # print_help adds line breaks depending on the number of available columns.
-        # To make it deterministic under test, we set it to 100 here if we are testing.
-        os.environ["COLUMNS"] = "100"
-    parser.print_help()
-    exit(0)
 
 if not baseurl:
     usage(
