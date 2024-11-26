@@ -871,7 +871,10 @@ if files:
         os.makedirs(directory)
 
     for submission in submissions:
-        team = id2team[submission["team_id"]]
+        team_id = submission["team_id"]
+        if team_id is None:
+            continue
+        team = id2team[team_id]
         name = team["name"] or "none"
         displayname = team["display_name"] or "none"
         zipfile = (
