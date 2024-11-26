@@ -276,7 +276,7 @@ def read_submissions() -> list:
     return submissions
 
 
-def read_judgements(submission_ids) -> list:
+def read_judgements_filterafter(submission_ids) -> list:
     """Read all judgements for the current problem in the current contest from the API.
 
     Returns:
@@ -306,13 +306,14 @@ def read_judgements(submission_ids) -> list:
     #   'submission_id': '134',
     #   'valid': True }
 
-    # pprint(data)
-
     judgements = []
+    # to be safe we verify entries
     for judgement in data:
         if not verify_fields("judgement", judgement, ["id", "judgement_type_id"]):
             continue
         judgements.append(judgement)
+
+    logging.info(f"Read {len(judgements)} unprocessed judgement(s) from the API.")
 
     # now still all judgements in contest are returned, but
     # should be only them belonging to a specific problem.
@@ -323,6 +324,109 @@ def read_judgements(submission_ids) -> list:
         if judgement["submission_id"] in submission_ids
     ]
     logging.info(f"Read {len(judgements)} judgement(s) from the API.")
+
+    return judgements
+
+
+def read_judgements(submission_ids) -> list:
+    """Read all judgements for the current problem in the current contest from the API.
+
+    Returns:
+        The judgements or None if an error occurred.
+    """
+    import pprint
+
+    id_set = "{" + ",".join([str(id) for id in submission_ids]) + "}"
+    try:
+        endpoint = "contests/" + my_contest["id"] + "/judgements"
+        params = "?submission_id=" + id_set
+        data = do_api_request(endpoint, params=params)
+    except RuntimeError as e:
+        error(e)
+
+    if not isinstance(data, list):
+        logging.warning(
+            "DOMjudge's API returned unexpected JSON data for endpoint 'judgements'."
+        )
+        return None
+
+    ## judgement looks like:
+    #   {'end_contest_time': '49:01:30.401',
+    #   'end_time': '2023-12-11T01:27:30.401+01:00',
+    #   'id': '134',
+    #   'judgement_type_id': 'TLE',
+    #   'max_run_time': 33.053,
+    #   'start_contest_time': '48:53:37.586',
+    #   'start_time': '2023-12-11T01:19:37.586+01:00',
+    #   'submission_id': '134',
+    #   'valid': True }
+
+    judgements = []
+    # to be safe we verify entries
+    for judgement in data:
+        if not verify_fields("judgement", judgement, ["id", "judgement_type_id"]):
+            continue
+        judgements.append(judgement)
+
+    logging.info(f"Read {len(judgements)} unprocessed judgement(s) from the API.")
+
+    # now still all judgements in contest are returned, but
+    # should be only them belonging to a specific problem.
+    # Filter by submission_id for submissions belonging to a problem:
+    judgements = [
+        judgement
+        for judgement in judgements
+        if judgement["submission_id"] in submission_ids
+    ]
+    logging.info(f"Read {len(judgements)} judgement(s) from the API.")
+
+    return judgements
+
+
+def read_judgements_multireq(submission_ids) -> list:
+    """Read all judgements for the current problem in the current contest from the API.
+
+    Returns:
+        The judgements or None if an error occurred.
+    """
+
+    judgements = []
+    for submission_id in submission_ids:
+        try:
+            endpoint = (
+                "contests/"
+                + my_contest["id"]
+                + "/judgements?submission_id="
+                + submission_id
+            )
+            data = do_api_request(endpoint)
+        except RuntimeError as e:
+            error(e)
+
+        if not isinstance(data, list):
+            logging.warning(
+                "DOMjudge's API returned unexpected JSON data for endpoint 'judgements'."
+            )
+            return None
+
+        ## judgement looks like:
+        #   {'end_contest_time': '49:01:30.401',
+        #   'end_time': '2023-12-11T01:27:30.401+01:00',
+        #   'id': '134',
+        #   'judgement_type_id': 'TLE',
+        #   'max_run_time': 33.053,
+        #   'start_contest_time': '48:53:37.586',
+        #   'start_time': '2023-12-11T01:19:37.586+01:00',
+        #   'submission_id': '134',
+        #   'valid': True }
+
+        # to be safe we verify entries
+        for judgement in data:
+            if not verify_fields("judgement", judgement, ["id", "judgement_type_id"]):
+                continue
+            judgements.append(judgement)
+
+    logging.info(f"Read {len(judgements)} unprocessed judgement(s) from the API.")
 
     return judgements
 
@@ -358,6 +462,10 @@ def read_runs(judgement_ids) -> list:
         # 'ordinal': 50,
         # 'run_time': 33.053,
         # 'time': '2023-12-11T01:27:30.386+01:00'}
+
+        logging.info(
+            f"Read {len(data)} run(s) for judgement id {judgement_id} from the API."
+        )
 
         for run in data:
             if not verify_fields("run", run, ["id", "judgement_type_id"]):
@@ -497,7 +605,7 @@ def verify_fields(label, obj, fields):
     return True
 
 
-def do_api_request(name: str, binary=False):
+def do_api_request(name: str, binary=False, params=None):
     """Perform an API call to the given endpoint and return its data.
 
     Parameters:
@@ -515,10 +623,22 @@ def do_api_request(name: str, binary=False):
 
     url = f"{baseurl}api/{api_version}{name}"
 
+    # params in url get base64 encoded,
+    # but sometimes you do not want '{' and '}' base64 encode eg. if you want to pass a id={2,3}
+    # see:
+    #   https://stackoverflow.com/questions/23496750/how-to-prevent-python-requests-from-percent-encoding-my-urls
+    #     https://requests.readthedocs.io/en/latest/api/#requests.get
+    #     https://docs.python.org/3/library/urllib.parse.html#urllib.parse.urlencode
+
     logging.info(f"Connecting to {url}")
 
+    print(url)
     try:
-        response = requests.get(url, headers=headers, auth=user_password_tuple)
+
+        response = requests.get(
+            url, headers=headers, auth=user_password_tuple, params=params
+        )
+
     except requests.exceptions.RequestException as e:
         raise RuntimeError(e)
 
