@@ -874,6 +874,8 @@ if files:
         team_id = submission["team_id"]
         if team_id is None:
             continue
+        if not team_id in id2team:
+            continue
         team = id2team[team_id]
         name = team["name"] or "none"
         displayname = team["display_name"] or "none"
