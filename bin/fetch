@@ -335,69 +335,6 @@ def read_judgements(submission_ids) -> list:
     return judgements
 
 
-# => {} syntax only works with curl  => curl does globbing , and this doesn't work with request library
-# def read_judgements_set(submission_ids) -> list:
-#     """Read all judgements for the current problem in the current contest from the API.
-
-#     Returns:
-#         The judgements or None if an error occurred.
-#     """
-#     import pprint
-
-#     id_set = "{" + ",".join([str(id) for id in submission_ids]) + "}"
-
-#     try:
-#         endpoint = "contests/" + my_contest["id"] + "/judgements"
-#         # params = "?submission_id=" + id_set
-#         params = "submission_id={61,62}"
-#         # params = "submission_id=61"
-
-#         # params = None
-#         data = do_api_request(endpoint, params=params)
-#     except RuntimeError as e:
-#         error(e)
-
-#     if not isinstance(data, list):
-#         logging.warning(
-#             "DOMjudge's API returned unexpected JSON data for endpoint 'judgements'."
-#         )
-#         return None
-
-#     ## judgement looks like:
-#     #   {'end_contest_time': '49:01:30.401',
-#     #   'end_time': '2023-12-11T01:27:30.401+01:00',
-#     #   'id': '134',
-#     #   'judgement_type_id': 'TLE',
-#     #   'max_run_time': 33.053,
-#     #   'start_contest_time': '48:53:37.586',
-#     #   'start_time': '2023-12-11T01:19:37.586+01:00',
-#     #   'submission_id': '134',
-#     #   'valid': True }
-
-#     logging.info(f"Read {len(data)} unprocessed judgement(s) from the API.")
-
-#     judgements = []
-#     # to be safe we verify entries
-#     for judgement in data:
-#         if not verify_fields("judgement", judgement, ["id", "judgement_type_id"]):
-#             continue
-#         judgements.append(judgement)
-
-#     logging.info(f"Read {len(judgements)} unprocessed judgement(s) from the API.")
-
-#     # now still all judgements in contest are returned, but
-#     # should be only them belonging to a specific problem.
-#     # Filter by submission_id for submissions belonging to a problem:
-#     judgements = [
-#         judgement
-#         for judgement in judgements
-#         if judgement["submission_id"] in submission_ids
-#     ]
-#     logging.info(f"Read {len(judgements)} judgement(s) from the API.")
-
-#     return judgements
-
-
 # read_runs_per_judgment
 def read_runs(judgement_ids) -> list:
     """Read all runs for the current problem in the current contest from the API.
@@ -947,7 +884,6 @@ if files:
     print("written zipfiles of submission code in files/ folder")
 
 judgements = read_judgements([submission["id"] for submission in submissions])
-exit(0)
 runs = read_runs([judgement["id"] for judgement in judgements])
 
 # store all problem's data within a contest
