@@ -61,7 +61,7 @@ for mailfile in "$from_directory"/*.eml; do
     printf "sending %s to %s\n" "$mailfile"  "$to_email"
     #cat $mailfile | mutt -s "subject" -- $email
     # prefer sendmail, because then also subject and recipient in mailfile which gives the ability to setup a more complete email in a file earlier
-    #sendmail -t -i -f "$from_email" <"$mailfile"
+    sendmail -t -i -f "$from_email" <"$mailfile"
     echo "sleep $SLEEP_VALUE to prevent overflowing mail server"
     sleep "$SLEEP_VALUE" 
 done
