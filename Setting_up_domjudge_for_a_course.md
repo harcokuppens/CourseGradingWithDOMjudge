@@ -214,16 +214,18 @@ When DOMjudge imports accounts with an "accounts.yaml" file, it allows you to sp
 its type to be either 'team' or 'admin'. Per type DOMjudge implements different behavior for 
 creating an user. 
 
-For type 'team' it creates a normal team user with role 'Team Member'. But for type 'admin' then it not only creates the
+For type 'team' it creates a normal team user with role 'Team Member'. This gives the user access to the 'Team' interface in DOMjudge, to submit solutions for contest problems.
+
+But for type 'admin' then DOMjudge not only creates the
 user with the 'Administrative User' role but also gives it the 'Team Member' role. 
 By having both roles 'Administrative User'  and  'Team member' allows the administrator user to switch roles between the 'Jury' and 'Team' interface in DOMjudge, allowing
-the 'admin' user, next to having administrative control in the 'Jury' interface, to switch to the 'Team' interfacteto also submit solutions 
+the 'admin' user, next to having administrative control in the 'Jury' interface, to switch to the 'Team' interface to also submit solutions 
 as a normal team member to the Test contest we made in the previous section.
 
 For type 'admin' DOMjudge also automatically
 creates a team only for this 'admin' user, where that team is in the 'Jury' team category. The 'Jury' team category we use to limit access to the Test contest to only admin users. Note that a Team category is usefull for configuration of a set of teams having this team category. For instance to allow access to a contest, or by specify whether teams can see other teams results using the invisible property set on a team category.
 
-Because for type 'admin' the teams are automatically created in DOMjudge we only need to import an `accounts.yaml`
+For type 'admin' the teams are automatically created in DOMjudge, so we only need to import an `accounts.yaml`
 file into DOMjudge describing the administrators.
 
 To make it convenient to create administrators I defined a simple CSV file format in which you can
