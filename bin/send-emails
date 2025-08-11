@@ -64,8 +64,9 @@ if [[ ! -d "$from_directory" ]]; then
 fi
 
 for mailfile in "$from_directory"/*.eml; do
-    to_email=$(basename "${mailfile%.eml}")
-    printf "sending %s to %s\n" "$mailfile"  "$to_email"
+    #to_email=$(basename "${mailfile%.eml}")
+    #printf "sending %s to %s\n" "$mailfile"  "$to_email"
+    printf "sending %s\n" "$mailfile" 
     #cat $mailfile | mutt -s "subject" -- $email
     # prefer sendmail, because then also subject and recipient in mailfile which gives the ability to setup a more complete email in a mailfile earlier
     sendmail -t -i -f "$from_email" <"$mailfile"
