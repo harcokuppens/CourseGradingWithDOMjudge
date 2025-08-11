@@ -35,5 +35,5 @@ For more generaral information about programming contests their specifications a
 * [Overview programming contests, specifications and tooling](Programming_contests_specifications_and_tooling.md)
 
 The scripts used in this repository use the **REST API** referenced in above document. We use BAPCtools to develop/create and test a problem. When we have a good problem for the course, only then we import it to DOMjudge.
-  
+Within DOMjudge there is a special Test contest which only administrators have access to. We use this Test contest to also test a new contest problem on the DOMjudge server before using it in the course. 
 
