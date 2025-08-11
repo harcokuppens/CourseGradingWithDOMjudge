@@ -23,6 +23,7 @@ from_directory="$2"
 # Some mail servers do not allow more then X emails to be send per minute.
 # To prevent you email account to be blocked, we sleep between sending emails.
 # We set the default to limit sending a maximum of 10 emails per minute.
+# This is a safe limit, but to sending 100 emails for 100 students will take 10 minutes. Workable but slow. 
 SLEEP_BETWEEN_SENDING_EMAILS=6
 
 if [[ ! -d "$from_directory" ]]; then
