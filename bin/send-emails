@@ -28,14 +28,28 @@ if [[ "$#" -lt "2" || "$#" -gt "3"  ]]; then
     exit 0
 fi
 
-SLEEP_BETWEEN_SENDING_EMAILS=6
+SLEEP_VALUE=6
 if [[ "$#" -eq "3" ]]; then
-    SLEEP_BETWEEN_SENDING_EMAILS="$3"
+    SLEEP_VALUE="$3"
 fi
+
+VALID_SLEEP_PATTERN="^[0-9]+(\.[0-9]+)?[smhd]?$"
+if ! [[ "$SLEEP_VALUE" =~ $VALID_SLEEP_PATTERN ]]; then
+    echo "Error: Invalid sleep value format '$SLEEP_VALUE'." 1>&2
+    echo "Please provide a positive number, optionally with a unit (s, m, h, d)." 1>&2
+    exit 1
+fi
+
 
 from_email="$1"
 from_directory="$2"
 
+
+VALID_EMAIL_PATTERN="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+if ! [[ "$from_email" =~ $VALID_EMAIL_PATTERN ]]; then
+    echo "ERROR: invalid email address '$from_email'" 1>&2
+    exit 1
+fi
 
 if [[ ! -d "$from_directory" ]]; then
     echo "ERROR: directory '$from_directory' does not exist" 1>&2
@@ -47,6 +61,7 @@ for mailfile in "$from_directory"/*.eml; do
     printf "sending %s to %s\n" "$mailfile"  "$to_email"
     #cat $mailfile | mutt -s "subject" -- $email
     # prefer sendmail, because then also subject and recipient in mailfile which gives the ability to setup a more complete email in a file earlier
-    sendmail -t -i -f "$from_email" <"$mailfile"
-    sleep "$SLEEP_BETWEEN_SENDING_EMAILS" # not to overflow mail server
+    #sendmail -t -i -f "$from_email" <"$mailfile"
+    echo "sleep $SLEEP_VALUE to prevent overflowing mail server"
+    sleep "$SLEEP_VALUE" 
 done
