@@ -212,12 +212,16 @@ be added and be tested. We only give administrators access to the Test contest.
 ### Setup Administrators
 When DOMjudge imports accounts with an "accounts.yaml" file, it allows you to specify per account
 its type to be either 'team' or 'admin'. Per type DOMjudge implements different behavior for 
-creating an user. For type 'team' it creates a normal team user with role 'Team Member'. But for type 'admin' then it not only creates the
-user with the 'Administrative User' role but also gives it the 'Team Member' role. For type 'admin' DOMjudge also automatically
-creates a team only for this 'admin' user, where that team is in the 'Jury' team category. Having both roles
-'Team member' and 'Administrative User' allows the administrator user to switch roles between the 'Jury' and 'Team' interface in DOMjudge, allowing
-the 'admin' user, next to having administrative control in the 'Jury' interface, to switch to the 'Team' interfact to also submit solutions 
+creating an user. 
+
+For type 'team' it creates a normal team user with role 'Team Member'. But for type 'admin' then it not only creates the
+user with the 'Administrative User' role but also gives it the 'Team Member' role. 
+By having both roles 'Administrative User'  and  'Team member' allows the administrator user to switch roles between the 'Jury' and 'Team' interface in DOMjudge, allowing
+the 'admin' user, next to having administrative control in the 'Jury' interface, to switch to the 'Team' interfacteto also submit solutions 
 as a normal team member to the Test contest we made in the previous section.
+
+For type 'admin' DOMjudge also automatically
+creates a team only for this 'admin' user, where that team is in the 'Jury' team category. The 'Jury' team category we use to limit access to the Test contest to only admin users. Note that a Team category is usefull for configuration of a set of teams having this team category. For instance to allow access to a contest, or by specify whether teams can see other teams results using the invisible property set on a team category.
 
 Because for type 'admin' the teams are automatically created in DOMjudge we only need to import an `accounts.yaml`
 file into DOMjudge describing the administrators.
