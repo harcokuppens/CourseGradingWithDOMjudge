@@ -22,7 +22,8 @@ from_directory="$2"
 # Prevent overflow mail server
 # Some mail servers do not allow more then X emails to be send per minute.
 # To prevent you email account to be blocked, we sleep between sending emails.
-SLEEP_BETWEEN_SENDING_EMAILS=5
+# We set the default to limit sending a maximum of 10 emails per minute.
+SLEEP_BETWEEN_SENDING_EMAILS=6
 
 if [[ ! -d "$from_directory" ]]; then
     echo "ERROR: directory '$from_directory' does not exist"
