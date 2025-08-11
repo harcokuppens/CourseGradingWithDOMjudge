@@ -35,7 +35,7 @@ if [[ "$#" -lt "2" || "$#" -gt "3"  ]]; then
     exit 0
 fi
 
-SLEEP_VALUE=6
+SLEEP_VALUE="6s"
 if [[ "$#" -eq "3" ]]; then
     SLEEP_VALUE="$3"
 fi
