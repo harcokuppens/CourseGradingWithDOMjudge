@@ -220,10 +220,12 @@ But for type 'admin' then DOMjudge not only creates the
 user with the 'Administrative User' role but also gives it the 'Team Member' role. 
 By having both roles 'Administrative User'  and  'Team member' allows the administrator user to switch roles between the 'Jury' and 'Team' interface in DOMjudge, allowing
 the 'admin' user, next to having administrative control in the 'Jury' interface, to switch to the 'Team' interface to also submit solutions 
-as a normal team member to the Test contest we made in the previous section.
+as a normal team member to the Test contest we will make in the next section.
 
-For type 'admin' DOMjudge also automatically
-creates a team only for this 'admin' user, where that team is in the 'Jury' team category. The 'Jury' team category we use to limit access to the Test contest to only admin users. Note that a Team category is usefull for configuration of a set of teams having this team category. For instance to allow access to a contest, or by specify whether teams can see other teams results using the invisible property set on a team category.
+For type 'admin' DOMjudge also automatically creates a team only for this 'admin' user, where that team is in the 'Jury' team category.  
+
+Note that a Team category is usefull for configuration of a set of teams having this team category. For instance to allow access to a contest, or by specify whether teams can see other teams results using the invisible property set on a team category.
+The 'Jury' team category we use to limit access to the Test contest to only admin users. We also a create a special team category per course part, so that we can have different teams configurations per course part. Per course part we create a contest containing that coursepart's problems. The course part's team category is to limit access to that coursepart to the teams configuration for that coursepart. Creating course parts is explained later in section E. below.
 
 For type 'admin' the teams are automatically created in DOMjudge, so we only need to import an `accounts.yaml`
 file into DOMjudge describing the administrators.
