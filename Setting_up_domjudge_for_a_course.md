@@ -174,7 +174,7 @@ errors. But it can also be possible that the submission just gives back the wron
 which case the expect sample output and the submissions output is shown next to each other. The
 sample outputs are available to the students, so no reason to hide it, and its very convenient to
 show this information so that students can immediately see what they did wrong. In below
-instructions we also allow to download code from submissions. Can be handy to sometimes go back.
+instructions we also allow to download code from submissions. Can be handy sometimes to go back.
 
     click on 'DOMjudge' in top right corner, to get 'DOMjudge Jury interface'
     click on 'Configuration settings'
@@ -192,8 +192,7 @@ you with this task.
 To use the scripts of the CourseGradingWithDOMjudge repo we need to clone the repo. We take
 `REPO_PATH` as the location where the repository gets cloned:
 
-    cd "$REPO_PATH"
-    git clone https://github.com/harcokuppens/CourseGradingWithDOMjudge
+    git clone https://github.com/harcokuppens/CourseGradingWithDOMjudge "$REPO_PATH"
 
 Then add its scripts folder to your PATH by adding to your `.bashrc`:
 
