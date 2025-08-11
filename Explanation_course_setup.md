@@ -18,8 +18,8 @@
 ## Requirements
 Using DOMjudge for course has some different requirements:
 
- 1. students should not be able to see each other results
-    this means no scoreboard
+ 1. students should not be able to see each other results.
+    This means no scoreboard.
  2. students need a way to submit trial versions of their solution for practicing, 
     and a final solution for grading
  3. students can work together in teams, where during the course the teams can change 
