@@ -210,15 +210,16 @@ using it in the course. The best practice is to have a separate Test contest to 
 be added and be tested. We only give administrators access to the Test contest.
 
 ### Setup Administrators
+When DOMjudge imports accounts with an "accounts.yaml" file, it allows you to specify per account
+its type to be either 'team' or 'admin'. Per type DOMjudge implements different behavior for 
+creating an user. For type 'team' it creates a normal team user with role 'Team Member'. But for type 'admin' then it not only creates the
+user with the 'Administrative User' role but also gives it the 'Team Member' role. For type 'admin' DOMjudge also automatically
+creates a team only for this 'admin' user, where that team is in the 'Jury' team category. Having both roles
+'Team member' and 'Administrative User' allows the administrator user to switch roles between the 'Jury' and 'Team' interface in DOMjudge, allowing
+the 'admin' user, next to having administrative control in the 'Jury' interface, to switch to the 'Team' interfact to also submit solutions 
+as a normal team member to the Test contest we made in the previous section.
 
-When DOMjudge imports with an "accounts.yaml" with user accounts of type 'admin' DOMjudge
-behaves differently than when importing normal team users (type 'team'). It then not only creates the
-user with the administrator role but also gives it the 'team' role. DOMjudge also automatically
-creates a team only for this user, where the team is in the 'Jury' team category. Having both roles
-allows the administrator user to switch roles between 'Jury' and 'Team' interface in DOMjudge, allowing
-us to also submit solutions as a team member to the Test contest we made in the previous section.
-
-Because the teams are automatically created in DOMjudge we only need to import an `accounts.yaml`
+Because for type 'admin' the teams are automatically created in DOMjudge we only need to import an `accounts.yaml`
 file into DOMjudge describing the administrators.
 
 To make it convenient to create administrators I defined a simple CSV file format in which you can
