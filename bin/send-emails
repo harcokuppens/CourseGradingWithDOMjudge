@@ -16,10 +16,17 @@ PARAMS:
   SLEEP_BETWEEN_SENDING_EMAILS: sleep between sending a previous and next email.
                                 By default this value is 6 in seconds.
 
-Some mail servers do not allow more then X emails to be send per minute.
-To prevent you email account to be blocked, we sleep between sending emails.
-We set the default to limit sending a maximum of 10 emails per minute.
-This is a safe limit, but note that to send 100 emails this will take 10 minutes. 
+DESCRIPTION:
+  The send-emails script allows you to first setup a folder containing emails 
+  in .eml files, after which you can send them out automatically with the 
+  send-emails script. If each email has a single recepient, then it is a
+  good convention to set the basename of the email file to the recepients
+  email address. 
+
+  Some mail servers do not allow more then X emails to be send per minute.
+  To prevent you email account to be blocked, we sleep between sending emails.
+  We set the default to limit sending a maximum of 10 emails per minute.
+  This is a safe limit, but note that to send 100 emails this will take 10 minutes. 
 "
 
 
