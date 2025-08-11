@@ -19,6 +19,11 @@ fi
 from_email="$1"
 from_directory="$2"
 
+# Prevent overflow mail server
+# Some mail servers do not allow more then X emails to be send per minute.
+# To prevent you email account to be blocked, we sleep between sending emails.
+SLEEP_BETWEEN_SENDING_EMAILS=5
+
 if [[ ! -d "$from_directory" ]]; then
     echo "ERROR: directory '$from_directory' does not exist"
     exit 1
@@ -32,5 +37,5 @@ for mailfile in $from_directory/*.eml; do
     #cat $mailfile | mutt -s "subject" -- $email
     # prefer sendmail, because then also subject and recipient in mailfile
     sendmail -t -i -f $from_email <$mailfile
-    sleep 1 # not to overflow mail server
+    sleep $SLEEP_BETWEEN_SENDING_EMAILS # not to overflow mail server
 done
