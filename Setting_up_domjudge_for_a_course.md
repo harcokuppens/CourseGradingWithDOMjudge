@@ -149,9 +149,11 @@ execution times in higher level languages with a timefactor. We use the followin
 | -------- | ---------- |
 | C        | 1          |
 | C++      | 1          |
-| java     | 3          |
-| python   | 4          |
-| Rust     | 1          |  
+| Rust     | 1          | 
+| Java     | 3          |
+| Kotlin   | 3          |
+| Python   | 4          |
+ 
 
 This means that for a problem with a timelimit of 1 second, a C or C++ program must solve the
 problem within 1 second, but a java program in 3 seconds, and a python program in 4 seconds.
