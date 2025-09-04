@@ -94,7 +94,6 @@ demo contest:
     click on 'demo' contest at bottom of window
     click on 'Edit' button at bottom of window
     then change config of 'Demo' contest:
-        'Enable public scoreboard' set from 'Yes' to 'No'
         copy 'Start Time' to 'Scoreboard freeze time' and 'End time' fields
         then increase the year with one year in the 'Scoreboard freeze time' and 'End time' fields
         which makes the demo contest open for submissions for one year
