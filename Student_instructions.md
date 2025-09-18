@@ -28,20 +28,26 @@ to test your solutions.
   problem. [^2]
 - Do not use the clarification request system in DOMjudge, but just send us an email if you have any
   questions or issues.
-- The DOMjudge version used is 8.2.3 and it supports the following language versions:
+- The DOMjudge version used is 8.3.1 and it supports the following language versions:
 
       * Python 3.9.16 (7.3.11+dfsg-2+deb12u1, Feb 02 2024, 18:54:53) [PyPy 7.3.11 with GCC 12.2.0]
-      * javac 17.0.11
-      * gcc (Debian 12.2.0-14) 12.2.0
-      * g++ (Debian 12.2.0-14) 12.2.0
+      * javac 17.0.15
+      * gcc (Debian 12.2.0-14+deb12u1) 12.2.0
+      * g++ (Debian 12.2.0-14+deb12u1) 12.2.0
+      * kotlinc-jvm 2.1.21 (JRE 17.0.15+6-Debian-1deb12u1)
+      * rustc 1.88.0 (6b00bc388 2025-06-23)
 
-  You can easily fetch the language versions supported by a specific DOMjudge version with the
-  script
-  [domjudge-language-versions](https://raw.githubusercontent.com/harcokuppens/CourseGradingWithDOMjudge/main/bin/domjudge-language-versions)
-  on any machine running docker.
+  Note that we used the harcokuppens/judgehost-extra-languages:8.3.1 image which is the
+  domjudge/judgehost:8.3.1 image extended with rust and kotlin.  
 
 [^1]: If you cannot figure out your mistake, feel free to contact us.
 [^2]:
     In programming contests, the winner is determined by first the number of problems solved and
     then the sum of submission times for correct problems (plus time penalties for incorrect
     solutions).
+
+
+
+
+
+    
