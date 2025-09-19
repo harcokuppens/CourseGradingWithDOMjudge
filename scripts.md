@@ -22,6 +22,8 @@ Administrative scripts
 - [`create-domjudge-credentials-mails`](#create-domjudge-credentials-mails) - from
   DOMjudge import files accounts.yaml and teams.yaml we generate credential emails in
   a local mail/ directory
+- [`send-emails`](#send-emails) - send out all emails setup in a local/ mail
+  directory
 
 Students submit
 
@@ -148,6 +150,33 @@ positional arguments:
 
 options:
   -h, --help          show this help message and exit
+```
+
+### send-emails
+
+```console
+$ send-emails  -h
+
+USAGE:
+  send-emails FROM_EMAIL DIR_CONTAINING_EMAILS [SLEEP_BETWEEN_SENDING_EMAILS]
+
+PARAMS:
+  FROM_EMAIL: email address used as sender
+  DIR_CONTAINING_EMAILS: the .eml files in this directory get send
+  SLEEP_BETWEEN_SENDING_EMAILS: sleep between sending a previous and next email.
+                                By default this value is 6 in seconds.
+
+DESCRIPTION:
+  The send-emails script allows you to first setup a folder containing emails
+  in .eml files, after which you can send them out automatically with the
+  send-emails script. If each email has a single recepient, then it is a
+  good convention to set the basename of the email file to the recepients
+  email address.
+
+  Some mail servers do not allow more then X emails to be send per minute.
+  To prevent you email account to be blocked, we sleep between sending emails.
+  We set the default to limit sending a maximum of 10 emails per minute.
+  This is a safe limit, but note that to send 100 emails this will take 10 minutes.
 ```
 
 ### submit
