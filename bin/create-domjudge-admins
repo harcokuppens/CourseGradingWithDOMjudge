@@ -214,13 +214,13 @@ def get_users_teams_from_rows(rows):
 
     users = []
     for row in rows:
-        name = row["name"]
-        email = row["email"]
+        name = row["name"].strip()
+        email = row["email"].strip()
         password = "".join(
             random.choice(string.ascii_uppercase + string.digits) for _ in range(10)
         )
         user = {
-            "id": email,
+            "id": email.replace("@", "_"),
             "username": email,
             "password": password,
             "type": "admin",
