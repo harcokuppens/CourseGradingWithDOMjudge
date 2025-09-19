@@ -5,9 +5,9 @@ DOMJUDGE_VERSION="$1"
 # note: domjudge has one domserver image and one judgehost image
 #       domjudge requires the versions of the domserver and judgehost images match
 
-if [[ -z "$DOMJUDGE_VERSION" ]]
+if [[ "$1" == "-h" || "$1" == "--help" || -z "$DOMJUDGE_VERSION" ]]
 then 
-  echo "usage: domjudge-extra-language-versions DOMJUDGE_VERSION"
+  echo "usage: domjudge-extra-language-versions [-h] DOMJUDGE_VERSION"
   echo ""
   echo "description: checking language versions on docker image harcokuppens/judgehost-extra-languages:DOMJUDGE_VERSION"
   echo ""              

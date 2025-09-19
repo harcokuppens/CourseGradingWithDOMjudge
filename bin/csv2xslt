@@ -8,6 +8,11 @@ import csv
 import sys
 from pathlib import Path
 
+if len(sys.argv) == 1 or  sys.argv[1] == "-h" or sys.argv[1] == "-h":
+    print("usage: csv2xslt FILE.csv ") 
+    print("csv2xslt converts a csv file to a nice excel file containing a table") 
+    sys.exit()
+
 inputfile=sys.argv[1]
 outputfile=Path(inputfile).stem + ".xlsx"
 
