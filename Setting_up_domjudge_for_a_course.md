@@ -473,12 +473,12 @@ Step by step instructions to create users and teams in DOMjudge:
         The `COURSEPART_NUMBER` is required to generate unique user and team IDs for
         that course's part.
 
-        The script first creates a subfolder `part${COURSEPART_NUMBER}` in which it
-        generates `teams.yaml` and `users.yaml` files.
+        The script generates the `teams.yaml` and `users.yaml` files in the current
+        working folder.
 
-        In the generate `teams.yaml` all teams are assigned to the Team Category
-        named `part${COURSEPART_NUMBER}-teams-config`. That is `part1-teams-config`
-        for the first course part.
+        In the generated `teams.yaml` file all teams are assigned to the Team
+        Category named `part${COURSEPART_NUMBER}-teams-config`. That is
+        `part1-teams-config` for the first course part.
 
         In case the `teams.csv` already contains a `teamname` column the script only
         adds the prefix `part${COURSEPART_NUMBER}` to the existing `teamname`. For
