@@ -8,53 +8,73 @@
 import argparse
 import os
 
-#filter_teams=['gradingteam091','gradingteam092']
-filter_teams =  None
+# filter_teams=['gradingteam091','gradingteam092']
+filter_teams = None
 
 
-version_text = '''
+version_text = """
 process -- process data file with final solutions for a problem in a DOMjudge contest into a table in a csv file
 Written by Harco Kuppens
 
 Fetch comes with ABSOLUTELY NO WARRANTY.  This is free software, and you
 are welcome to redistribute it under certain conditions.  See the GNU
 General Public Licence for details.
-'''
+"""
 # Note: we set add_help to false since we can only print the help text after
 # parsing flags, since the help contains data needed from the API.
 parser = argparse.ArgumentParser(
-        formatter_class=argparse.RawTextHelpFormatter,
-        description='Process data file with final solutions for a problem in a DOMjudge contest into a table in a csv file',
-        add_help=False)
-parser.add_argument('--version', action='version', version=version_text, help='output version information and exit')
-parser.add_argument('-h', '--help', help='display this help and exit', action='store_true')
-parser.add_argument('datafile',nargs='?', help='datafile we got from fetch command. Default: contest_problem_data.pod', default="contest_problem_data.pod" )
-parser.add_argument('--skip', type=int, default=0, help='number of public samples we have to skip, because we only evaluated on secret samples')  
+    formatter_class=argparse.RawTextHelpFormatter,
+    description="Process data file with final solutions for a problem in a DOMjudge contest into a table in a csv file",
+    add_help=False,
+)
+parser.add_argument(
+    "--version",
+    action="version",
+    version=version_text,
+    help="output version information and exit",
+)
+parser.add_argument(
+    "-h", "--help", help="display this help and exit", action="store_true"
+)
+parser.add_argument(
+    "datafile",
+    nargs="?",
+    help="datafile we got from fetch command. Default: contest_problem_data.pod",
+    default="contest_problem_data.pod",
+)
+parser.add_argument(
+    "--skip",
+    type=int,
+    default=0,
+    help="number of public samples we have to skip, because we only evaluated on secret samples",
+)
 
 args = parser.parse_args()
 
-#inputfile="contest_problem_data.pod"
+# inputfile="contest_problem_data.pod"
 
-numsamples=args.skip
-inputfile=args.datafile
+numsamples = args.skip
+inputfile = args.datafile
 
-#print(numsamples)
+# print(numsamples)
 
 if args.help:
-    if 'BATS_VERSION' in os.environ:
+    if "BATS_VERSION" in os.environ:
         # print_help adds line breaks depending on the number of available columns.
         # To make it deterministic under test, we set it to 100 here if we are testing.
-        os.environ['COLUMNS'] = '100'
+        os.environ["COLUMNS"] = "100"
     parser.print_help()
     exit(0)
 
 import os
+
 if not os.path.isfile(inputfile):
     import sys
+
     print("ERROR: missing inputfile '" + inputfile + "'")
     sys.exit(1)
 
-with open(inputfile, 'r') as f:
+with open(inputfile, "r") as f:
     all_contest_problem_data = eval(f.read())
 
 # all problem's data for a contest is stored in a dict looking like:
@@ -66,54 +86,56 @@ with open(inputfile, 'r') as f:
 #        "runs" : runs
 #    }
 
-teams=all_contest_problem_data['teams']
-submissions=all_contest_problem_data['submissions']
-judgements=all_contest_problem_data['judgements']
-runs=all_contest_problem_data['runs']
+teams = all_contest_problem_data["teams"]
+submissions = all_contest_problem_data["submissions"]
+judgements = all_contest_problem_data["judgements"]
+runs = all_contest_problem_data["runs"]
 
-team_id2team={}
+team_id2team = {}
 for team in teams:
-    id=team['id']
-    team_id2team[id]=team
-    
-    team['submissions']=[]
+    id = team["id"]
+    team_id2team[id] = team
 
-submission_id2submission={}
+    team["submissions"] = []
+
+submission_id2submission = {}
 for submission in submissions:
-    id=submission['id']
-    submission_id2submission[id]=submission
+    id = submission["id"]
+    team_id = submission["team_id"]
+    if team_id not in team_id2team:
+        continue
 
-    submission['judgements']=[]
+    team = team_id2team[team_id]
+    submission["judgements"] = []
+    submission_id2submission[id] = submission
+    team["submissions"].append(submission)
 
-    team_id=submission['team_id']
-    team=team_id2team[team_id]
-    team['submissions'].append(submission)
-    
 
-judgement_id2judgement={}
-for judgement in judgements: 
-    id=judgement['id']
-    judgement_id2judgement[id]=judgement
-    
-    judgement['runs']=[]
+judgement_id2judgement = {}
+for judgement in judgements:
+    id = judgement["id"]
+    judgement_id2judgement[id] = judgement
 
-    submission_id=judgement['submission_id']   
-    if submission_id not in submission_id2submission: continue
-    submission=submission_id2submission[submission_id]
-    submission['judgements'].append(judgement)
+    judgement["runs"] = []
 
-run_id2run={}
+    submission_id = judgement["submission_id"]
+    if submission_id not in submission_id2submission:
+        continue
+    submission = submission_id2submission[submission_id]
+    submission["judgements"].append(judgement)
 
-if numsamples != 0 :
-   runs=runs[numsamples:]
+run_id2run = {}
 
-for run in runs: 
-    id=run['id']
-    run_id2run[id]=run
-    
-    judgement_id=run['judgement_id']   
-    judgement=judgement_id2judgement[judgement_id]
-    judgement['runs'].append(run)
+if numsamples != 0:
+    runs = runs[numsamples:]
+
+for run in runs:
+    id = run["id"]
+    run_id2run[id] = run
+
+    judgement_id = run["judgement_id"]
+    judgement = judgement_id2judgement[judgement_id]
+    judgement["runs"].append(run)
 
 from datetime import datetime
 from pprint import pprint
@@ -125,96 +147,133 @@ from pprint import pprint
 # take all runs of latest judgement (see previous line)
 
 for team in teams:
-    submissions=team['submissions']
+    submissions = team["submissions"]
     # get latest submission
     if submissions:
-        latest_submission=max(submissions, key=lambda submission: datetime.fromisoformat(submission['time']))
+        latest_submission = max(
+            submissions,
+            key=lambda submission: datetime.fromisoformat(submission["time"]),
+        )
 
-        judgements=latest_submission['judgements']   
+        judgements = latest_submission["judgements"]
         # get latest judgement
         if judgements:
-            latest_judgement=max(judgements, key=lambda judgement: datetime.fromisoformat(judgement['start_time']))
+            latest_judgement = max(
+                judgements,
+                key=lambda judgement: datetime.fromisoformat(judgement["start_time"]),
+            )
         else:
-            latest_judgement=None 
-        latest_submission['judgement']=latest_judgement
-        del latest_submission['judgements']  
+            latest_judgement = None
+        latest_submission["judgement"] = latest_judgement
+        del latest_submission["judgements"]
     else:
-        latest_submission=None 
-     
-    team['submission']=latest_submission
-    del team['submissions']
+        latest_submission = None
+
+    team["submission"] = latest_submission
+    del team["submissions"]
 
 # get only teams with submissions
-teams = [ team for team in teams if team['submission']]
-
+teams = [team for team in teams if team["submission"]]
 
 
 # only process teams in filter_teams
 if filter_teams:
-    teams = [ team for team in teams if team['name'] in filter_teams]
+    teams = [team for team in teams if team["name"] in filter_teams]
 
 
 # store only final submission and judgement per team data for the given problem in the given contest
-with open("contest_problem_data_per_team_only_latest_submission_and_judgement.txt", "w") as data_file:
+with open(
+    "contest_problem_data_per_team_only_latest_submission_and_judgement.txt", "w"
+) as data_file:
     pprint(teams, data_file)
 
 # export as csv
-rows=[]
-headers=['team','language','overall_judgement','problems','correct(AC)','wrong_answer(WA)','limit(TLE/MLE/OLE)','error(NO/CE/RTE)','max_run_time']
+rows = []
+headers = [
+    "team",
+    "language",
+    "overall_judgement",
+    "problems",
+    "correct(AC)",
+    "wrong_answer(WA)",
+    "limit(TLE/MLE/OLE)",
+    "error(NO/CE/RTE)",
+    "max_run_time",
+]
 for team in teams:
-    row={}
-    row['team']=team['name'] or "none"
-    row['name']=team['display_name']  or "none"
+    row = {}
+    row["team"] = team["name"] or "none"
+    row["name"] = team["display_name"] or "none"
 
-    submission=team['submission']
-    row['language']=submission['language_id']
-    
-    judgement=submission['judgement']
+    submission = team["submission"]
+    row["language"] = submission["language_id"]
+
+    judgement = submission["judgement"]
     if not judgement:
-        print("WARNING: team '" + team['name'] + "' has no judgement for its latest submission " + submission['id'] )
-        row['overall_judgement']="missing"
+        print(
+            "WARNING: team '"
+            + team["name"]
+            + "' has no judgement for its latest submission "
+            + submission["id"]
+        )
+        row["overall_judgement"] = "missing"
         rows.append(row)
         continue
 
-    row['overall_judgement']=judgement['judgement_type_id']
-    row['max_run_time']=judgement['max_run_time']
-    
-    runs=judgement['runs']
-    verdict_count={"CE":0,"MLE":0,"OLE":0,"RTE":0,"TLE":0,"WA":0,"NO":0,"AC":0}
-    runnum2label={}
-    
+    row["overall_judgement"] = judgement["judgement_type_id"]
+    row["max_run_time"] = judgement["max_run_time"]
+
+    runs = judgement["runs"]
+    verdict_count = {
+        "CE": 0,
+        "MLE": 0,
+        "OLE": 0,
+        "RTE": 0,
+        "TLE": 0,
+        "WA": 0,
+        "NO": 0,
+        "AC": 0,
+    }
+    runnum2label = {}
+
     for run in runs:
-        verdict=run['judgement_type_id']
-        num=run['ordinal']
-        run_time=run['run_time']
-        
-        verdict_count[verdict]=verdict_count[verdict]+1
-        runnum2label[num]=verdict + "/" + str(run_time)
-   
-    
-    problems=[  item[0] for item in verdict_count.items() if item[1] != 0 and item[0] != "AC" ]
-    row['problems']= "/".join(problems)   
-    row['correct(AC)']=verdict_count["AC"]
-    row['wrong_answer(WA)']=verdict_count["WA"]
-    row['limit(TLE/MLE/OLE)']= str(verdict_count["TLE"]) + "/" + str(verdict_count["MLE"]) +  "/" + str(verdict_count["OLE"])
+        verdict = run["judgement_type_id"]
+        num = run["ordinal"]
+        run_time = run["run_time"]
+
+        verdict_count[verdict] = verdict_count[verdict] + 1
+        runnum2label[num] = verdict + "/" + str(run_time)
+
+    problems = [
+        item[0] for item in verdict_count.items() if item[1] != 0 and item[0] != "AC"
+    ]
+    row["problems"] = "/".join(problems)
+    row["correct(AC)"] = verdict_count["AC"]
+    row["wrong_answer(WA)"] = verdict_count["WA"]
+    row["limit(TLE/MLE/OLE)"] = (
+        str(verdict_count["TLE"])
+        + "/"
+        + str(verdict_count["MLE"])
+        + "/"
+        + str(verdict_count["OLE"])
+    )
     # row['error(NO/CE/RTE)']= str(verdict_count["NO"]) + "/" + str(verdict_count["CE"]) +  "/" + str(verdict_count["RTE"])
     # note: CE verdict is always per submission, there are no runs then! So we will never see CE in column 'error(NO/CE/RTE)'
-    row['error(NO/RTE)']= str(verdict_count["NO"]) +  "/" + str(verdict_count["RTE"])
+    row["error(NO/RTE)"] = str(verdict_count["NO"]) + "/" + str(verdict_count["RTE"])
 
-    
-    keys=list(runnum2label.keys())
+    keys = list(runnum2label.keys())
     keys.sort()
     for num in keys:
-        key="t"+str(num)
-        row[key]=runnum2label[num]
-        #headers.append(key)
-    
+        key = "t" + str(num)
+        row[key] = runnum2label[num]
+        # headers.append(key)
+
     rows.append(row)
 
-headers=rows[0].keys()     
+headers = rows[0].keys()
 
 # types=["CE","MLE","OLE","RTE","TLE","WA","NO","AC"]
-   
+
 # 'https://domjudge.science.ru.nl/api/v4/contests/6/judgement-types?strict=false'
 # [
 #   {
@@ -266,37 +325,37 @@ headers=rows[0].keys()
 #     "solved": true
 #   }
 # ]
-    
 
 
 import csv
 
-outputfile="gradings.details.csv"
+outputfile = "gradings.details.csv"
 
-with open(outputfile, 'wt') as f:
-    writer = csv.DictWriter(f, fieldnames=headers,quoting=csv.QUOTE_NONNUMERIC)
-    csvheaders = dict( (n,n) for n in headers )
+with open(outputfile, "wt") as f:
+    writer = csv.DictWriter(f, fieldnames=headers, quoting=csv.QUOTE_NONNUMERIC)
+    csvheaders = dict((n, n) for n in headers)
     # change headers in next line if you want different headers then keys in the dictionary!!
     writer.writerow(csvheaders)
     for row in rows:
         writer.writerow(row)
     print("detailed output written to: " + outputfile)
 
-outputfile="gradings.csv"
+outputfile = "gradings.csv"
 
-# filter 
-filter_headers=['team','language','overall_judgement','problems','correct(AC)']
+# filter
+filter_headers = ["team", "language", "overall_judgement", "problems", "correct(AC)"]
 
 if filter_headers:
-    headers=filter_headers
+    headers = filter_headers
     for row in rows:
         unwanted = set(row) - set(filter_headers)
-        for unwanted_key in unwanted: del row[unwanted_key]
+        for unwanted_key in unwanted:
+            del row[unwanted_key]
 
 
-with open(outputfile, 'wt') as f:
-    writer = csv.DictWriter(f, fieldnames=headers,quoting=csv.QUOTE_NONNUMERIC)
-    csvheaders = dict( (n,n) for n in headers )
+with open(outputfile, "wt") as f:
+    writer = csv.DictWriter(f, fieldnames=headers, quoting=csv.QUOTE_NONNUMERIC)
+    csvheaders = dict((n, n) for n in headers)
     # change headers in next line if you want different headers then keys in the dictionary!!
     writer.writerow(csvheaders)
     for row in rows:
