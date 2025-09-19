@@ -239,8 +239,16 @@ to having administrative control in the 'Jury' interface, to switch to the 'Team
 interface to also submit solutions as a normal team member to the Test contest we
 will make in the next section.
 
-For type 'admin' DOMjudge also automatically creates a team only for this 'admin'
-user, where that team is in the 'Jury' team category.
+The automatically created 'admin' user account by default only has the role of
+'Administrative User'. When using the DOMjudge system it is adviced to create new
+users with of 'admin' type, instead of using the 'admin' user, because with these
+accounts you can do both administrative tasks, but also do tests in the 'Team'
+interface. The system registrates which administrative user did which tests, whereas
+when all administative users would share the 'admin' account this information would
+not be available.
+
+For a user with type 'admin' DOMjudge also automatically creates a team only for this
+'admin' user, where that team is in the 'Jury' team category.
 
 Note that a Team category is usefull for configuration of a set of teams having this
 team category. For instance to allow access to a contest, or by specify whether teams
@@ -287,7 +295,7 @@ We can do the import manually via the "Import / export" page linked on the "DOMj
 Jury interface". But we can also do it using the REST API using the `httpie` tool:
 
     DOMJUDGE_SERVER="http://localhost:12345"
-    ADMINUSER="admin"
+    ADMINUSER='userwithadminrights'
     PASSWORD="secret"
     # admin password can be read from ./data/passwords/admin.pw
     # see https://github.com/harcokuppens/DOMjudgeDockerCompose/
@@ -297,6 +305,8 @@ Jury interface". But we can also do it using the REST API using the `httpie` too
 
 On a fresh install of DOMjudge, there is no `Jury` team category. When above import
 is done, next to the users and their teams, also a `Jury` team category is created.
+The `Jury` category seems to be automatically to be created when importing an account
+of type `admin`.
 
 #### Step 3: Inform the new administrators by mail.
 
@@ -486,7 +496,7 @@ Step by step instructions to create users and teams in DOMjudge:
         the [httpie tool](https://httpie.io):
 
             DOMJUDGE_SERVER="http://localhost:12345"
-            ADMINUSER="admin"
+            ADMINUSER="'userwithadminrights'"
             PASSWORD="secret"
             # admin password can be read from ./data/passwords/admin.pw
             # see https://github.com/harcokuppens/DOMjudgeDockerCompose/
@@ -748,8 +758,9 @@ the problem and fetch its results by doing:
         # create a new directory to collect all data there
         mkdir grading_data_processed_using_domjudge
         cd grading_data_processed_using_domjudge
-        user=userwithadminrights; password='mypassword';
-        fetch  --auth "${user}:${password}" --url https://domjudge.science.ru.nl/ \
+        ADMINUSER='userwithadminrights'; PASSWORD='mypassword';
+        DOMJUDGE_SERVER="http://localhost:12345"
+        fetch  --auth "${ADMINUSER}:${PASSWORD}" --url "$DOMJUDGE_SERVER" \
                --contest yourcontest --problem grading_yourproblem --files --last-per-team
 
     The `fetch` script by default will download data about all submissions to a

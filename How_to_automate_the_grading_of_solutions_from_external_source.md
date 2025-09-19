@@ -3,16 +3,17 @@
 **Table of Contents**
 
 <!--ts-->
-* [How to automate the grading of solutions from external source](#how-to-automate-the-grading-of-solutions-from-external-source)
-   * [setup domjudge for grading which is invisible for students](#setup-domjudge-for-grading-which-is-invisible-for-students)
-      * [Create a special grading contest with team category "grading"](#create-a-special-grading-contest-with-team-category-grading)
-      * [create grading teams and users](#create-grading-teams-and-users)
-   * [Add a problem for grading in the grading contest](#add-a-problem-for-grading-in-the-grading-contest)
-   * [Collect grading solutions for a problem](#collect-grading-solutions-for-a-problem)
-      * [cleanup tricks](#cleanup-tricks)
-   * [How to RUN the grading of solutions in DOMjudge](#how-to-run-the-grading-of-solutions-in-domjudge)
-   * [Fetch grading results](#fetch-grading-results)
-<!--te-->
+
+- [How to automate the grading of solutions from external source](#how-to-automate-the-grading-of-solutions-from-external-source)
+  - [setup domjudge for grading which is invisible for students](#setup-domjudge-for-grading-which-is-invisible-for-students)
+    - [Create a special grading contest with team category "grading"](#create-a-special-grading-contest-with-team-category-grading)
+    - [create grading teams and users](#create-grading-teams-and-users)
+  - [Add a problem for grading in the grading contest](#add-a-problem-for-grading-in-the-grading-contest)
+  - [Collect grading solutions for a problem](#collect-grading-solutions-for-a-problem)
+    - [cleanup tricks](#cleanup-tricks)
+  - [How to RUN the grading of solutions in DOMjudge](#how-to-run-the-grading-of-solutions-in-domjudge)
+  - [Fetch grading results](#fetch-grading-results)
+  <!--te-->
 
 ## setup domjudge for grading which is invisible for students
 
@@ -58,23 +59,21 @@
 
              password="qd4WHeJXbd"
 
-
-
-
 ## Add a problem for grading in the grading contest
 
-say we have a problem called 'boxes' then create a new problem called 'gradingboxes' where we
-replace the answers with new answers for grading (which students never saw)
+say we have a problem called 'boxes' then create a new problem called 'gradingboxes'
+where we replace the answers with new answers for grading (which students never saw)
 
-upload this grading problem to domjudge and do NOT attach it to a contest!! note: problems are only
-visible to students when they are attached to a contest where they have access to as an team. By
-default a team has no access to any contest.
+upload this grading problem to domjudge and do NOT attach it to a contest!! note:
+problems are only visible to students when they are attached to a contest where they
+have access to as an team. By default a team has no access to any contest.
 
-then edit the grading contest, and its edit from at the end you can attach the grading problem to
-this grading contest. When doing this it is IMPORTANT that you set "Lazy eval" to "No". This makes
-that for each submission all testcases are always run. When "Lazy eval" is set to "Yes" then the
-judging is stopped early if any of the testcases is not successful. This reduces the load, and the
-student can focus on this specific testcase to fix his code.
+then edit the grading contest, and its edit from at the end you can attach the
+grading problem to this grading contest. When doing this it is IMPORTANT that you set
+"Lazy eval" to "No". This makes that for each submission all testcases are always
+run. When "Lazy eval" is set to "Yes" then the judging is stopped early if any of the
+testcases is not successful. This reduces the load, and the student can focus on this
+specific testcase to fix his code.
 
 SEE: grading_contest_with_boxesgrading_problem_linked_to_run_non_lazy_DOMjudge.pdf
 
@@ -82,8 +81,9 @@ create grading problem and attach to
 
 ## Collect grading solutions for a problem
 
-Collect from the students all solutions and put them all in folder where each team gets a subfolder
-named by the team id. In this subfolder are the source files of the team.
+Collect from the students all solutions and put them all in folder where each team
+gets a subfolder named by the team id. In this subfolder are the source files of the
+team.
 
 An example folder, where we also allow multiple source files per team:
 
@@ -111,8 +111,8 @@ An example folder, where we also allow multiple source files per team:
 
 ### cleanup tricks
 
-However sometimes we get our external source delivered per team as a folder containing also some
-documentation, or the source is in a zip, etc..
+However sometimes we get our external source delivered per team as a folder
+containing also some documentation, or the source is in a zip, etc..
 
 For example $ tree dirty_solutionsteams/ ..
 
@@ -124,8 +124,8 @@ For example $ tree dirty_solutionsteams/ ..
 
       ..
 
-
-Some folders have a zip containing the source code. We automatically unzip and remove the zip file:
+Some folders have a zip containing the source code. We automatically unzip and remove
+the zip file:
 
     # get zip paths in array
     readarray -t myarray < <(find . -name '*.zip')
@@ -144,7 +144,8 @@ Setup some paths; change to your specific case
 
 Per team we an submit a solution for grading:
 
-    python3 $CODEDIR/submit -y -q --auth gradinguser036:qd4WHeJXbd --url https://domjudge.science.ru.nl/ --contest grading --problem boxesgrading solutions/reruns_on_fixed_code/36/App.java
+    DOMJUDGE_SERVER="http://localhost:12345"
+    python3 $CODEDIR/submit -y -q --auth gradinguser036:qd4WHeJXbd --url "$DOMJUDGE_SERVER"--contest grading --problem boxesgrading solutions/reruns_on_fixed_code/36/App.java
 
 But we can do it automatically for multiple users
 
@@ -155,16 +156,18 @@ But we can do it automatically for multiple users
         num=$(basename $f)
         # commit each team sources to its own grading team using its own grading user!
         printf -v user "gradinguser%03d" $num
-        python3 $CODEDIR/submit -y -q --auth "${user}:${password}" --url https://domjudge.science.ru.nl/ --contest grading --problem boxesgrading  $f/* ;
+        DOMJUDGE_SERVER="http://localhost:12345"
+        python3 $CODEDIR/submit -y -q --auth "${user}:${password}" --url "$DOMJUDGE_SERVER" --contest grading --problem boxesgrading  $f/* ;
         printf -- "--------\n"
         sleep 5;
     done
 
-
-IMPORTANT: sleep 5 is important so that we not overload the domserver with posts of files to server!
+IMPORTANT: sleep 5 is important so that we not overload the domserver with posts of
+files to server!
 
 ## Fetch grading results
 
-Finally fetching and processing grading result is done in exact the same manner as for
+Finally fetching and processing grading result is done in exact the same manner as
+for
 
 ...
