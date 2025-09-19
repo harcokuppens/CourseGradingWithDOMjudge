@@ -13,7 +13,7 @@ filter_teams =  None
 
 
 version_text = '''
-process -- process final solutions for a problem in a DOMjudge contest
+process -- process data file with final solutions for a problem in a DOMjudge contest into a table in a csv file
 Written by Harco Kuppens
 
 Fetch comes with ABSOLUTELY NO WARRANTY.  This is free software, and you
@@ -24,7 +24,7 @@ General Public Licence for details.
 # parsing flags, since the help contains data needed from the API.
 parser = argparse.ArgumentParser(
         formatter_class=argparse.RawTextHelpFormatter,
-        description='Process final solutions for a problem in a DOMjudge contest',
+        description='Process data file with final solutions for a problem in a DOMjudge contest into a table in a csv file',
         add_help=False)
 parser.add_argument('--version', action='version', version=version_text, help='output version information and exit')
 parser.add_argument('-h', '--help', help='display this help and exit', action='store_true')
