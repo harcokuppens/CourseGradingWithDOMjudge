@@ -135,10 +135,14 @@ to add extra languages. The setup of using DOMjudge in docker allows us to easil
 extra languages which is described
 [here](https://github.com/harcokuppens/DOMjudgeDockerCompose/blob/main/README.md#adding-extra-languages-in-domjudge).
 
-The `DOMjudgeDockerCompose` setup by default already installs rustc in the
-judgehosts. We advise you to follow the simple instructions to also
-[enable the Rust language](https://github.com/harcokuppens/DOMjudgeDockerCompose/blob/main/README.md#adding-rust-language)
-in DOMjudge.
+The `DOMjudgeDockerCompose` setup by uses a special judgehost image which next to the
+standard language installs extra the rustc and kotlinc languages. Because these
+languages are not installed by the standard judgehost image, they are not by default
+enabled in DOMjudge. To use them in DOMjudge you have to follow the instructions to
+[enable the Rust and Kotlin languages](https://github.com/harcokuppens/DOMjudgeDockerCompose/blob/main/README.md#activate-a-language)
+in DOMjudge. There is also problem with the default configuration in DOMjudge for the
+Rust language for which you have to apply the  
+[fix](https://github.com/harcokuppens/DOMjudgeDockerCompose/blob/main/README.md#fix-for-the-rust-language-configuration).
 
 ### 4. Setting language timefactors
 
