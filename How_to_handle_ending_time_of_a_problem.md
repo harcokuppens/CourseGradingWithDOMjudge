@@ -124,7 +124,7 @@ We then have clear parts in DOMjudge how students cooperated.
        
 Above brainstorm leads us to take a simple approach:
      
- 1. Don't use explicit endtime for problem in system, but just a communicate endtime for a problem.
+ 1. Don't use explicit endtime for problem in system, but just communicate an endtime  for a problem to the students.
   If the endtime of problem is passed the teacher ends the problem manually by: 
 
     1. disable judging of grading version of problem. 
