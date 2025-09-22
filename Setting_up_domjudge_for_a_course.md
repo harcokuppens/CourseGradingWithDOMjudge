@@ -386,14 +386,11 @@ of DOMjudge for use in a course:
 
 - [Explanation course setup](Explanation_course_setup.md)
 
-
+### 1. Setup a course for a specific teams configuration
 
 Below we setup a course part for a teams configuration labeled with the
 `Team Category` named `part1-teams-config`. The same procedure can be repeated for
 other course parts with other teams configurations.
-
-### 1. Setup a course for a specific teams configuration
-
 
 #### Create a Team Category to limit contest access to teams in that category
 
@@ -438,7 +435,12 @@ Then create a different contest for each course part. We take as coursename
        "Open contest to all teams" set to "No"
        select in "Team categories" the value 'part1-teams-config'
 
-### 2. Create and mail users of contest
+### 2. Create and mail users of course part
+
+Below we add users and teams to this specific course part. It defines the specific
+teams configuration labeled with the `Team Category` named `part1-teams-config` for
+this course part. The same procedure can be repeated for other course parts with
+other teams configurations.
 
 #### Create user and teams in DOMjudge
 
