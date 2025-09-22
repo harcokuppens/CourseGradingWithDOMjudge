@@ -159,6 +159,7 @@ describe the design of how setting teams in DOMjudging can be made easy using sc
 
 ## Conclusion
 
-The `teams.csv` file explained above is the only information an end user has to supply to create
-users and teams in DOMjudge. Using information in this file we can use scripts to generate accounts
-and teams in DOMjudge and inform students of their credentials and team with generated emails.
+The course part number and the `teams.csv` file explained above is the only information an end user 
+has to supply to create users and teams in DOMjudge for that course part. Using information in this 
+file together with the coursepart number we can use scripts to generate accounts and teams in DOMjudge 
+and inform students of their credentials and team with generated emails.
