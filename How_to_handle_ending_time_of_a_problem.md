@@ -127,7 +127,7 @@ Above brainstorm leads us to take a simple approach:
  1. Don't use an explicit endtime for problem in the system, but just communicate an endtime for a problem to the students.
   If the endtime of problem is passed the teacher ends the problem manually by: 
 
-    1. disable judging of the grading version of the problem. 
+    1. disable submitting to the grading version of the problem. 
         This makes the grading problem invisible for teams, and they cannot submit to it anymore!
         The teams can still see the none-grading 'practicing' problem.  Note that they still can submit to the 'practicing' problem, but they probably won't.
     2. use the fetch script to download results from the grading problem.
