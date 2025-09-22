@@ -26,10 +26,12 @@ update toc by running command:
          * [Step 3: Inform the new administrators by mail.](#step-3-inform-the-new-administrators-by-mail)
       * [Setup Test contest](#setup-test-contest)
    * [E. Per course part setup and usage DOMjudge](#e-per-course-part-setup-and-usage-domjudge)
-      * [1. Setup part of a course for a specific teams configuration](#1-setup-part-of-a-course-for-a-specific-teams-configuration)
+      * [1. Setup a course for a specific teams configuration](#1-setup-a-course-for-a-specific-teams-configuration)
+         * [Create a Team Category to limit contest access to teams in that category](#create-a-team-category-to-limit-contest-access-to-teams-in-that-category)
+         * [Create contest limited by created team category](#create-contest-limited-by-created-team-category)
+      * [2. Create and mail users of contest](#2-create-and-mail-users-of-contest)
          * [Create user and teams in DOMjudge](#create-user-and-teams-in-domjudge)
          * [Mailing credentials to students](#mailing-credentials-to-students)
-         * [Create contest](#create-contest)
       * [2. Creating, testing and importing a problem](#2-creating-testing-and-importing-a-problem)
          * [Create problem for the course](#create-problem-for-the-course)
          * [Add problem to the course](#add-problem-to-the-course)
@@ -307,10 +309,24 @@ Jury interface". But we can also do it using the REST API using the `httpie` too
     # import accounts
     https -a "$ADMINUSER:$PASSWORD" --check-status -b -f POST "$DOMJUDGE_SERVER/api/v4/users/accounts" yaml@admin-accounts.yaml
 
+On import the DOMjudge system creates each administrator user account, with its own
+team with the same name. Each user account gets roles "Administrative User" and "Team
+Member".
+
 On a fresh install of DOMjudge, there is no `Jury` team category. When above import
-is done, next to the users and their teams, also a `Jury` team category is created.
-The `Jury` category seems to be automatically to be created when importing an account
-of type `admin`.
+is done, next to the users and their teams, also a `Jury` team category is
+automatically created, such that each team for an administrator account can be set in
+the `Jury` category.
+
+Technical note: it seams that the external ID of the created team is set to the
+username of the corresponding admin user. In our setup we use an email address as
+username, however the '@' seems not to be allowed in the external ID. During the
+import however the DOMjudge system seems to break its own rule and set the external
+ID of the team to the admin's user username with the '@' in it. However if we try to
+edit this team DOMjudge starts complaining about the '@' in the external ID. We just
+ignore this problem, because we do not really need to use the team, except for
+setting it to the `Jury` team category to restrict access for contests to only admins
+using the `Jury` team category.
 
 #### Step 3: Inform the new administrators by mail.
 
@@ -370,20 +386,13 @@ of DOMjudge for use in a course:
 
 - [Explanation course setup](Explanation_course_setup.md)
 
-### 1. Setup part of a course for a specific teams configuration
+### 1. Setup a course for a specific teams configuration
 
 Below we setup a course part for a teams configuration labeled with the
 `Team Category` named `part1-teams-config`. The same procedure can be repeated for
 other teams configurations.
 
-#### Create user and teams in DOMjudge
-
-We use scripts to create teams and users. Details about the design choices how we
-make these teams and users you can read here:
-
-- [Explanation of users and teams setup](Explanation_of_users_and_teams_setup.md)
-
-Step by step instructions to create users and teams in DOMjudge:
+#### Create a Team Category to limit contest access to teams in that category
 
 1.  First add the `Team Category` named `part1-teams-config` which we can use for the
     first course part
@@ -408,7 +417,36 @@ Step by step instructions to create users and teams in DOMjudge:
     For details see
     [Explanation of users and teams setup](Explanation_of_users_and_teams_setup.md).
 
-2.  Create data folder per course part
+#### Create contest limited by created team category
+
+Then create a different contest for each course part. We take as coursename
+'mycourse', but you can use any coursename here.
+
+    click on 'DOMjudge' in top right corner, to get 'DOMjudge Jury interface'
+    click on 'Contests'
+    click on 'Add new contest' button
+       in 'External ID', 'Shortname' and 'Name' boxes enter 'mycourse-part-1'
+       select value in "Activate time" and
+       paste it into "Start time" and "End time" fields.
+       In the "End time" field increase the date by 1 year.
+       "Record balloons" set to "No"
+       "Medals enabled" set to "No"
+       "Enable public scoreboard" set to "No"
+       "Open contest to all teams" set to "No"
+       select in "Team categories" the value 'part1-teams-config'
+
+### 2. Create and mail users of contest
+
+#### Create user and teams in DOMjudge
+
+We use scripts to create teams and users. Details about the design choices how we
+make these teams and users you can read here:
+
+- [Explanation of users and teams setup](Explanation_of_users_and_teams_setup.md)
+
+Step by step instructions to create users and teams in DOMjudge:
+
+1.  Create data folder per course part
 
         COURSEPART_NUMBER=1
         mkdir part${COURSEPART_NUMBER}
@@ -418,7 +456,7 @@ Step by step instructions to create users and teams in DOMjudge:
     folder per coursepart eg. `part${COURSEPART_NUMBER}`. Then we have all user and
     team data for all courseparts nicely stored on disk as backup.
 
-3.  Create a `teams.csv` file, where each line represents a team, with the two
+2.  Create a `teams.csv` file, where each line represents a team, with the two
     columns:
 
     1.  the first column is the name of the team. We use as team name a string
@@ -464,7 +502,7 @@ Step by step instructions to create users and teams in DOMjudge:
     ["Explanation of users and teams setup"](Explanation_of_users_and_teams_setup.md),
     for each coursepart we generate a different user account for each user.
 
-4.  From the `teams.csv` file create users and teams in DOMjudge.
+3.  From the `teams.csv` file create users and teams in DOMjudge.
 
     We do this in 2 steps:
 
@@ -536,24 +574,6 @@ Make sure you use a Linux machine for which `sendmail` is configured. If somehow
 method does not work for you, you can use one of the alternative methods described in
 the page
 [Sending batch of personalized emails](Sending_batch_of_personalized_emails.md).
-
-#### Create contest
-
-Then create a different contest for each course part. We take as coursename
-'mycourse', but you can use any coursename here.
-
-    click on 'DOMjudge' in top right corner, to get 'DOMjudge Jury interface'
-    click on 'Contests'
-    click on 'Add new contest' button
-       in 'External ID', 'Shortname' and 'Name' boxes enter 'mycourse-part-1'
-       select value in "Activate time" and
-       paste it into "Start time" and "End time" fields.
-       In the "End time" field increase the date by 1 year.
-       "Record balloons" set to "No"
-       "Medals enabled" set to "No"
-       "Enable public scoreboard" set to "No"
-       "Open contest to all teams" set to "No"
-       select in "Team categories" the value 'part1-teams-config'
 
 ### 2. Creating, testing and importing a problem
 
