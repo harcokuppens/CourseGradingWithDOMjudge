@@ -26,10 +26,10 @@ update toc by running command:
          * [Step 3: Inform the new administrators by mail.](#step-3-inform-the-new-administrators-by-mail)
       * [Setup Test contest](#setup-test-contest)
    * [E. Per course part setup and usage DOMjudge](#e-per-course-part-setup-and-usage-domjudge)
-      * [1. Setup a course for a specific teams configuration](#1-setup-a-course-for-a-specific-teams-configuration)
+      * [1. Setup a course part for a specific teams configuration](#1-setup-a-course-part-for-a-specific-teams-configuration)
          * [Create a Team Category to limit contest access to teams in that category](#create-a-team-category-to-limit-contest-access-to-teams-in-that-category)
-         * [Create contest limited by created team category](#create-contest-limited-by-created-team-category)
-      * [2. Create and mail users of contest](#2-create-and-mail-users-of-contest)
+         * [Create contest for course part limited by created team category](#create-contest-for-course-part-limited-by-created-team-category)
+      * [2. Create and mail users of course part](#2-create-and-mail-users-of-course-part)
          * [Create user and teams in DOMjudge](#create-user-and-teams-in-domjudge)
          * [Mailing credentials to students](#mailing-credentials-to-students)
       * [2. Creating, testing and importing a problem](#2-creating-testing-and-importing-a-problem)
@@ -386,7 +386,7 @@ of DOMjudge for use in a course:
 
 - [Explanation course setup](Explanation_course_setup.md)
 
-### 1. Setup a course for a specific teams configuration
+### 1. Setup a course part for a specific teams configuration
 
 Below we setup a course part for a teams configuration labeled with the
 `Team Category` named `part1-teams-config`. The same procedure can be repeated for
@@ -417,7 +417,7 @@ other course parts with other teams configurations.
     For details see
     [Explanation of users and teams setup](Explanation_of_users_and_teams_setup.md).
 
-#### Create contest limited by created team category
+#### Create contest for course part limited by created team category
 
 Then create a different contest for each course part. We take as coursename
 'mycourse', but you can use any coursename here.
