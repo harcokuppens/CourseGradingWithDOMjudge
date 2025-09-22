@@ -7,6 +7,31 @@
 
 import argparse
 import os
+import re
+
+
+def rewrite_string_with_padded_number(s):
+    """
+    Rewrites a string by zero-padding the trailing number to a length of 3.
+
+    Args:
+        s (str): The input string ending with a number.
+
+    Returns:
+        str: The rewritten string with the padded number.
+    """
+    match = re.search(r"(\d+)$", s)
+    if match:
+        number_str = match.group(1)
+        # Extract the part of the string before the number
+        prefix = s[: -len(number_str)]
+        # Zero-pad the number to a length of 3
+        padded_number = number_str.zfill(3)
+        return f"{prefix}{padded_number}"
+    else:
+        # Return the original string if no number is found at the end
+        return s
+
 
 # filter_teams=['gradingteam091','gradingteam092']
 filter_teams = None
@@ -203,7 +228,21 @@ headers = [
 for team in teams:
     row = {}
     row["team"] = team["name"] or "none"
-    row["name"] = team["display_name"] or "none"
+
+    # pad team number at end of team name with zero's such that string sorting gives right order
+    row["team"] = rewrite_string_with_padded_number(row["team"])
+
+    # row["name"] = team["display_name"] or "none"
+    # we assume Display Name:   "part1-team003: <one or multiple full names of team members>"
+    if team["display_name"]:
+        parts = team["display_name"].split(":")
+        if len(parts) == 2:
+            members = parts[1]
+        else:
+            members = team["display_name"]
+    else:
+        members = "none"
+    row["members"] = members.strip()
 
     submission = team["submission"]
     row["language"] = submission["language_id"]
@@ -271,6 +310,9 @@ for team in teams:
     rows.append(row)
 
 headers = rows[0].keys()
+
+# sort rows on team value
+rows = sorted(rows, key=lambda row: row["team"])
 
 # types=["CE","MLE","OLE","RTE","TLE","WA","NO","AC"]
 

@@ -879,9 +879,7 @@ if files:
         team = id2team[team_id]
         name = team["name"] or "none"
         displayname = team["display_name"] or "none"
-        zipfile = (
-            "files/" + name + "__" + displayname + "__s" + submission["id"] + ".zip"
-        )
+        zipfile = "files/" + displayname + "__s" + submission["id"] + ".zip"
         zipfile = zipfile.replace(" ", "_")
         zipfile = zipfile.replace(",", "_")
         data = read_submission_files_as_zip(submission["id"], zipfile)
