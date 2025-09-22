@@ -50,13 +50,13 @@ users in DOMjudge:
 - if an user is logged in it should be clear to which team the user belongs by **displaying** the
   **team ID** and the **team's member names**.
 - all students get **per email their user credentials of the team** they are in.
+- each student gets **per course part a new login in a new team**  
 
 ## User and teams setup
 
 ### User and team in DOMjudge
 
-We create per team only one user, so the user account and its team account are basicly the same. So
-we configure them also with the same data:
+To meet above design choices we define the user and team fields as follows:
 
       for User
       +  ID:                 "u-1-005"                => the ID of 5th user in part 1 of the course
@@ -159,6 +159,7 @@ describe the design of how setting teams in DOMjudging can be made easy using sc
 
 ## Conclusion
 
-The `teams.csv` file explained above is the only information an end user has to supply to create
-users and teams in DOMjudge. Using information in this file we can use scripts to generate accounts
-and teams in DOMjudge and inform students of their credentials and team with generated emails.
+The course part number and the `teams.csv` file explained above is the only information an end user 
+has to supply to create users and teams in DOMjudge for that course part. Using information in this 
+file together with the coursepart number we can use scripts to generate accounts and teams in DOMjudge 
+and inform students of their credentials and team with generated emails.

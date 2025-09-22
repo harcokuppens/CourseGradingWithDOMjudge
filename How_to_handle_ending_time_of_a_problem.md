@@ -124,18 +124,18 @@ We then have clear parts in DOMjudge how students cooperated.
        
 Above brainstorm leads us to take a simple approach:
      
- 1. Don't use explicit endtime for problem in system, but just a communicate endtime for a problem.
+ 1. Don't use an explicit endtime for problem in the system, but just communicate an endtime for a problem to the students.
   If the endtime of problem is passed the teacher ends the problem manually by: 
 
-    1. disable judging of grading version of problem. 
+    1. disable submitting to the grading version of the problem. 
         This makes the grading problem invisible for teams, and they cannot submit to it anymore!
         The teams can still see the none-grading 'practicing' problem.  Note that they still can submit to the 'practicing' problem, but they probably won't.
-    2. use download script to download results from grading script.
+    2. use the fetch script to download results from the grading problem.
       
      
- 2. If a contest is done, we can disable submitting to the contest: the practicing problems stay visible, but you cannot submit to it anymore. This prevents people submitting to old problems, but let them still see them. This allows students to look back.     
+ 2. If a contest is done, we can disable submitting to the contest: the practicing problem stays visible, but you cannot submit to it anymore. This prevents people submitting to old problems, but let them still see them. This allows students to look back.     
         
- 3. If course is done, you can disable all contests: then all contests are hidden. Teams can login but do not see anything anymore. Course is over, students do not need to look back anymore.
+ 3. If the course is done, you can disable all contests: then all contests are hidden. Teams can login but do not see anything anymore. The course is over, students do not need to look back anymore.
        
 
 Every year start DOMjudge fresh! Don't use a system with old teams and old contests, because this
