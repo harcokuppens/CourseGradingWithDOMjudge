@@ -50,13 +50,13 @@ users in DOMjudge:
 - if an user is logged in it should be clear to which team the user belongs by **displaying** the
   **team ID** and the **team's member names**.
 - all students get **per email their user credentials of the team** they are in.
+- each student gets **per course part an new login** 
 
 ## User and teams setup
 
 ### User and team in DOMjudge
 
-We create per team only one user, so the user account and its team account are basicly the same. So
-we configure them also with the same data:
+To meet above design choices we define the user and team fields as follows:
 
       for User
       +  ID:                 "u-1-005"                => the ID of 5th user in part 1 of the course
