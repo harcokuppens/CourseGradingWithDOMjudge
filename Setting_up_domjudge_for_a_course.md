@@ -386,11 +386,14 @@ of DOMjudge for use in a course:
 
 - [Explanation course setup](Explanation_course_setup.md)
 
-### 1. Setup a course for a specific teams configuration
+
 
 Below we setup a course part for a teams configuration labeled with the
 `Team Category` named `part1-teams-config`. The same procedure can be repeated for
-other teams configurations.
+other course parts with other teams configurations.
+
+### 1. Setup a course for a specific teams configuration
+
 
 #### Create a Team Category to limit contest access to teams in that category
 
