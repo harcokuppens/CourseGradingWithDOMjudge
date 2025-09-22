@@ -764,7 +764,7 @@ its passed we disable submitting to the 'grading' problem, and fetch the results
 it. The problem's deadline is communicated to the students during the course and in
 the problem description.
 
-When the deadline of the problem is passed, the teacher has enfore the deadline on
+When the deadline of the problem has passed, the teacher can enforce the deadline on
 the problem and fetch its results by doing:
 
 1.  **Disable submission** to the grading version of the problem:
