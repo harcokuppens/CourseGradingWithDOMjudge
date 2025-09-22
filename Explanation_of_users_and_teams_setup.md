@@ -50,7 +50,7 @@ users in DOMjudge:
 - if an user is logged in it should be clear to which team the user belongs by **displaying** the
   **team ID** and the **team's member names**.
 - all students get **per email their user credentials of the team** they are in.
-- each student gets **per course part an new login** 
+- each student gets **per course part an new login in a new team**  
 
 ## User and teams setup
 
