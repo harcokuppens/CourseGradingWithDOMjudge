@@ -97,7 +97,7 @@ https://domjudge.org is an open source tool
 
          REST api's linked from DOMjudge jury interface:  
            DOMjudge API
-              http://localhost:12345/api/doc      
+              $DOMJUDGE_SERVER/api/doc      
            ICPC contest API 
              https://ccs-specs.icpc.io/2021-11/contest_api 
     

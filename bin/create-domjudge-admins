@@ -82,7 +82,7 @@ import string
 template = """\
 To: {to_address} 
 From: {from_address}
-Subject: Algorithms and data structures: DOMjudge login credentials for Admin account 
+Subject: {course_name}: DOMjudge login credentials for Admin account 
 Content-Type: text/plain; charset=us-ascii
 
 Dear {name},
@@ -122,6 +122,7 @@ def parseargs():
         "MAIL_FOLDER",
         help="folder in which the mails are generated. This folder is created for you, and should not already exist.",
     )
+    parser.add_argument("COURSE_NAME", help="Name of the course.")
     parser.add_argument(
         "FROM_EMAILADDRESS", help="Email address used to send the generated emails."
     )
@@ -134,12 +135,14 @@ def parseargs():
     args = parser.parse_args()
     admins_csv_file = args.ADMINS_CSV_FILE
     mail_folder = args.MAIL_FOLDER
+    course_name = args.COURSE_NAME
     from_emailaddress = args.FROM_EMAILADDRESS
     from_full_name = args.FROM_FULL_NAME
 
     return (
         admins_csv_file,
         mail_folder,
+        course_name,
         from_emailaddress,
         from_full_name,
     )
@@ -252,7 +255,7 @@ def write_domjudge_import_file_accounts_yaml(users):
     usersfile.close()
 
 
-def write_mails(users, from_full_name, from_emailaddress, mail_folder):
+def write_mails(users, from_full_name, from_emailaddress, mail_folder, course_name):
 
     # create mail folder; if it already exists we quit with an error because
     # we do not want to corrupt an already existing mail folder
@@ -273,6 +276,7 @@ def write_mails(users, from_full_name, from_emailaddress, mail_folder):
             "to_address": user["email"],
             "from_address": from_emailaddress,
             "teamname": user["teamname"],
+            "course_name": course_name,
         }
 
         # fill email template with data
@@ -291,6 +295,7 @@ def main():
     (
         admins_csv_file,
         mail_folder,
+        course_name,
         from_emailaddress,
         from_full_name,
     ) = parseargs()
@@ -302,7 +307,7 @@ def main():
 
     write_domjudge_import_file_accounts_yaml(users)
 
-    write_mails(users, from_full_name, from_emailaddress, mail_folder)
+    write_mails(users, from_full_name, from_emailaddress, mail_folder, course_name)
 
 
 if __name__ == "__main__":

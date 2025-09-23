@@ -32,16 +32,16 @@ update toc by running command:
       * [2. Create and mail users of course part](#2-create-and-mail-users-of-course-part)
          * [Create user and teams in DOMjudge](#create-user-and-teams-in-domjudge)
          * [Mailing credentials to students](#mailing-credentials-to-students)
-      * [2. Creating, testing and importing a problem](#2-creating-testing-and-importing-a-problem)
+      * [3. Creating, testing and importing a problem](#3-creating-testing-and-importing-a-problem)
          * [Create problem for the course](#create-problem-for-the-course)
          * [Add problem to the course](#add-problem-to-the-course)
             * [Create practicing problem from grading problem](#create-practicing-problem-from-grading-problem)
             * [Import problem](#import-problem)
             * [Set laziness of problem](#set-laziness-of-problem)
             * [Test problem in DOMjudge](#test-problem-in-domjudge)
-      * [3. Students can submit code to the problem](#3-students-can-submit-code-to-the-problem)
-      * [4. At problem's deadline fetch and process student results.](#4-at-problems-deadline-fetch-and-process-student-results)
-      * [5. Ending contest and course](#5-ending-contest-and-course)
+      * [4. Students can submit code to the problem](#4-students-can-submit-code-to-the-problem)
+      * [5. At problem's deadline fetch and process student results.](#5-at-problems-deadline-fetch-and-process-student-results)
+      * [6. Ending contest and course](#6-ending-contest-and-course)
 <!--te-->
 
 ## A. Create a fresh and up to date DOMjudge installation
@@ -289,7 +289,7 @@ Now let setup the new admins in 3 steps.
 
 Create an `admins.csv` file, and then run the following script:
 
-     create-domjudge-admins "admins.csv" "mail/" "thesender@gmail.com" "The Sender Name"
+     create-domjudge-admins "admins.csv" "mail/" "Course name "thesender@gmail.com" "The Sender Name"
 
 Which will create an `admin-accounts.yaml` import file for DOMjudge, and the mails in
 the `mail/` folder, where each mail is from the sender "The Sender Name" with email
@@ -300,7 +300,7 @@ address "thesender@gmail.com".
 We can do the import manually via the "Import / export" page linked on the "DOMjudge
 Jury interface". But we can also do it using the REST API using the `httpie` tool:
 
-    DOMJUDGE_SERVER="http://localhost:12345"
+    DOMJUDGE_SERVER="http://localhost:1080"
     ADMINUSER='userwithadminrights'
     PASSWORD="secret"
     # admin password can be read from ./data/passwords/admin.pw
@@ -542,7 +542,7 @@ Step by step instructions to create users and teams in DOMjudge:
         [REST API](https://www.domjudge.org/docs/manual/main/develop.html#api) using
         the [httpie tool](https://httpie.io):
 
-            DOMJUDGE_SERVER="http://localhost:12345"
+            DOMJUDGE_SERVER="http://localhost:1080"
             ADMINUSER="'userwithadminrights'"
             PASSWORD="secret"
             # admin password can be read from ./data/passwords/admin.pw
@@ -564,7 +564,7 @@ logical place to explain the mailing procedure.
 We run the script with the `teams.yaml` and `accounts.yaml` DOMjudge import files
 which we generated in the previous section:
 
-    create-domjudge-credentials-mails  "accounts.yaml" "teams.yaml" "mail/" "thesender@gmail.com" "The Sender Name"
+    create-domjudge-credentials-mails  "accounts.yaml" "teams.yaml" "mail/" "course name" "thesender@gmail.com" "The Sender Name"
 
 This will generate in the `mail/` subfolder the mails which we will send to the
 students. We do not directly send the emails, because we want to be able to inspect
@@ -580,7 +580,7 @@ method does not work for you, you can use one of the alternative methods describ
 the page
 [Sending batch of personalized emails](Sending_batch_of_personalized_emails.md).
 
-### 2. Creating, testing and importing a problem
+### 3. Creating, testing and importing a problem
 
 Below we explain how to add a problem to a contest of a course part, how students can
 practice and submit their final result. Finally we describe how the teacher then can
@@ -724,7 +724,7 @@ feature is also underdocumented. I personally prefer separating importing and
 testing, and do the testing in a separate test contest which separates testing
 concern from production concern. See 'Best practice' above.
 
-### 3. Students can submit code to the problem
+### 4. Students can submit code to the problem
 
 When a problem is added to DOMjudge, the students can start working on it. We provide
 the students with [instructions](Student_instructions.md) of how to use DOMjudge in
@@ -751,7 +751,7 @@ he has wrong. Maybe he can ask the teacher for an hint.
 A team should only submit once per grading problem, however if something went wrong,
 they are allowed to submit again. For grading the latest submission is used.
 
-### 4. At problem's deadline fetch and process student results.
+### 5. At problem's deadline fetch and process student results.
 
 When problem's deadline reached the teacher fetches and processes the judgements of
 the students final grading submissions to easily grade the students.
@@ -788,7 +788,7 @@ the problem and fetch its results by doing:
         mkdir grading_data_processed_using_domjudge
         cd grading_data_processed_using_domjudge
         ADMINUSER='userwithadminrights'; PASSWORD='mypassword';
-        DOMJUDGE_SERVER="http://localhost:12345"
+        DOMJUDGE_SERVER="http://localhost:1080"
         fetch  --auth "${ADMINUSER}:${PASSWORD}" --url "$DOMJUDGE_SERVER" \
                --contest yourcontest --problem grading_yourproblem --files --last-per-team
 
@@ -816,7 +816,7 @@ the problem and fetch its results by doing:
          csv2xslt gradings.csv
          csv2xslt gradings.details.csv
 
-### 5. Ending contest and course
+### 6. Ending contest and course
 
 If the contest is done, we **disable submitting** to the contest: the practicing
 problems stay visible, but you cannot submit to it anymore. This prevents people
