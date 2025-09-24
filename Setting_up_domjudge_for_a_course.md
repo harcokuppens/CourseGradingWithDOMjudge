@@ -133,18 +133,21 @@ Using external id's simplifies setting up teams.
 ### 3. Adding extra languages to DOMjudge
 
 By default DOMjudge only supports C,C++,Java and Python. However sometimes you want
-to add extra languages. The setup of using DOMjudge in docker allows us to easily add
-extra languages which is described
-[here](https://github.com/harcokuppens/DOMjudgeDockerCompose/blob/main/README.md#adding-extra-languages-in-domjudge).
+to add extra languages. To add an extra language you first have to install it on the
+judgehost image, and configure it on the domserver image.
 
-The `DOMjudgeDockerCompose` setup by uses a special judgehost image which next to the
-standard language installs extra the rustc and kotlinc languages. Because these
-languages are not installed by the standard judgehost image, they are not by default
-enabled in DOMjudge. To use them in DOMjudge you have to follow the instructions to
-[enable the Rust and Kotlin languages](https://github.com/harcokuppens/DOMjudgeDockerCompose/blob/main/README.md#activate-a-language)
-in DOMjudge. There is also problem with the default configuration in DOMjudge for the
-Rust language for which you have to apply the  
-[fix](https://github.com/harcokuppens/DOMjudgeDockerCompose/blob/main/README.md#fix-for-the-rust-language-configuration).
+The setup of using DOMjudge in docker allows us to easily install extra languages in
+the DOMjudge judgehosts. The technical detail of this setup is described
+[here](https://github.com/harcokuppens/DOMjudgeDockerCompose/blob/main/README.md#adding-extra-languages-in-domjudge).
+However for the Rust and Kotlin languages the default `DOMjudgeDockerCompose` setup
+uses a special judgehost image which next to the standard languages has installed the
+Rust and Kotlin languages. Because that these languages are not installed by the
+standard judgehost image, they are also not by default enabled in the domserver image
+of DOMjudge. Therefore to use them you have to follow the instructions to
+[enable the Rust and Kotlin languages](https://github.com/harcokuppens/DOMjudgeDockerCompose/blob/main/README.md#enable-a-predefined-language)
+in DOMjudge. Finally there is also a problem with the default configuration in
+DOMjudge for the Rust language. For this can to apply the following
+[fix](https://github.com/harcokuppens/DOMjudgeDockerCompose/blob/main/README.md#fix-for-the-compiler-executable-for-the-rust-language).
 
 ### 4. Setting language timefactors
 
