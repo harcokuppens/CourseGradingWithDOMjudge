@@ -45,6 +45,12 @@ subfolder of this repo we will use the pre-setup data files:
 
 - `test/admins.csv` : teacher admin accounts
 - `test/teams.csv` : fake student accounts
+- `test/hello.zip` : zip file containing source code for many submissions in its
+  `submissions/` folder.
+- `test/gradings.details.xlsx`: the final excel data table you will get when you have
+  processed the submission results. This file will be regeneraed in this test again,
+  which we can then compare with an older version in the `test/` folder to see we
+  still get similar results. Note: the files can differ in timing data.
 
 From the `bin/` subfolder we will use scripts described in detail [here](scripts.md).
 
@@ -541,5 +547,5 @@ spreadsheet.
          csv2xslt gradings.details.csv
 
     For the "Hello World!" problem you can compare whether the newly create **excel**
-    files are similar to those in $TEST_DATA_DIR/. Note, they cannot be exactly
+    files are similar to those in `$TEST_DATA_DIR`. Note, they cannot be exactly
     equivalent because they contain timings.
