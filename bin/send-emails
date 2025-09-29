@@ -1,14 +1,14 @@
 #!/bin/bash
 
-set -e # exit on error
-set -u # exit on undefined variable
-set -o pipefail # exit on error in pipe
+set -e            # exit on error
+set -u            # exit on undefined variable
+set -o pipefail   # exit on error in pipe
 shopt -s nullglob # expand empty globs to nothing, not to itself
 
 readonly USAGE="
 
 USAGE:
-  send-emails FROM_EMAIL DIR_CONTAINING_EMAILS [SLEEP_BETWEEN_SENDING_EMAILS]
+  send-emails [-t] FROM_EMAIL DIR_CONTAINING_EMAILS [SLEEP_BETWEEN_SENDING_EMAILS]
   
 PARAMS:
   FROM_EMAIL: email address used as sender
@@ -27,10 +27,20 @@ DESCRIPTION:
   To prevent you email account to be blocked, we sleep between sending emails.
   We set the default to limit sending a maximum of 10 emails per minute.
   This is a safe limit, but note that to send 100 emails this will take 10 minutes. 
+
+  By using the '-t' option the emails are send to the sender's email address 
+  instead of the recipient's email address specified in the .eml file. This
+  could be useful for testing.
 "
 
+FORCE_RETURN_SENDER_MODE="false"
+if [[ "$1" == "-t" ]]; then
+    FORCE_RETURN_SENDER_MODE="true"
+    printf "sending emails to the sender's email address instead; Sending to '%s'.\n" "$from_email"
+    shift
+fi
 
-if [[ "$#" -lt "2" || "$#" -gt "3"  ]]; then
+if [[ "$#" -lt "2" || "$#" -gt "3" ]]; then
     echo "$USAGE"
     exit 0
 fi
@@ -47,10 +57,8 @@ if ! [[ "$SLEEP_VALUE" =~ $VALID_SLEEP_PATTERN ]]; then
     exit 1
 fi
 
-
 from_email="$1"
 from_directory="$2"
-
 
 VALID_EMAIL_PATTERN="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
 if ! [[ "$from_email" =~ $VALID_EMAIL_PATTERN ]]; then
@@ -66,10 +74,15 @@ fi
 for mailfile in "$from_directory"/*.eml; do
     #to_email=$(basename "${mailfile%.eml}")
     #printf "sending %s to %s\n" "$mailfile"  "$to_email"
-    printf "sending %s\n" "$mailfile" 
+    printf "sending %s\n" "$mailfile"
     #cat $mailfile | mutt -s "subject" -- $email
     # prefer sendmail, because then also subject and recipient in mailfile which gives the ability to setup a more complete email in a mailfile earlier
-    sendmail -t -i -f "$from_email" <"$mailfile"
+    if [[ "$FORCE_RETURN_SENDER_MODE" == "true" ]]; then
+        printf "sending back to sender %s\n" "$from_email"
+        sendmail -i -f "$from_email" "$from_email" <"$mailfile"
+    else
+        sendmail -t -i -f "$from_email" <"$mailfile"
+    fi
     echo "sleep $SLEEP_VALUE to prevent overflowing mail server"
-    sleep "$SLEEP_VALUE" 
+    sleep "$SLEEP_VALUE"
 done
