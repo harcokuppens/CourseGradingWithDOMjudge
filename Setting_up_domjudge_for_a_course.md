@@ -823,53 +823,31 @@ The final **excel** files uses abbreviations to describe the following result ty
 for the submisssions:
 
 **CA: CORRECT-ANSWER**
-
-<div style="margin-left: 2em; margin-top: -1em; margin-bottom: 1em;">
-The submission passed all tests: you solved this problem!
-</div>
+* The submission passed all tests: you solved this problem!
 
 **WA: WRONG-ANSWER**
-
-<div style="margin-left: 2em; margin-top: -1em;margin-bottom: 1em;">
-The output of your program was incorrect. This can happen simply because your solution is not correct, but remember that your output must exactly formatte as specificied in the problem description.</div>
+* The output of your program was incorrect. This can happen simply because your solution is not correct, but remember that your output must exactly formatte as specificied in the problem description.
 
 **NO: NO-OUTPUT**
-
-<div style="margin-left: 2em; margin-top: -1em;margin-bottom: 1em;">
-Your program did not generate any output. Check that you write to standard out.
-</div>
+* Your program did not generate any output. Check that you write to standard out.
 
 **CE: COMPILER-ERROR**
-
-<div style="margin-left: 2em; margin-top: -1em;margin-bottom: 1em;">
-There was an error when compiling your program. On the submission details page you can inspect the exact error.
+* There was an error when compiling your program. On the submission details page you can inspect the exact error.
 Note that when compilation takes more than `COMPILETIME` seconds, it is aborted and this counts as a compilation error.
-</div>
 
 **RTE: RUNTIME-ERROR**
-
-<div style="margin-left: 2em; margin-top: -1em;margin-bottom: 1em;">
-There was an error during the execution of your program. This can have a lot of different causes like division by zero, incorrectly addressing memory (e.g. by indexing arrays out of bounds), trying to use more memory than the limit, reading or writing to files, etc.
+* There was an error during the execution of your program. This can have a lot of different causes like division by zero, incorrectly addressing memory (e.g. by indexing arrays out of bounds), trying to use more memory than the limit, reading or writing to files, etc.
 Also check that your program exits with exit code 0!
-</div>
 
 **TLE: TIME-LIMIT-EXCEEDED**
-
-<div style="margin-left: 2em; margin-top: -1em;margin-bottom: 1em;">
-Your program took longer than the maximum allowed time for this problem. Therefore it has been aborted. This might indicate that your program hangs in a loop or that your solution is not efficient enough.  
-</div>
+* Your program took longer than the maximum allowed time for this problem. Therefore it has been aborted. This might indicate that your program hangs in a loop or that your solution is not efficient enough.  
 
 **MLE: MEMORY-LIMIT-EXCEEDED**
-
-<div style="margin-left: 2em; margin-top: -1em;margin-bottom: 1em;">
-Your program used more than the maximum allowed memory for this problem. Therefore it has been aborted.
-</div>
+* Your program used more than the maximum allowed memory for this problem. Therefore it has been aborted.
 
 **OLE: OUTPUT-LIMIT-EXCEEDED**
+* Your program generated more output than the allowed limit. The solution is considered incorrect.
 
-<div style="margin-left: 2em; margin-top: -1em;margin-bottom: 1em;">
-Your program generated more output than the allowed limit. The solution is considered incorrect.
-</div>
 
 In the **excel** files we combine the "limit(TLE/MLE/OLE)" and "error(NO/RTE)" result
 types in a column to make the table more compact and readable. Note that
