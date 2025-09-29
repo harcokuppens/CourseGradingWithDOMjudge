@@ -34,9 +34,8 @@ DESCRIPTION:
 "
 
 FORCE_RETURN_SENDER_MODE="false"
-if [[ "$1" == "-t" ]]; then
+if [[ "${1-}" == "-t" ]]; then
     FORCE_RETURN_SENDER_MODE="true"
-    printf "sending emails to the sender's email address instead; Sending to '%s'.\n" "$from_email"
     shift
 fi
 
@@ -71,6 +70,9 @@ if [[ ! -d "$from_directory" ]]; then
     exit 1
 fi
 
+if [[ "$FORCE_RETURN_SENDER_MODE" == "true" ]]; then
+    printf "TEST MODE: sending emails to the sender's email address instead; Sending to '%s'.\n" "$from_email"
+fi    
 for mailfile in "$from_directory"/*.eml; do
     #to_email=$(basename "${mailfile%.eml}")
     #printf "sending %s to %s\n" "$mailfile"  "$to_email"
@@ -78,7 +80,6 @@ for mailfile in "$from_directory"/*.eml; do
     #cat $mailfile | mutt -s "subject" -- $email
     # prefer sendmail, because then also subject and recipient in mailfile which gives the ability to setup a more complete email in a mailfile earlier
     if [[ "$FORCE_RETURN_SENDER_MODE" == "true" ]]; then
-        printf "sending back to sender %s\n" "$from_email"
         sendmail -i -f "$from_email" "$from_email" <"$mailfile"
     else
         sendmail -t -i -f "$from_email" <"$mailfile"
