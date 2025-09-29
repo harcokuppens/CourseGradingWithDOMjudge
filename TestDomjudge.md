@@ -539,3 +539,7 @@ spreadsheet.
 
          csv2xslt gradings.csv
          csv2xslt gradings.details.csv
+
+    For the "Hello World!" problem you can compare whether the newly create **excel**
+    files are similar to those in $TEST_DATA_DIR/. Note, they cannot be exactly
+    equivalent because they contain timings.
